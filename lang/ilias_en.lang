@@ -1,0 +1,231 @@
+action_activities#:#Activity generation in progress
+action_activities_ko#:#Activity generation failed
+action_activities_ko_desc#:#Unfortunately, activities generation of document "%s" has failed on %s. Error message: %s
+action_activities_ok#:#Activities generated
+action_activities_ok_desc#:#Activities of document "%s" have been generated on %s, you can now see them in the "Content" tab.
+action_analysis#:#Analysis in progress
+action_analysis_ko#:#Analysis failed
+action_analysis_ko_desc#:#Unfortunately, analysis of document "%s" has failed on %s. Error message: %s
+action_analysis_ok#:#Analysis is ready
+action_analysis_ok_desc#:#Analysis of document "%s" has been completed on %s, you can now review it.
+action_review#:#Review in progress
+action_review_ko#:#Review failed
+action_review_ok#:#Review is ready
+action_tac#:#TAC received!
+action_tic#:#TIC sent
+action_transcription#:#Transcription in progress
+action_transcription_ko#:#Transcription failed
+action_transcription_ko_desc#:#Unfortunately, transcription of document "%s" has failed on %s. Error message: %s
+action_transcription_ok#:#Transcription is ready
+action_transcription_ok_desc#:#Transcription of document "%s" has been completed on %s, you can now check it and start the analysis.
+activities_crossword#:#Crossword
+activities_cw_words#:#Defines how many words to use in the Crossword activity
+activities_dragtheword#:#Drag the word
+activities_dtw_words#:#Defines how many words to use in the Drag The Word activity
+activities_findtheword#:#Find the word
+activities_flashcards_flashcards#:#Defines how many flashcards should appear in the conceptual assessment activity
+activities_ftw_words#:#Defines how many words to use in the Find The Word activity
+activities_generation_start#:#Selected activities are generating; you will receive a notification when they are ready. It may take up to 1 minute.
+activities_glossary#:#Glossary
+activities_grade#:#Conceptual assessment
+activities_grade_questions#:#Defines how many questions should appear in the conceptual assessment activity
+activities_gradeq#:#Contextual assessment
+activities_gradeq_questions#:#Defines how many questions should appear in the contextual assessment activity
+activities_hoquestions#:#High order questions
+activities_ibook#:#Interactive book
+activities_ivideo#:#Interactive video
+activities_ivideo_questions#:#Defines how many questions should be proposed per set in the Interactive Video activity. There are 2 sets: one at the middle of the video, one at the end of the video
+activities_ivideo_summary#:#Defines if the summary will be added to the end of the Interactive Video activity
+activities_ko#:#Activities generation failed: %s
+activities_not_downloaded#:#Cannot find activity file on disk.
+activities_not_yet_generated#:#Activities for this document haven't been generated yet.
+activities_practice#:#Conceptual flashcards
+activities_practice_flashcards#:#Defines how many questions should appear in the conceptual flashcard activity
+activities_practiceq#:#Contextual flashcards
+activities_practiceq_flashcards#:#Defines how many questions should appear in the contextual flashcard activity
+activities_select#:#Select an activity
+activities_selected#:#NOLEJ activity: %s from module "%s".
+activities_settings#:#Refine the details before generating the activities
+activities_summary#:#Summary
+activities_use_in_ibook#:#Show this activity in the module Content
+api_key#:#API Key
+api_key_info#:#Your NOLEJ API Key.
+cat_create_xnlj#:#Create NOLEJ object
+cmd_analyze#:#Start analysis
+cmd_apply#:#Apply
+cmd_back_to_content#:#NOLEJ module
+cmd_back_to_modules#:#&laquo; Back to NOLEJ modules
+cmd_cancel#:#Cancel
+cmd_choose#:#Choose
+cmd_create#:#Create document
+cmd_details#:#Details
+cmd_edit#:#Edit
+cmd_generate#:#Generate activities
+cmd_insert#:#Insert
+cmd_review#:#Confirm review
+cmd_review_info#:#Once you've reviewed the summary, as well as each question and concept, you can proceed to create H5P activities.
+cmd_save#:#Save
+cmd_select#:#Select media from mediapool
+cmd_tic#:#Send TIC
+cmd_update#:#Update
+cmd_webhook_call#:#Check current status
+cmd_webhook_call_info#:#If you have been waiting a long time for the outcome of the operation, you can try to synchronize the status with the NOLEJ server. In fact, it is possible, albeit rare, that the answer was lost along the way...
+concepts_definition#:#Definition
+concepts_enable#:#Concept enabled
+concepts_game_cw#:#Crossword
+concepts_game_dtw#:#Drag the word
+concepts_game_ftw#:#Find the word
+concepts_games#:#Available games
+concepts_label#:#Label
+concepts_language#:#Language
+concepts_n#:#Concept #%d
+concepts_saved#:#Concepts have been updated.
+concepts_use_for_assessment#:#Use for assessment
+concepts_use_for_cw#:#Use for Crossword
+concepts_use_for_dtw#:#Use for Drag the word
+concepts_use_for_ftw#:#Use for Find the word
+concepts_use_for_gaming#:#Use for gaming
+concepts_use_for_practice#:#Use for Concept cards
+configuration_title#:#Configure
+content_loading#:#Content is loading...
+crs_create_xnlj#:#Create NOLEJ object
+err_access_denied#:#You cannot access this course.
+err_activities_get#:#Cannot retrieve some of the generated activities: %s. Please, try again to generate the activities.
+err_analysis_not_ready#:#The analysis is not ready yet, please wait some time and check again.
+err_api_key_missing#:#API Key is missing! Save it and try again.
+err_concepts_file#:#Concepts file cannot be retrieved. Please, try again.
+err_concepts_put#:#NOLEJ returned an error, please check your data and try again.
+err_concepts_save#:#Concepts file cannot be saved on disk. Try again, and if it persists ask an Administrator for help.
+err_content_id#:#cannot determine content id
+err_credentials#:#Invalid/Wrong credentials.
+err_doc_response#:#An error accurred during the creation of NOLEJ module:<br>%s<br>Please try again or contact an administrator if this error persists.
+err_file_upload#:#Failed to upload file. Please contact an administrator.
+err_h5p_content#:#Sorry, this activity cannot be loaded. Please contact an administrator.
+err_h5p_package#:#not a valid H5P package
+err_h5p_plugin#:#Sorry, your version of H5P plugin is not supported. Please update it or contact an administrator.
+err_json_decode#:#cannot decode the JSON
+err_questions_file#:#Questions file cannot be retrieved. Please, try again.
+err_questions_put#:#NOLEJ returned an error, please check your data and try again.
+err_questions_save#:#Questions file cannot be saved on disk. Try again, and if it persists ask an Administrator for help.
+err_review_not_ready#:#You haven't completed the review yet.
+err_settings_file#:#Activities settings file cannot be retrieved. Please, try again.
+err_settings_put#:#NOLEJ returned an error, please check your data and try again.
+err_settings_save#:#Activities settings file cannot be saved on disk. Try again, and if it persists ask an Administrator for help.
+err_summary_file#:#Summary file cannot be retrieved. Please, try again.
+err_summary_put#:#NOLEJ returned an error, please check your data and try again.
+err_summary_save#:#Summary file cannot be saved on disk. Try again, and if it persists ask an Administrator for help.
+err_tic_response#:#NOLEJ endpoint returned an invalid response.
+err_transcription_not_ready#:#The transcription is not ready yet, please wait some time and check again. It should take a tenth of the source duration; if after this time you haven't received any notification, please contact an Administrator. 
+fold_create_xnlj#:#Create NOLEJ object
+goto_activity_management#:#Go to Activity Management
+grp_create_xnlj#:#Create NOLEJ object
+limit_audio#:#Audio limits
+limit_content#:#Content limitations
+limit_doc#:#Document limits
+limit_max_duration#:#Max duration
+limit_max_pages#:#Maximum number of pages
+limit_max_size#:#File maximum size
+limit_min_characters#:#Minimum characters
+limit_minutes#:#%s minutes
+limit_type#:#Allowed types
+limit_video#:#Video limits
+lp_status#:#Learning Progress
+lp_status_#:#No state yet.
+lp_status_0#:#Not Attempted
+lp_status_1#:#In Progress
+lp_status_2#:#Completed
+lp_status_3#:#Failed
+lp_status_info#:#Attention, Setting the LP Status will set the LP status of the currently logged in user to the chosen status. THE STATUS OF EVERY OTHER USER WILL BE SET TO NOT ATTEMPTED! You will find this repository object by searching for its title, its description or the expression "Repoplugin".
+module_select#:#Select a NOLEJ Module
+modules#:#NOLEJ modules
+obj_xnlj#:#NOLEJ
+obj_xnlj_select#:#Select NOLEJ object
+objs_xnlj#:#NOLEJ objects
+plugin_description#:#NOLEJ: Build interactive microlearning with AI
+plugin_title#:#NOLEJ
+prop_audio#:#Audio streaming
+prop_audio_info#:#Analyze audio from SoundCloud
+prop_automatic#:#Automatic mode
+prop_automatic_info#:#If checked, NOLEJ goes directly to the final step: the generation of H5P activities. Except for audio and video, where the user is asked to review the transcription.
+prop_content#:#Web page content
+prop_content_info#:#Analyze the web page content
+prop_description#:#Description
+prop_file#:#File
+prop_file_info#:#Upload a file (audio, video, or a document).
+prop_freetext#:#Text
+prop_freetext_info#:#Write some text directly.
+prop_input_file#:#File
+prop_input_file_info#:#Upload an audio, or a video, or a document.
+prop_input_mob#:#Media object
+prop_input_mob_info#:#Choose a media from a media pool.
+prop_language#:#Language
+prop_language_info#:#The language of the media. This helps NOLEJ to better analyze the media.
+prop_media_source#:#Media source
+prop_mob#:#MediaPool
+prop_mob_info#:#Choose a media from a media pool.
+prop_offline#:#Offline
+prop_online#:#Online
+prop_status#:#Status
+prop_textarea#:#Text
+prop_textarea_info#:#Write here the text that you want to be analyzed by NOLEJ.
+prop_title#:#Title
+prop_title_info#:#Leave empty if you want NOLEJ to set a title for you.
+prop_transcription#:#Transcription
+prop_url#:#URL
+prop_url_info#:#Paste here the media's URL.
+prop_video#:#Video streaming
+prop_video_info#:#Analyze video from YouTube, Vimeo or Wistia
+prop_web#:#Web URL
+prop_web_info#:#Analyze a resource from the Web.
+prop_web_src#:#Choose what to analyze from that URL
+questions_answer#:#Answer
+questions_distractors#:#Distractors
+questions_enable#:#Question enabled
+questions_explanation#:#Explanation
+questions_n#:#Question #%d
+questions_question#:#Question
+questions_question_type#:#Type of question
+questions_saved#:#Questions have been updated.
+questions_selected_distractor#:#Selected distractor
+questions_type_all#:#All questions
+questions_type_ftb#:#Fill in the blanks
+questions_type_hoq#:#High order question
+questions_type_mcq#:#Multichoice question
+questions_type_open#:#Open answer
+questions_type_tf#:#True/False
+questions_use_for_grading#:#Use for grading
+review_concepts#:#Concepts
+review_questions#:#Questions
+review_summary#:#Summary
+root_create_xnlj#:#Create NOLEJ object
+set_completed#:#Set LP Status to completed
+set_failed#:#Set LP Status to not failed
+set_in_progress#:#Set LP Status to in progress
+set_not_attempted#:#Set LP Status to not attempted
+set_passed#:#Set LP Status to not completed
+summary_abstract#:#Abstract
+summary_keypoints#:#Keypoints
+summary_saved#:#Summary has been updated.
+tab_activities#:#H5P activities
+tab_activity_management#:#Creation workflow
+tab_analysis#:#AI analysis
+tab_configuration#:#Configuration
+tab_content#:#Content
+tab_creation#:#Document creation
+tab_insert_from_pool#:#Select media from mediapool
+tab_modules#:#Modules
+tab_properties#:#Properties
+tab_review#:#Review
+tac_received#:#TAC received!
+tac_received_info#:#TAC with exchange ID %s has been received on %s.
+tic_sent#:#TIC sent.
+update_successful#:#Update Successful
+work_in_progress#:#NOLEJ AI is working for you. Please wait a bit more.
+xnlj_add#:#Create
+xnlj_delete#:#Delete: User can move or delete NOLEJ objects
+xnlj_edit_permission#:#Change Permissions: User can change permission settings
+xnlj_new#:#Add a NOLEJ object
+xnlj_read#:#Read: User has read access to NOLEJ objects
+xnlj_visible#:#Visible: NOLEJ object is visible
+xnlj_write#:#Edit Settings: User can edit settings of NOLEJ objects
+

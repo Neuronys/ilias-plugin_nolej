@@ -1,0 +1,109 @@
+:root {
+    --star-full: #e67e22;
+    --star-empty: #bdc3c7;
+}
+
+.icon.outlined.xnlj {
+    background-image: url("../images/icon_xnlj.svg");
+}
+
+.nlj-course-img {
+    max-height: 90px;
+    max-width: 90px;
+}
+
+.nlj-partner-icon {
+    height: 1.5em;
+}
+
+.glyphicon-star {
+    color: var(--star-full);
+}
+
+.glyphicon-star.empty {
+    color: var(--star-empty);
+}
+
+.glyphicon-star.half {
+    position: relative;
+}
+
+.glyphicon-star.half::before {
+    position: relative;
+    z-index: 9;
+    width: 47%;
+    display: block;
+    overflow: hidden;
+}
+
+.glyphicon-star.half::after {
+    content: '\e006';
+    position: absolute;
+    z-index: 8;
+    color: var(--star-empty);
+    top: 0;
+    left: 0;
+}
+
+.gly-spin {
+    -webkit-animation: spin 2s infinite linear;
+    -moz-animation: spin 2s infinite linear;
+    -o-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+}
+@-moz-keyframes spin {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+    100% {
+        -moz-transform: rotate(359deg);
+    }
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+    }
+}
+@-o-keyframes spin {
+    0% {
+        -o-transform: rotate(0deg);
+    }
+    100% {
+        -o-transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+#nlj_page_sel {
+    display: inline-block;
+}
+
+.il_InfoScreenPropertyValue * {
+    max-width: 100%;
+}
+
+@media (min-width: 768px) {
+    .nlj-course-img {
+        max-height: 130px;
+        max-width: 130px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .nlj-course-img {
+        max-height: 180px;
+        max-width: 180px;
+    }
+}

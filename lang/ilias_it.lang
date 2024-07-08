@@ -1,0 +1,231 @@
+action_activities#:#Generazione delle attività in corso
+action_activities_ko#:#Generazione delle attività fallita
+action_activities_ko_desc#:#Sfortunatamente, la generazione delle attività del documento "%s" non ha avuto successo, in data %s. Messaggio di errore: %s
+action_activities_ok#:#Attività generate
+action_activities_ok_desc#:#Le attività del documento "%s" sono state generate con successo in data %s; puoi ora vederle nel tab "Contenuto".
+action_analysis#:#Analisi in corso
+action_analysis_ko#:#Analisi fallita
+action_analysis_ko_desc#:#Sfortunatamente, l'analisi del documento "%s" non ha avuto successo, in data %s. Messaggio di errore: %s
+action_analysis_ok#:#Analisi completata
+action_analysis_ok_desc#:#Il documento "%s" è stato analizzato con successo in data %s; puoi ora procedere con la revisione.
+action_review#:#Revisione in corso
+action_review_ko#:#Revisione fallita
+action_review_ok#:#Revisione completata
+action_tac#:#TAC ricevuto!
+action_tic#:#TIC inviato
+action_transcription#:#Trascrizione in corso
+action_transcription_ko#:#Trascrizione fallita
+action_transcription_ko_desc#:#Sfortunatamente, la trascrizione del documento "%s" non ha avuto successo, in data %s. Messaggio di errore: %s
+action_transcription_ok#:#Trascrizione completata
+action_transcription_ok_desc#:#Il documento "%s" è stato trascritto con successo in data %s; puoi ora controllarlo e procedere con l'analisi.
+activities_crossword#:#Cruciverba
+activities_cw_words#:#Definisce quante parole utilizzare nel cruciverba
+activities_dragtheword#:#Trascina la parola
+activities_dtw_words#:#Definisce quante parole utilizzare in Trascina la parola
+activities_findtheword#:#Trova la parola
+activities_flashcards_flashcards#:#Definisce quante flashcard dovranno apparire nel quiz concettuale
+activities_ftw_words#:#Numero di parole
+activities_generation_start#:#Le attività selezionate sono in generazione; riceverai una notifica quando saranno pronte. Può volerci fino a un minuto.
+activities_glossary#:#Glossario
+activities_grade#:#Quiz concettuale
+activities_grade_questions#:#Definisce quante domande dovranno apparire nel quiz concettuale
+activities_gradeq#:#Quiz contestuale
+activities_gradeq_questions#:#Definisce quante domande dovranno apparire nel quiz contestuale
+activities_hoquestions#:#Domande di alto livello
+activities_ibook#:#Libro interattivo
+activities_ivideo#:#Video interattivo
+activities_ivideo_questions#:#Definisce quante domande dovranno apparire in ogni set nel video interattivo. Ci sono 2 set: uno a metà del video, uno al termine
+activities_ivideo_summary#:#Definisce se il sommario deve essere aggiunto in coda al video interattivo
+activities_ko#:#La generazione delle attività è fallita: %s
+activities_not_downloaded#:#Non è stato possibile recuperare l'attività dal disco.
+activities_not_yet_generated#:#Le attività per questo documento non sono ancora state generate.
+activities_practice#:#Flashcard concettuali
+activities_practice_flashcards#:#Definisce quante domande dovranno apparire nelle flashcard concettuali
+activities_practiceq#:#Flashcard contestuali
+activities_practiceq_flashcards#:#Definisce quante domande dovranno apparire nelle flashcard contestuali
+activities_select#:#Seleziona un'attività
+activities_selected#:#Attività da NOLEJ: %s dal modulo "%s".
+activities_settings#:#Rifinisci i dettagli prima di generare le attività
+activities_summary#:#Sommario
+activities_use_in_ibook#:#Mostra questa attività nel contenuto del modulo
+api_key#:#Chiave API
+api_key_info#:#La tua chiave API di NOLEJ.
+cat_create_xnlj#:#Crea oggetto NOLEJ
+cmd_analyze#:#Avvia analisi
+cmd_apply#:#Applica
+cmd_back_to_content#:#Modulo NOLEJ
+cmd_back_to_modules#:#&laquo; Torna ai moduli NOLEJ
+cmd_cancel#:#Annulla
+cmd_choose#:#Seleziona
+cmd_create#:#Crea documento
+cmd_details#:#Dettagli
+cmd_edit#:#Modifica
+cmd_generate#:#Genera attività
+cmd_insert#:#Inserisci
+cmd_review#:#Conferma revisione
+cmd_review_info#:#Se hai revisionato il sommario, tutte le domande e i concetti, puoi procedere con la creazione degli oggetti H5P.
+cmd_save#:#Salva
+cmd_select#:#Seleziona un oggetto dal mediapool
+cmd_tic#:#Invia TIC
+cmd_update#:#Aggiorna
+cmd_webhook_call#:#Controlla lo stato attuale
+cmd_webhook_call_info#:#Se attendi da molto l'esito dell'operazione, puoi provare a sincronizzare lo stato con il server di NOLEJ. È possibile infatti, seppur raro, che la risposta si sia persa per strada...
+concepts_definition#:#Definizione
+concepts_enable#:#Concetto abilitato
+concepts_game_cw#:#Cruciverba
+concepts_game_dtw#:#Trascina la parola
+concepts_game_ftw#:#Trova la parola
+concepts_games#:#Giochi disponibili
+concepts_label#:#Parola chiave
+concepts_language#:#Lingua
+concepts_n#:#Concetto n° %d
+concepts_saved#:#I concetti sono stati aggiornati.
+concepts_use_for_assessment#:#Utilizza per i test
+concepts_use_for_cw#:#Utilizza per Cruciverba
+concepts_use_for_dtw#:#Utilizza per Trascina la parola
+concepts_use_for_ftw#:#Utilizza per Trova la parola
+concepts_use_for_gaming#:#Utilizza per i giochi
+concepts_use_for_practice#:#Utilizza per le Carte concettuali
+configuration_title#:#Configura
+content_loading#:#Caricamento del contenuto...
+crs_create_xnlj#:#Crea oggetto NOLEJ
+err_access_denied#:#Non puoi accedere a questo corso.
+err_activities_get#:#Impossibile ottenere alcune delle attività generate: %s. Riprova a generare nuovamente le attività.
+err_analysis_not_ready#:#L'analisi non è ancora completa, attendi ancora un po' di tempo e torna qui per verificare.
+err_api_key_missing#:#Non hai indicato la tua chiave API! Vai nella configurazione del plugin e indica la tua chiave API per poter utilizzare il plugin di NOLEJ.
+err_concepts_file#:#Impossibile caricare i concetti. Per favore, riprova.
+err_concepts_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
+err_concepts_save#:#Impossibile salvare il file dei concetti. Riprova, e se persiste contatta un Amministratore.
+err_content_id#:#impossibile determinare l'id del contenuto
+err_credentials#:#Le credenziali non sono valide.
+err_doc_response#:#C'è stato un errore durante la creazione del modulo NOLEJ:<br>%s<br>Per favore riprova, oppure contatta un amministratore se l'errore persiste.
+err_file_upload#:#Errore nel caricamento del file. Contattare un amministratore.
+err_h5p_content#:#Non è stato possibile caricare l'attività. Per favore, contatta un amministratore.
+err_h5p_package#:#non è un valido pacchetto H5P
+err_h5p_plugin#:#La versione del plugin H5P installata non è supportata. Per favore, aggiorna il plugin o contatta un amministratore.
+err_json_decode#:#non può decodificare il JSON
+err_questions_file#:#Impossibile caricare le domande. Per favore, riprova.
+err_questions_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
+err_questions_save#:#Impossibile salvare il file delle domande. Riprova, e se persiste contatta un Amministratore.
+err_review_not_ready#:#Non hai ancora completato la revisione.
+err_settings_file#:#Impossibile caricare le impostazioni delle attività. Per favore, riprova.
+err_settings_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
+err_settings_save#:#Impossibile salvare il file delle impostazioni delle attività. Riprova, e se persiste contatta un Amministratore.
+err_summary_file#:#Impossibile caricare il file di sommario. Per favore, riprova.
+err_summary_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
+err_summary_save#:#Impossibile salvare il file di sommario. Riprova, e se persiste contatta un Amministratore.
+err_tic_response#:#L'endpoint di NOLEJ ha restituito una risposta non prevista.
+err_transcription_not_ready#:#La trascrizione non è ancora completa, attendi ancora un po' di tempo e torna qui per verificare. L'attesa stimata è di circa un decimo rispetto alla durata del file scelto; se è trascorso molto più di questo tempo e non hai ancora ricevuto una notifica, per favore contatta un Amministratore.
+fold_create_xnlj#:#Crea un oggetto NOLEJ
+goto_activity_management#:#Vai in Gestione Attività
+grp_create_xnlj#:#Crea un oggetto NOLEJ
+limit_audio#:#Limiti per gli audio
+limit_content#:#Limiti per i contenuti
+limit_doc#:#Limiti per i documenti
+limit_max_duration#:#Durata massima
+limit_max_pages#:#Numero massimo di pagine
+limit_max_size#:#Dimensione massima del file
+limit_min_characters#:#Numero minimo di caratteri
+limit_minutes#:#%s minuti
+limit_type#:#Estensioni consentite
+limit_video#:#Limiti per i video
+lp_status#:#Progressi didattici
+lp_status_#:#Nessuno stato salvato.
+lp_status_0#:#Accesso non effettuato
+lp_status_1#:#In corso
+lp_status_2#:#Completato
+lp_status_3#:#Fallito
+lp_status_info#:#Attention, Setting the LP Status will set the LP status of the currently logged in user to the chosen status. THE STATUS OF EVERY OTHER USER WILL BE SET TO NOT ATTEMPTED! You will find this repository object by searching for its title, its description or the expression "Repoplugin".
+module_select#:#Seleziona un modulo NOLEJ
+modules#:#Moduli NOLEJ
+obj_xnlj#:#NOLEJ
+obj_xnlj_select#:#Seleziona un oggetto NOLEJ
+objs_xnlj#:#Oggetti NOLEJ
+plugin_description#:#NOLEJ: Crea microlearning interattivo con l'IA
+plugin_title#:#NOLEJ
+prop_audio#:#Streaming Audio
+prop_audio_info#:#Analizza un audio da SoundCloud
+prop_automatic#:#Modalità automatica
+prop_automatic_info#:#Se impostato, NOLEJ procede direttamente con l'ultimo step: la generazione degli oggetti H5P. Ad eccezione di audio e video, per i quali l'utente deve confermare la trascrizione.
+prop_content#:#Contenuto della pagina web
+prop_content_info#:#Analizza il contenuto della pagina
+prop_description#:#Descrizione
+prop_file#:#File
+prop_file_info#:#Carica un file (audio, video, o un documento).
+prop_freetext#:#Testo
+prop_freetext_info#:#Scrivi direttamente qui un testo.
+prop_input_file#:#File
+prop_input_file_info#:#Carica un file (audio, video, o un documento).
+prop_input_mob#:#Oggetto multimediale
+prop_input_mob_info#:#Scegli un oggetto dal mediapool
+prop_language#:#Lingua
+prop_language_info#:#La lingua utilizzata nel file da analizzare. Questa informazione aiuta NOLEJ ad analizzarne meglio il contenuto.
+prop_media_source#:#Sorgente
+prop_mob#:#MediaPool
+prop_mob_info#:#Scegli un oggetto dal mediapool.
+prop_offline#:#Offline
+prop_online#:#Online
+prop_status#:#Stato
+prop_textarea#:#Testo
+prop_textarea_info#:#Scrivi qui il testo che NOLEJ dovrà analizzare.
+prop_title#:#Titolo
+prop_title_info#:#Lascia vuoto questo campo se vuoi che NOLEJ trovi un titolo adatto, basandosi sul contenuto.
+prop_transcription#:#Trascrizione
+prop_url#:#URL
+prop_url_info#:#Incolla qui l'URL del file multimediale
+prop_video#:#Streaming Video
+prop_video_info#:#Analizza video da YouTube, Vimeo o Wistia
+prop_web#:#URL web
+prop_web_info#:#Analizza una risorsa da Internet.
+prop_web_src#:#Scegli cosa NOLEJ dovrà analizzare da questo URL.
+questions_answer#:#Risposta
+questions_distractors#:#Distrattori
+questions_enable#:#Domanda abilitata
+questions_explanation#:#Spiegazione
+questions_n#:#Domanda n° %d
+questions_question#:#Domanda
+questions_question_type#:#Tipologia di domanda
+questions_saved#:#Le domande sono state aggiornate.
+questions_selected_distractor#:#Distrattore selezionato
+questions_type_all#:#Tutte le domande
+questions_type_ftb#:#Completa gli spazi vuoti
+questions_type_hoq#:#Domanda di alto livello
+questions_type_mcq#:#Risposta multipla
+questions_type_open#:#Risposta aperta
+questions_type_tf#:#Vero/Falso
+questions_use_for_grading#:#Utilizza per la classificazione
+review_concepts#:#Concetti
+review_questions#:#Domande
+review_summary#:#Sommario
+root_create_xnlj#:#Crea oggetto NOLEJ
+set_completed#:#Set LP Status to completed
+set_failed#:#Set LP Status to not failed
+set_in_progress#:#Set LP Status to in progress
+set_not_attempted#:#Set LP Status to not attempted
+set_passed#:#Set LP Status to not completed
+summary_abstract#:#Abstract
+summary_keypoints#:#Punti chiave
+summary_saved#:#Il sommario è stato aggiornato.
+tab_activities#:#Attività H5P
+tab_activity_management#:#Flusso di creazione
+tab_analysis#:#Analisi IA
+tab_configuration#:#Configurazione
+tab_content#:#Contenuto
+tab_creation#:#Creazione del documento
+tab_insert_from_pool#:#Seleziona un media dal mediapool
+tab_modules#:#Moduli
+tab_properties#:#Proprietà
+tab_review#:#Revisione
+tac_received#:#TAC ricevuto!
+tac_received_info#:#TAC con exchange ID %s è stato ricevuto il %s.
+tic_sent#:#TIC inviato.
+update_successful#:#Aggiornamento completato.
+work_in_progress#:#NOLEJ AI sta lavorando per te. Per favore, attendi un altro po'.
+xnlj_add#:#Crea
+xnlj_delete#:#Elimina: l'utente può spostare o eliminare oggetti NOLEJ
+xnlj_edit_permission#:#Cambio di permessi: l'utente può cambiare le impostazioni sui permessi
+xnlj_new#:#Aggiungi un oggetto NOLEJ
+xnlj_read#:#Lettura: l'utente può accedere agli oggetti NOLEJ
+xnlj_visible#:#Visibilità: gli oggetti NOLEJ sono visibili all'utente
+xnlj_write#:#Modifica impostazioni: l'utente può modificare le impostazioni degli oggetti NOLEJ
+
