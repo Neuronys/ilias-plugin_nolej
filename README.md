@@ -42,7 +42,7 @@ This plugin currently supports the following languages:
 
 ## Requirements
 Note: this branch is for ILIAS 6 and 7. If you have ILIAS 8,
-see [branch main](https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS/tree/main).
+see [branch main](https://github.com/Neuronys/ilias-robj_nolej/tree/main).
 
 * ILIAS 6.x - 7.x
 * [H5P Repository plugin](https://github.com/srsolutionsag/H5P) installed and updated (tested wih version `4.1.16`).
@@ -56,7 +56,7 @@ From the ILIAS directory, run:
 ```sh
 mkdir -p Customizing/global/plugins/Services/Repository/RepositoryObject
 cd Customizing/global/plugins/Services/Repository/RepositoryObject
-git clone -b release_7 https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS.git Nolej
+git clone -b release_7 https://github.com/Neuronys/ilias-robj_nolej.git Nolej
 ```
 
 Return to the ILIAS directory and run:
@@ -93,7 +93,7 @@ composer du
 
 ### Page component companion plugin
 Explore a personalized touch to your pages with the
-[companion page component plugin](https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS-Page-Component/)!
+[companion page component plugin](https://github.com/Neuronys/ilias-pgcp_nolej/)!
 Seamlessly insert activities directly within the ILIAS page editor to tailor your
 experience. This addition takes customization to the next level, providing a
 more dynamic and engaging user interface. Get ready to elevate your content
