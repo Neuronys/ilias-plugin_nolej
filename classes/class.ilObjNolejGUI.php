@@ -59,13 +59,13 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     const PROP_ONLINE = "online";
 
     /** @var ilCtrl */
-    protected ilCtrl $ctrl;
+    protected $ctrl;
 
     /** @var ilTabsGUI */
-    protected ilTabsGUI $tabs;
+    protected $tabs;
 
     /** @var ilGlobalTemplateInterface */
-    public ilGlobalTemplateInterface $tpl;
+    public $tpl;
 
     /** @var string */
     protected string $selectedType = "";
@@ -86,7 +86,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Get type.
      * @return string
      */
-    final function getType(): string
+    final function getType()
     {
         return ilNolejPlugin::PLUGIN_ID;
     }
@@ -95,7 +95,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Handles all commmands of this class, centralizes permission checks
      * @param string $cmd
      */
-    public function performCommand(string $cmd): void
+    public function performCommand($cmd)
     {
         global $DIC;
 
@@ -146,7 +146,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * After object has been created -> jump to this command
      * @return string
      */
-    function getAfterCreationCmd(): string
+    function getAfterCreationCmd()
     {
         return self::CMD_PROPERTIES_EDIT;
     }
@@ -155,12 +155,12 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Get standard command
      * @return string
      */
-    function getStandardCmd(): string
+    function getStandardCmd()
     {
         return self::CMD_CONTENT_SHOW;
     }
 
-    public function afterSave(ilObject $a_new_object): void
+    public function afterSave(ilObject $a_new_object)
     {
         $parent_data = $this->tree->getParentNodeData($a_new_object->getRefId());
         $a_new_object->setPermissions($parent_data["ref_id"]);
@@ -170,7 +170,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * @return bool returns true iff the plugin supports import/export
      */
-    protected function supportsExport(): bool
+    protected function supportsExport()
     {
         return false;
     }
@@ -178,7 +178,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * @return bool returns true iff this plugin object supports cloning
      */
-    protected function supportsCloning(): bool
+    protected function supportsCloning()
     {
         return false;
     }
@@ -186,7 +186,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * Set tabs
      */
-    protected function setTabs(): void
+    protected function setTabs()
     {
         // tab for the "show content" command
         if ($this->object->hasReadPermission()) {
@@ -226,7 +226,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * Edit Properties. This commands uses the form class to display an input form.
      */
-    protected function editProperties(): void
+    protected function editProperties()
     {
         $form = $this->initPropertiesForm();
         $this->addValuesToForm($form);
@@ -236,7 +236,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * @return ilPropertyFormGUI
      */
-    protected function initPropertiesForm(): ilPropertyFormGUI
+    protected function initPropertiesForm()
     {
         $this->tabs->activateTab(self::TAB_PROPERTIES);
 
@@ -262,7 +262,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * @param $form ilPropertyFormGUI
      */
-    protected function addValuesToForm(&$form): void
+    protected function addValuesToForm(&$form)
     {
         $form->setValuesByArray(
             array(
@@ -277,7 +277,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * Save
      */
-    protected function saveProperties(): void
+    protected function saveProperties()
     {
         $form = $this->initPropertiesForm();
         $form->setValuesByPost();
@@ -290,7 +290,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         $this->tpl->setContent($form->getHTML());
     }
 
-    protected function printContentMenu(): void
+    protected function printContentMenu()
     {
         global $DIC;
 
@@ -337,7 +337,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         $this->tpl->setLeftContent($renderer->render($wf));
     }
 
-    protected function showContent(): void
+    protected function showContent()
     {
         global $DIC;
 
@@ -381,7 +381,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * @param int $contentId
      * @return string html
      */
-    public static function getH5PHtml($contentId): string
+    public static function getH5PHtml($contentId)
     {
         global $DIC, $tpl;
 
@@ -440,7 +440,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * @return string
      */
-    public function buildIcon($id, $alt = ""): string
+    public function buildIcon($id, $alt = "")
     {
         return sprintf(
             '<img border="0" align="middle" src="%s" alt="%s" /> ',
@@ -453,7 +453,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Add items to info screen
      * @param ilInfoScreenGUI $info
      */
-    public function addInfoItems($info): void
+    public function addInfoItems($info)
     {
         global $tpl;
 
@@ -548,7 +548,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     /**
      * We need this method if we can't access the tabs otherwise...
      */
-    private function activateTab(): void
+    private function activateTab()
     {
         $next_class = $this->ctrl->getCmdClass();
 
@@ -565,7 +565,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Goto redirection
      * @param array $a_target
      */
-    public static function _goto(array $a_target): void
+    public static function _goto($a_target)
     {
         global $DIC;
         $ilCtrl = $DIC->ctrl();

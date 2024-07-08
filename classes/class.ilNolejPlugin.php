@@ -47,6 +47,8 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         global $DIC;
 
         $this->provider_collection = $this->getPluginProviderCollection(); // Fix overflow
+
+        $DIC->language()->loadLanguageModule(self::PREFIX);
     }
 
     /**
@@ -77,7 +79,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
      * Must correspond to the plugin subdirectory
      * @return string
      */
-    public function getPluginName(): string
+    public function getPluginName()
     {
         return self::PLUGIN_NAME;
     }
@@ -86,17 +88,17 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
      * Returns a list of all repository object types which can be a parent of this type.
      * @return array
      */
-    public function getParentTypes(): array
+    public function getParentTypes()
     {
         $par_types = array("root", "cat", "crs", "grp", "fold", "lso", "prg");
         return $par_types;
     }
 
-    protected function afterActivation(): void
+    protected function afterActivation()
     {
     }
 
-    protected function uninstallCustom(): void
+    protected function uninstallCustom()
     {
         $tables = [
             self::TABLE_CONFIG,
@@ -119,7 +121,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
      * @inheritdoc
      * @return bool
      */
-    public function allowCopy(): bool
+    public function allowCopy()
     {
         return false;
     }
@@ -142,12 +144,11 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         include_once (self::PLUGIN_DIR . "/classes/class.ilNolejConfigGUI.php");
 
         return sprintf(
-            "%s&ref_id=31&plugin_id=%s&ctype=Services&cname=%s&slot_id=%s&pname=%s",
+            "%s&ref_id=31&admin_mode=settings&ctype=Services&cname=%s&slot_id=%s&pname=%s",
             $DIC->ctrl()->getLinkTargetByClass(
                 ["ilAdministrationGUI", "ilObjComponentSettingsGUI", ilNolejConfigGUI::class],
                 ilNolejConfigGUI::CMD_CONFIGURE
             ),
-            self::PLUGIN_ID,
             self::CNAME,
             self::SLOT_ID,
             self::PLUGIN_NAME

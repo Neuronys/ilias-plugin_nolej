@@ -31,19 +31,19 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
     const TAB_CONFIGURE = "configuration";
 
     /** @var ilCtrl */
-    protected ilCtrl $ctrl;
+    protected $ctrl;
 
     /** @var string */
     protected $cmd;
 
     /** @var ilTabsGUI */
-    protected ilTabsGUI $tabs;
+    protected $tabs;
 
     /** @var ilDBInterface */
-    protected ilDBInterface $db;
+    protected $db;
 
     /** @var ilLanguage */
-    protected ilLanguage $lng;
+    protected $lng;
 
     /** @var ilNolejConfig */
     protected $config;
@@ -76,7 +76,7 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
      * Handles all commmands,
      * $cmd = functionName()
      */
-    public function performCommand(string $cmd): void
+    public function performCommand($cmd)
     {
         $next_class = $this->ctrl->getNextClass($this);
 

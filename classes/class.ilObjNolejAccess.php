@@ -35,12 +35,12 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      * @return bool true, if everything is ok
      */
     public function _checkAccess(
-        string $a_cmd,
-        string $a_permission,
-        int $a_ref_id,
-        int $a_obj_id,
-        ?int $a_user_id = null
-    ): bool {
+        $a_cmd,
+        $a_permission,
+        $a_ref_id,
+        $a_obj_id,
+        $a_user_id = null
+    ) {
         global $DIC;
 
         if ($a_ref_id === null) {
@@ -86,7 +86,7 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      * @param int $a_obj_id
      * @return bool
      */
-    public static function _isOffline(int $a_obj_id): bool
+    public static function _isOffline($a_obj_id)
     {
         global $ilDB;
 
@@ -103,13 +103,13 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      * Returns an array with valid operators for the specific object type
      * @return array
      */
-    public static function getConditionOperators(): array
+    public static function getConditionOperators()
     {
         include_once './Services/Conditions/classes/class.ilConditionHandler.php'; //bugfix mantis 24891
-        return array(
+        return [
             ilConditionHandler::OPERATOR_FAILED,
             ilConditionHandler::OPERATOR_PASSED
-        );
+        ];
     }
 
     /**
@@ -117,7 +117,7 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      * @param string $a_target
      * @return bool
      */
-    public static function _checkGoto(string $a_target): bool
+    public static function _checkGoto($a_target)
     {
         include_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejGUI.php");
         $target = substr($a_target, strlen(ilNolejPlugin::PLUGIN_ID) + 1); // Remove plugin ID
@@ -135,7 +135,7 @@ class ilObjNolejAccess extends ilObjectPluginAccess
     /**
      * @inheritDoc
      */
-    public function canBeDelivered(ilWACPath $ilWACPath): bool
+    public function canBeDelivered(ilWACPath $ilWACPath)
     {
         return true;
         // $module = $ilWACPath->getModuleIdentifier();

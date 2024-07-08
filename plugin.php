@@ -13,8 +13,8 @@
 $id = "xnlj";
 $version = "1.3.1";
 
-$ilias_min_version = "8.0";
-$ilias_max_version = "8.999";
+$ilias_min_version = "6.0";
+$ilias_max_version = "7.999";
 
 $responsible = "OC Open Consulting SB srl";
 $responsible_mail = "plugins@oc-group.eu";

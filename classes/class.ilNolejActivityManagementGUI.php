@@ -111,16 +111,16 @@ class ilNolejActivityManagementGUI
     const STATUS_COMPLETED = 8;
 
     /** @var ilCtrl */
-    protected ilCtrl $ctrl;
+    protected $ctrl;
 
     /** @var ilTabsGUI */
-    protected ilTabsGUI $tabs;
+    protected $tabs;
 
     /** @var ilDBInterface */
-    protected ilDBInterface $db;
+    protected $db;
 
     /** @var ilLanguage */
-    protected ilLanguage $lng;
+    protected $lng;
 
     /** @var ilObjNolejGUI */
     protected $gui_obj;
@@ -167,7 +167,7 @@ class ilNolejActivityManagementGUI
 
         $this->gui_obj = $gui_obj;
         $this->documentId = $gui_obj != null
-            ? $this->gui_obj->getObject()->getDocumentId()
+            ? $this->gui_obj->object->getDocumentId()
             : $documentId;
         $this->dataDir = $this->config->dataDir() . $this->documentId;
         $this->statusCheck();
@@ -175,7 +175,7 @@ class ilNolejActivityManagementGUI
         $tpl->setTitle(
             $this->gui_obj == null
             ? $this->txt("plugin_title")
-            : $this->gui_obj->getObject()->getTitle(),
+            : $this->gui_obj->object->getTitle(),
             false
         );
         $tpl->setDescription($this->txt("plugin_description"));
@@ -196,7 +196,7 @@ class ilNolejActivityManagementGUI
      * Handles all commmands,
      * $cmd = functionName()
      */
-    public function executeCommand(): void
+    public function executeCommand()
     {
         global $tpl;
 
@@ -223,28 +223,31 @@ class ilNolejActivityManagementGUI
                 switch ($cmd) {
                     // Need to have permission to access modules
                     case self::CMD_CREATION:
-                    case self::CMD_SET_INT_LINK:
-                    case self::CMD_CREATE:
                     case self::CMD_ANALYSIS:
-                    case self::CMD_ANALYZE:
                     case self::CMD_REVISION:
                     case self::CMD_SUMMARY:
-                    case self::CMD_SUMMARY_SAVE:
                     case self::CMD_QUESTIONS:
-                    case self::CMD_QUESTIONS_SAVE:
                     case self::CMD_CONCEPTS:
-                    case self::CMD_CONCEPTS_SAVE:
-                    case self::CMD_REVIEW:
                     case self::CMD_ACTIVITIES:
-                    case self::CMD_GENERATE:
-                    case self::CMD_CHECK_UPDATES:
-                    case self::CMD_WEBHOOK_CALL:
                         $this->cmd = $cmd;
                         if ($this->gui_obj != null) {
                             $this->printWorkflow($cmd);
                             $this->$cmd();
                         }
                         break;
+
+                    case self::CMD_SET_INT_LINK:
+                    case self::CMD_CREATE:
+                    case self::CMD_ANALYZE:
+                    case self::CMD_SUMMARY_SAVE:
+                    case self::CMD_QUESTIONS_SAVE:
+                    case self::CMD_CONCEPTS_SAVE:
+                    case self::CMD_REVIEW:
+                    case self::CMD_GENERATE:
+                    case self::CMD_CHECK_UPDATES:
+                    case self::CMD_WEBHOOK_CALL:
+                        $this->cmd = $cmd;
+                        $this->$cmd();
 
                     default:
                         $cmd = $this->defaultCmd;
@@ -267,7 +270,7 @@ class ilNolejActivityManagementGUI
             return;
         }
 
-        $this->status = $this->gui_obj->getObject()->getDocumentStatus();
+        $this->status = $this->gui_obj->object->getDocumentStatus();
 
         switch ($this->status) {
             case self::STATUS_CREATION:
@@ -561,8 +564,8 @@ class ilNolejActivityManagementGUI
      */
     protected function get(string $key)
     {
-        if (\ilSession::has(ilNolejPlugin::PLUGIN_ID . "_" . $key)) {
-            return \ilSession::get(ilNolejPlugin::PLUGIN_ID . "_" . $key);
+        if (isset($_SESSION[ilNolejPlugin::PLUGIN_ID . "_" . $key])) {
+            return $_SESSION[ilNolejPlugin::PLUGIN_ID . "_" . $key];
         }
         return null;
     }
@@ -572,7 +575,7 @@ class ilNolejActivityManagementGUI
      */
     protected function set(string $key, $val): void
     {
-        \ilSession::set(ilNolejPlugin::PLUGIN_ID . "_" . $key, $val);
+        $_SESSION[ilNolejPlugin::PLUGIN_ID . "_" . $key] = $val;
     }
 
     /**
@@ -580,7 +583,9 @@ class ilNolejActivityManagementGUI
      */
     protected function clear(string $key): void
     {
-        \ilSession::clear(ilNolejPlugin::PLUGIN_ID . "_" . $key);
+        if (isset($_SESSION[ilNolejPlugin::PLUGIN_ID . "_" . $key])) {
+            unset($_SESSION[ilNolejPlugin::PLUGIN_ID . "_" . $key]);
+        }
     }
 
     public function setInternalLink(): void
@@ -732,7 +737,7 @@ class ilNolejActivityManagementGUI
              */
             $title = new ilTextInputGUI($this->txt("prop_" . self::PROP_TITLE), self::PROP_TITLE);
             $title->setInfo($this->txt("prop_" . self::PROP_TITLE . "_info"));
-            $title->setValue($this->gui_obj->getObject()->getTitle());
+            $title->setValue($this->gui_obj->object->getTitle());
             $title->setMaxLength(250);
             $form->addItem($title);
 
@@ -795,13 +800,13 @@ class ilNolejActivityManagementGUI
                 $path = ilObjMediaObject::_lookupItemPath($mobId);
                 $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
                 if (in_array($extension, self::TYPE_AUDIO)) {
-                    $audio = $f->player()->audio($path);
-                    $preview = $renderer->render($audio);
+                    // $audio = $f->player()->audio($path);
+                    // $preview = $renderer->render($audio);
                 } else if (in_array($extension, self::TYPE_VIDEO)) {
-                    $video = $f->player()->video($path);
-                    $preview = $renderer->render($video);
+                    // $video = $f->player()->video($path);
+                    // $preview = $renderer->render($video);
                 } else if (in_array($extension, self::TYPE_DOC)) {
-                    $preview = "";
+                    // $preview = "";
                 } else {
                     $this->clearInternalLink();
                     $link_str = "";
@@ -929,20 +934,20 @@ class ilNolejActivityManagementGUI
         } else {
 
             $title = new ilNonEditableValueGUI($this->txt("prop_" . self::PROP_TITLE), self::PROP_TITLE);
-            $title->setValue($this->gui_obj->getObject()->getTitle());
+            $title->setValue($this->gui_obj->object->getTitle());
             $form->addItem($title);
 
             $mediaSource = new ilNonEditableValueGUI($this->txt("prop_" . self::PROP_MEDIA_SRC), self::PROP_MEDIA_SRC);
-            $mediaSource->setValue($this->gui_obj->getObject()->getDocumentSource());
-            $mediaSource->setInfo($this->txt("prop_" . $this->gui_obj->getObject()->getDocumentMediaType()));
+            $mediaSource->setValue($this->gui_obj->object->getDocumentSource());
+            $mediaSource->setInfo($this->txt("prop_" . $this->gui_obj->object->getDocumentMediaType()));
             $form->addItem($mediaSource);
 
             $language = new ilNonEditableValueGUI($this->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
-            $language->setValue($this->lng->txt("meta_l_" . $this->gui_obj->getObject()->getDocumentLang()));
+            $language->setValue($this->lng->txt("meta_l_" . $this->gui_obj->object->getDocumentLang()));
             $form->addItem($language);
 
             // $automaticMode = new ilCheckboxInputGUI($this->txt("prop_" . self::PROP_AUTOMATIC), self::PROP_AUTOMATIC);
-            // $automaticMode->setChecked($this->gui_obj->getObject()->getDocumentAutomaticMode());
+            // $automaticMode->setChecked($this->gui_obj->object->getDocumentAutomaticMode());
             // $automaticMode->setDisabled(true);
             // $form->addItem($automaticMode);
         }
@@ -1144,7 +1149,7 @@ class ilNolejActivityManagementGUI
                 $decrementedCredit = 1;
                 $mobInput = $this->getInternalLink();
                 $t_arr = explode("_", $mobInput["target"]);
-                $objId = (int) $t_arr[count($t_arr) - 1];
+                $objId = $t_arr[count($t_arr) - 1];
                 $path = ilObjMediaObject::_lookupItemPath($objId);
                 $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
                 if (in_array($extension, self::TYPE_AUDIO)) {
@@ -1256,9 +1261,9 @@ class ilNolejActivityManagementGUI
         $apiAutomaticMode = false; // (bool) $form->getInput(self::PROP_AUTOMATIC);
 
         // Update object title if it differs from the current one.
-        if ($apiTitle != "" && $apiTitle != $this->gui_obj->getObject()->getTitle()) {
-            $this->gui_obj->getObject()->setTitle($apiTitle);
-            $this->gui_obj->getObject()->update();
+        if ($apiTitle != "" && $apiTitle != $this->gui_obj->object->getTitle()) {
+            $this->gui_obj->object->setTitle($apiTitle);
+            $this->gui_obj->object->update();
         }
 
         $api = new ilNolejAPI($api_key);
@@ -1307,7 +1312,7 @@ class ilNolejActivityManagementGUI
             "UPDATE " . ilNolejPlugin::TABLE_DATA . " SET"
             . " document_id = %s WHERE id = %s;",
             array("text", "integer"),
-            array($result->id, $this->gui_obj->getObject()->getId())
+            array($result->id, $this->gui_obj->object->getId())
         );
 
         $this->db->manipulateF(
@@ -1325,7 +1330,7 @@ class ilNolejActivityManagementGUI
                 "text"
             ),
             array(
-                $this->gui_obj->getObject()->getTitle(),
+                $this->gui_obj->object->getTitle(),
                 self::STATUS_CREATION_PENDING,
                 $decrementedCredit,
                 $apiUrl,
@@ -1535,8 +1540,8 @@ class ilNolejActivityManagementGUI
          * - $title: Title returned from transcription;
          * - $objTitle: Current module title.
          */
-        $title = $this->gui_obj->getObject()->getDocumentTitle();
-        $objTitle = $this->gui_obj->getObject()->getTitle();
+        $title = $this->gui_obj->object->getDocumentTitle();
+        $objTitle = $this->gui_obj->object->getTitle();
 
         if ($status == self::STATUS_ANALISYS) {
             $form = new ilPropertyFormGUI();
@@ -1668,17 +1673,17 @@ class ilNolejActivityManagementGUI
             return;
         }
 
-        $apiAutomaticMode = $this->gui_obj->getObject()->getDocumentAutomaticMode();
+        $apiAutomaticMode = $this->gui_obj->object->getDocumentAutomaticMode();
         $api = new ilNolejAPI($api_key);
 
         /**
          * May update title
          */
         $title = $form->getInput(self::PROP_TITLE);
-        $objTitle = $this->gui_obj->getObject()->getTitle();
+        $objTitle = $this->gui_obj->object->getTitle();
         if ($title != "" && $title != $objTitle) {
-            $this->gui_obj->getObject()->setTitle($title);
-            $this->gui_obj->getObject()->update();
+            $this->gui_obj->object->setTitle($title);
+            $this->gui_obj->object->update();
         }
 
         $url = ILIAS_HTTP_PATH . substr(ilWACSignedPath::signFile($this->dataDir . "/transcription.htm"), 1);
@@ -3040,7 +3045,7 @@ class ilNolejActivityManagementGUI
             [$documentId]
         );
         if ($row = $this->db->fetchAssoc($result)) {
-            return (int) $row["id"];
+            return $row["id"];
         }
         return -1;
     }

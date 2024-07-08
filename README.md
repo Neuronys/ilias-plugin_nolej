@@ -41,11 +41,11 @@ This plugin currently supports the following languages:
 * :de: German
 
 ## Requirements
-Note: this branch is for ILIAS 8. If you have ILIAS 6 or 7,
-see [branch release_7](https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS/tree/release_7).
+Note: this branch is for ILIAS 6 and 7. If you have ILIAS 8,
+see [branch main](https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS/tree/main).
 
-* ILIAS 8.x
-* [H5P Repository plugin](https://github.com/srsolutionsag/H5P) installed and updated (tested wih version `5.0.11`).
+* ILIAS 6.x - 7.x
+* [H5P Repository plugin](https://github.com/srsolutionsag/H5P) installed and updated (tested wih version `4.1.16`).
 
 ## Installation
 
@@ -56,7 +56,7 @@ From the ILIAS directory, run:
 ```sh
 mkdir -p Customizing/global/plugins/Services/Repository/RepositoryObject
 cd Customizing/global/plugins/Services/Repository/RepositoryObject
-git clone https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS.git Nolej
+git clone -b release_7 https://github.com/oc-group/Nolej-AI-for-ILIAS-LMS.git Nolej
 ```
 
 Return to the ILIAS directory and run:
@@ -90,13 +90,6 @@ composer du
    2. Select tab `TinyMCE Editor` -> `General Settings`
    3. Activate the checkbox
    4. Save
-
-4. (Only for ILIAS 8) Open `client.ini.php` file inside the `data` directory and put this below `[server]`:
-
-```
-[server]
-prevent_super_global_replacement = 1
-```
 
 ### Page component companion plugin
 Explore a personalized touch to your pages with the
