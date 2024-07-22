@@ -10,7 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use ILIAS\DI\Container;
 use ILIAS\GlobalScreen\Provider\PluginProviderCollection;
 
 /**
@@ -18,7 +17,6 @@ use ILIAS\GlobalScreen\Provider\PluginProviderCollection;
  */
 class ilNolejPlugin extends ilRepositoryObjectPlugin
 {
-
     const PLUGIN_ID = "xnlj";
     const PLUGIN_NAME = "Nolej";
     const PLUGIN_DIR = "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej";

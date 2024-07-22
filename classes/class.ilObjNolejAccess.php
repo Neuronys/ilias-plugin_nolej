@@ -10,8 +10,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilObjNolej.php");
-// require_once("./Services/Conditions/interfaces/interface.ilConditionHandling.php"); //bugfix mantis 24891
+require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilObjNolej.php";
 
 /**
  * Please do not create instances of large application classes
@@ -19,7 +18,6 @@ require_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject
  */
 class ilObjNolejAccess extends ilObjectPluginAccess
 {
-
     /**
      * Checks whether a user may invoke a command or not
      * (this method is called by ilAccessHandler::checkAccess)

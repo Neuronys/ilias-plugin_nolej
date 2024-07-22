@@ -11,23 +11,18 @@ declare(strict_types=1);
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejNotificationPrefRepository.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php");
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejNotificationPrefRepository.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 
 use ILIAS\GlobalScreen\Identification\IdentificationInterface;
 use ILIAS\GlobalScreen\Scope\Notification\Provider\AbstractNotificationPluginProvider;
-
-// use ILIAS\Nolej\Notification\NolejNotificationPrefRepository;
-// use ILIAS\GlobalScreen\Scope\Notification\Provider\AbstractNotificationProvider;
-// use ILIAS\GlobalScreen\Scope\Notification\Provider\NotificationProvider;
 
 /**
  * This class provides the notifications in ILIAS
  */
 class NolejNotificationProvider extends AbstractNotificationPluginProvider
 {
-
     /**
      * @inheritDoc
      */
@@ -37,7 +32,6 @@ class NolejNotificationProvider extends AbstractNotificationPluginProvider
         $lng = $this->dic->language();
         $ui = $this->dic->ui();
         $user = $this->dic->user();
-        $ctrl = $this->dic->ctrl();
         $config = new ilNolejConfig();
 
         $noti_repo = new NolejNotificationPrefRepository($user);
@@ -64,7 +58,7 @@ class NolejNotificationProvider extends AbstractNotificationPluginProvider
             ->symbol()
             ->icon()
             ->custom(
-                ilRepositoryObjectPlugin::_getImagePath("Services", "robj", "Nolej", "outlined/icon_xnlj.svg"),
+                ilRepositoryObjectPlugin::_getImagePath("Services", "Repository", "robj", "Nolej", "outlined/icon_xnlj.svg"),
                 $config->txt("plugin_title")
             );
 

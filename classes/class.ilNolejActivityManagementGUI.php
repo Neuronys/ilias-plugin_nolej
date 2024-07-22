@@ -10,34 +10,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejMediaSelectorGUI.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php");
-
-include_once ("./Services/Form/classes/class.ilCheckboxInputGUI.php");
-
-// use srag\Plugins\H5P\Content\Form\ImportContentFormProcessor;
-// use srag\Plugins\H5P\Content\Form\ImportContentFormBuilder;
-// use srag\Plugins\H5P\Content\Form\EditContentFormBuilder;
-// use srag\Plugins\H5P\Content\Form\EditContentFormProcessor;
-// use srag\Plugins\H5P\Content\ContentEditorHelper;
-// use srag\Plugins\H5P\Content\ContentEditorData;
-// use srag\Plugins\H5P\Content\IContent;
-// use srag\Plugins\H5P\Content\Form\ContentPostProcessor;
-// use srag\Plugins\H5P\Content\Form\IPostProcessorAware;
-// use srag\Plugins\H5P\Form\IFormBuilder;
-// use srag\Plugins\H5P\ArrayBasedRequestWrapper;
-// use srag\Plugins\H5P\IRepositoryFactory;
-// use srag\Plugins\H5P\IRequestParameters;
-// use srag\Plugins\H5P\TemplateHelper;
-// use srag\Plugins\H5P\RequestHelper;
-// use srag\Plugins\H5P\ITranslator;
-// use srag\Plugins\H5P\IContainer;
-// use Psr\Http\Message\ServerRequestInterface;
-// use ILIAS\UI\Component\Input\Container\Form\Form;
-// use ILIAS\UI\Factory as ComponentFactory;
-// use srag\Plugins\H5P\Settings\IGeneralSettings;
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejMediaSelectorGUI.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 
 /**
  * GUI to manage every step of the Nolej module creation.
@@ -49,8 +25,6 @@ include_once ("./Services/Form/classes/class.ilCheckboxInputGUI.php");
  */
 class ilNolejActivityManagementGUI
 {
-    // use H5PTrait;
-
     const CMD_CREATION = "creation";
     const CMD_SET_INT_LINK = "setInternalLink";
     const CMD_CREATE = "create";
@@ -198,8 +172,6 @@ class ilNolejActivityManagementGUI
      */
     public function executeCommand(): void
     {
-        global $tpl;
-
         $next_class = $this->ctrl->getNextClass();
         $cmd = $this->ctrl->getCmd();
 
@@ -307,7 +279,7 @@ class ilNolejActivityManagementGUI
             self::STATUS_CREATION_PENDING,
             self::STATUS_ANALISYS_PENDING,
             self::STATUS_REVISION_PENDING,
-            self::STATUS_ACTIVITIES_PENDING
+            self::STATUS_ACTIVITIES_PENDING,
         ];
 
         if (!in_array($this->status, $pendingStatuses)) {
@@ -338,7 +310,7 @@ class ilNolejActivityManagementGUI
      */
     protected function getWebhookCallBox(): string
     {
-        global $DIC, $tpl;
+        global $DIC;
         $f = $DIC->ui()->factory();
         $renderer = $DIC->ui()->renderer();
 

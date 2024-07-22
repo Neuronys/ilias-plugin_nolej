@@ -19,7 +19,6 @@
  */
 class ilObjNolejListGUI extends ilObjectPluginListGUI
 {
-
     /**
      * Init type
      */
