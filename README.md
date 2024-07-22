@@ -56,7 +56,7 @@ From the ILIAS directory, run:
 ```sh
 mkdir -p Customizing/global/plugins/Services/Repository/RepositoryObject
 cd Customizing/global/plugins/Services/Repository/RepositoryObject
-git clone -b release_7 https://github.com/Neuronys/ilias-robj_nolej.git Nolej
+git clone -b release_7 https://github.com/Neuronys/ilias-robj_nolej Nolej
 ```
 
 Return to the ILIAS directory and run:
