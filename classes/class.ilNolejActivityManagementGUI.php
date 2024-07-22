@@ -1117,7 +1117,7 @@ class ilNolejActivityManagementGUI
                 $mobInput = $this->getInternalLink();
                 $t_arr = explode("_", $mobInput["target"]);
                 $objId = (int) $t_arr[count($t_arr) - 1];
-                $path = ilObjMediaObject::_lookupItemPath($objId);
+                $path = ilObjMediaObject::_lookupItemPath($objId, false, false);
                 $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
                 if (in_array($extension, self::TYPE_AUDIO)) {
                     $apiFormat = self::PROP_M_AUDIO;
