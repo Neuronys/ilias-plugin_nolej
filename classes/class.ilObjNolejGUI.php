@@ -10,19 +10,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ("./Services/Tracking/classes/class.ilLearningProgress.php");
-require_once ("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
-require_once ("./Services/Tracking/classes/status/class.ilLPStatusPlugin.php");
-
-require_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejPlugin.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php");
-
-// use srag\DIC\H5P\DICTrait;
-// use srag\Plugins\H5P\Content\Content;
-// use srag\Plugins\H5P\Content\Editor\EditContentFormGUI;
-// use srag\Plugins\H5P\Content\Editor\ImportContentFormGUI;
-// use srag\Plugins\H5P\Utils\H5PTrait;
+require_once "./Services/Tracking/classes/class.ilLearningProgress.php";
+require_once "./Services/Tracking/classes/class.ilLPStatusWrapper.php";
+require_once "./Services/Tracking/classes/status/class.ilLPStatusPlugin.php";
+require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejPlugin.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 
 use ILIAS\GlobalScreen\Scope\MainMenu\Collector\Renderer\Hasher;
 
@@ -77,7 +70,6 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     {
         global $DIC, $ilCtrl, $ilTabs, $tpl;
         $this->ctrl = $ilCtrl;
-        $this->renderer = $DIC->ui()->renderer();
         $this->tabs = $ilTabs;
         $this->tpl = $tpl;
     }
@@ -296,7 +288,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
         $db = $DIC->database();
         $f = $DIC->ui()->factory()->listing()->workflow();
-        $renderer = $this->renderer;
+        $renderer = $DIC->ui()->renderer();
 
         $result = $db->queryF(
             "SELECT * FROM " . ilNolejPlugin::TABLE_H5P

@@ -10,10 +10,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejMediaSelectorGUI.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php");
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejMediaSelectorGUI.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
 
 /**
  * Plugin configuration GUI class

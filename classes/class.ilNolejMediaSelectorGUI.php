@@ -10,7 +10,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php");
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 
 /**
  * Select media object

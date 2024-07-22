@@ -10,18 +10,16 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ("./Services/Tracking/interfaces/interface.ilLPStatusPlugin.php");
-
-require_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejPlugin.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php");
-require_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilObjNolejGUI.php");
+require_once "./Services/Tracking/interfaces/interface.ilLPStatusPlugin.php";
+require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejPlugin.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
+require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilObjNolejGUI.php";
 
 /**
  * Repository plugin object class
  */
 class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
 {
-
     /** @var bool */
     protected bool $online = false;
 
