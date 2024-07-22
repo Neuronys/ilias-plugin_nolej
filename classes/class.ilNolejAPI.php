@@ -10,8 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/vendor/autoload.php";
-
 /**
  * This class provides common methods to interact with Nolej REST API.
  */
@@ -47,9 +45,9 @@ class ilNolejAPI
             "headers" => [
                 "Authorization" => "X-API-KEY " . $this->apikey,
                 "User-Agent" => "ILIAS Plugin",
-                "Content-Type" => "application/json"
+                "Content-Type" => "application/json",
             ],
-            "body" => $data_json
+            "body" => $data_json,
         ]);
 
         if (!$decode) {
@@ -77,9 +75,9 @@ class ilNolejAPI
             "headers" => [
                 "Authorization" => "X-API-KEY " . $this->apikey,
                 "User-Agent" => "ILIAS Plugin",
-                "Content-Type" => "application/json"
+                "Content-Type" => "application/json",
             ],
-            "body" => $data_json
+            "body" => $data_json,
         ]);
 
         if (!$decode) {
@@ -113,9 +111,9 @@ class ilNolejAPI
             "headers" => [
                 "Authorization" => "X-API-KEY " . $this->apikey,
                 "User-Agent" => "ILIAS Plugin",
-                "Content-Type" => "application/json"
+                "Content-Type" => "application/json",
             ],
-            "body" => $encodedData
+            "body" => $encodedData,
         ]);
 
         if (!$decodeOutput) {
