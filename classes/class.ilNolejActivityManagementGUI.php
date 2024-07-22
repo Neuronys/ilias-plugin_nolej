@@ -1128,7 +1128,7 @@ class ilNolejActivityManagementGUI
                 } else {
                     $decrementedCredit = 0;
                 }
-                $apiUrl = ilNolejMediaSelectorGUI::getSignedUrl($objId, true);
+                $apiUrl = ilNolejMediaSelectorGUI::getSignedUrl($objId, true, ilWACSignedPath::MAX_LIFETIME);
                 break;
 
             case self::PROP_M_FILE:
