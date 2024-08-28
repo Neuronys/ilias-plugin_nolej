@@ -22,6 +22,8 @@ require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.ph
  */
 class ilNolejConfigGUI extends ilPluginConfigGUI
 {
+    public const SECRET = "**********";
+
     const CMD_CONFIGURE = "configure";
     const CMD_SAVE = "save";
     const CMD_TIC = "tic";
@@ -134,18 +136,20 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
     {
         $this->initTabs(self::TAB_CONFIGURE);
 
-        include_once ("Services/Form/classes/class.ilPropertyFormGUI.php");
+        include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
         $form = new ilPropertyFormGUI();
 
         $section = new ilFormSectionHeaderGUI();
         $section->setTitle($this->txt("configuration_title"));
         $form->addItem($section);
 
-        $api_key = new ilTextInputGUI($this->txt("api_key"), "api_key");
+        $api_key = new ilPasswordInputGUI($this->txt("api_key"), "api_key");
         $api_key->setMaxLength(100);
+        $api_key->setRetype(false);
+        $api_key->setDisableHtmlAutoComplete(true);
         $api_key->setRequired(true);
         $api_key->setInfo($this->txt("api_key_info"));
-        $api_key->setValue($this->config->get("api_key", ""));
+        $api_key->setValue(empty($this->config->get("api_key", "")) ? "" : self::SECRET);
         $form->addItem($api_key);
 
         $form->addCommandButton(self::CMD_SAVE, $this->txt("cmd_save"));
@@ -165,7 +169,9 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
 
         if ($form->checkInput()) {
             $api_key = $form->getInput("api_key");
-            $this->config->set("api_key", $api_key);
+            if (!empty($api_key) && $api_key != self::SECRET) {
+                $this->config->set("api_key", $api_key);
+            }
             $this->ctrl->redirect($this, self::CMD_CONFIGURE);
 
         } else {
@@ -254,7 +260,7 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
             [
                 "message" => $message,
                 "s3URL" => $mediaUrl,
-                "webhookURL" => $webhookUrl
+                "webhookURL" => $webhookUrl,
             ],
             true
         );
