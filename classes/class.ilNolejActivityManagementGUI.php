@@ -15,6 +15,8 @@ require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php";
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejMediaSelectorGUI.php";
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 
+require_once "./Services/Form/classes/class.ilCheckboxInputGUI.php";
+
 /**
  * GUI to manage every step of the Nolej module creation.
  *
