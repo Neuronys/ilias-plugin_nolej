@@ -3073,17 +3073,17 @@ class ilNolejActivityManagementGUI
 
         $h5p_storage->savePackage([
             "metadata" => [
-                "authors" => $h5p_kernel->mainJsonData["authors"],
-                "authorComments" => $h5p_kernel->mainJsonData["authorComments"],
-                "changes" => $h5p_kernel->mainJsonData["changes"],
-                "defaultLanguage" => $h5p_kernel->mainJsonData["defaultLanguage"],
-                "license" => $h5p_kernel->mainJsonData["license"],
-                "licenseExtras" => $h5p_kernel->mainJsonData["licenseExtras"],
-                "licenseVersion" => $h5p_kernel->mainJsonData["licenseVersion"],
-                "source" => $h5p_kernel->mainJsonData["source"],
-                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->txt("activities_" . $type),
-                "yearFrom" => $h5p_kernel->mainJsonData["yearFrom"],
-                "yearTo" => $h5p_kernel->mainJsonData["yearTo"],
+                "authors" => $h5p_kernel->mainJsonData["authors"] ?? "-",
+                "authorComments" => $h5p_kernel->mainJsonData["authorComments"] ?? "",
+                "changes" => $h5p_kernel->mainJsonData["changes"] ?? "",
+                "defaultLanguage" => $h5p_kernel->mainJsonData["defaultLanguage"] ?? "",
+                "license" => $h5p_kernel->mainJsonData["license"] ?? "",
+                "licenseExtras" => $h5p_kernel->mainJsonData["licenseExtras"] ?? "",
+                "licenseVersion" => $h5p_kernel->mainJsonData["licenseVersion"] ?? "",
+                "source" => $h5p_kernel->mainJsonData["source"] ?? "",
+                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->txt("activities_$type"),
+                "yearFrom" => $h5p_kernel->mainJsonData["yearFrom"] ?? "",
+                "yearTo" => $h5p_kernel->mainJsonData["yearTo"] ?? "",
                 "obj_id" => $this->getObjIdFromDocumentId($this->documentId),
                 // "parent_type" => "unknown", // instead of ilNolejPlugin::PLUGIN_ID, so that read permission is granted
                 "in_workspace" => false
@@ -3091,61 +3091,6 @@ class ilNolejActivityManagementGUI
         ]);
 
         ilH5PEditorStorage::removeTemporarilySavedFiles($file_upload_communicator->getUploadPath());
-
-        // self::h5p()
-        //     ->contents()
-        //     ->editor()
-        //     ->storageFramework()
-        //     ->saveFileTemporarily($filePath, true);
-
-        // if (!self::h5p()->contents()->editor()->validatorCore()->isValidPackage()) {
-        //     return $this->txt("err_h5p_package");
-        // }
-
-        // $core = self::h5p()->contents()->core();
-
-        // self::h5p()
-        //     ->contents()
-        //     ->editor()
-        //     ->storageCore()
-        //     ->savePackage([
-        //         "metadata" => [
-        //             "authors" => $core->mainJsonData["authors"],
-        //             "authorComments" => $core->mainJsonData["authorComments"],
-        //             "changes" => $core->mainJsonData["changes"],
-        //             "defaultLanguage" => $core->mainJsonData["defaultLanguage"],
-        //             "license" => $core->mainJsonData["license"],
-        //             "licenseExtras" => $core->mainJsonData["licenseExtras"],
-        //             "licenseVersion" => $core->mainJsonData["licenseVersion"],
-        //             "source" => $core->mainJsonData["source"],
-        //             "title" => $type == "ibook" ? $core->mainJsonData["title"] : "", // No title
-        //             "yearFrom" => $core->mainJsonData["yearFrom"],
-        //             "yearTo" => $core->mainJsonData["yearTo"]
-        //         ]
-        //     ]);
-
-        // self::h5p()
-        //     ->contents()
-        //     ->editor()
-        //     ->storageFramework()
-        //     ->removeTemporarilySavedFiles(
-        //         self::h5p()
-        //             ->contents()
-        //             ->framework()
-        //             ->getUploadedH5pFolderPath()
-        //     );
-
-        // $contentId = intval(
-        //     self::h5p()
-        //         ->contents()
-        //         ->editor()
-        //         ->storageCore()
-        //         ->contentId
-        // );
-
-        // $h5p_content = self::h5p()
-        //     ->contents()
-        //     ->getContentById($contentId);
 
         $contentId = $h5p_storage->contentId;
 
@@ -3217,5 +3162,4 @@ class ilNolejActivityManagementGUI
         $form = $this->initActivitiesForm();
         $tpl->setContent($form->getHTML());
     }
-
 }
