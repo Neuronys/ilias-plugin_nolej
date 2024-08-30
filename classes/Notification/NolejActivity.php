@@ -364,7 +364,7 @@ class NolejActivity
             array($a_doc_id, $a_user_id, $a_action)
         );
         $row = $ilDB->fetchAssoc($set);
-        if ($row["user_id"]) {
+        if ($row && $row["user_id"]) {
             $this->importDBRow($row);
         } else {
             $this->setTimestamp(time());
