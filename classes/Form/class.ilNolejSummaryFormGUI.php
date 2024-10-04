@@ -38,6 +38,10 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         $form = $this->form();
         $this->tpl->setContent($form->getHTML());
 
+        $this->tpl->setRightContent(
+            $this->renderer->render($this->manager->getWorkflow()->withActive(4))
+        );
+
         // if ($this->status == ilNolejActivityManagementGUI::STATUS_REVISION) {
         //     $this->tpl->setRightContent($this->getReviewBox());
         // }

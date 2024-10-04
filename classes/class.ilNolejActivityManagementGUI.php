@@ -23,28 +23,8 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
  */
 class ilNolejActivityManagementGUI
 {
-    const CMD_ANALYSIS = "analysis";
-    const CMD_ANALYZE = "analyze";
-    const CMD_REVISION = "revision";
-    const CMD_REVIEW = "review";
-    const CMD_SUMMARY = "summary";
-    const CMD_SUMMARY_SAVE = "saveSummary";
-    const CMD_QUESTIONS = "questions";
-    const CMD_QUESTIONS_SAVE = "saveQuestions";
-    const CMD_CONCEPTS = "concepts";
-    const CMD_CONCEPTS_SAVE = "saveConcepts";
-    const CMD_ACTIVITIES = "activities";
-    const CMD_GENERATE = "generate";
     const CMD_CHECK_UPDATES = "checkUpdates";
     const CMD_WEBHOOK_CALL = "webhookCall";
-
-    const TAB_CREATION = "tab_creation";
-    const TAB_ANALYSIS = "tab_analysis";
-    const TAB_REVIEW = "tab_review";
-    const TAB_ACTIVITIES = "tab_activities";
-    const SUBTAB_SUMMARY = "review_summary";
-    const SUBTAB_QUESTIONS = "review_questions";
-    const SUBTAB_CONCEPTS = "review_concepts";
 
     public const STATUS_CREATION = 0;
     public const STATUS_CREATION_PENDING = 1;
@@ -180,7 +160,7 @@ class ilNolejActivityManagementGUI
                     case self::CMD_WEBHOOK_CALL:
                         $this->cmd = $cmd;
                         if ($this->obj_gui != null) {
-                            $this->printWorkflow($cmd);
+                            // $this->printWorkflow($cmd);
                             $this->$cmd();
                         }
                         break;
@@ -210,15 +190,18 @@ class ilNolejActivityManagementGUI
             case self::STATUS_CREATION_PENDING:
                 $this->defaultClass = ilNolejCreationFormGUI::class;
                 break;
+
             case self::STATUS_ANALISYS:
             case self::STATUS_ANALISYS_PENDING:
                 $this->defaultClass = ilNolejTranscriptionFormGUI::class;
                 break;
+
             case self::STATUS_REVISION:
             case self::STATUS_REVISION_PENDING:
             case self::STATUS_COMPLETED:
                 $this->defaultClass = ilNolejConceptsFormGUI::class;
                 break;
+
             case self::STATUS_ACTIVITIES:
             case self::STATUS_ACTIVITIES_PENDING:
                 $this->defaultClass = ilNolejActivitiesFormGUI::class;
@@ -227,26 +210,35 @@ class ilNolejActivityManagementGUI
     }
 
     /**
-     * Call last webhook and update status
+     * Check if a status is considered "pending".
+     * @param int $status
+     * @return bool
      */
-    protected function webhookCall(): void
+    protected function isStatusPending($status)
     {
         $pendingStatuses = [
             self::STATUS_CREATION_PENDING,
             self::STATUS_ANALISYS_PENDING,
-            self::STATUS_REVISION_PENDING,
             self::STATUS_ACTIVITIES_PENDING,
         ];
 
-        if (!in_array($this->status, $pendingStatuses)) {
-            $class = $this->defaultClass;
-            $this->ctrl->redirectByClass($class, ilNolejFormGUI::CMD_SHOW);
+        return array_key_exists($status, $pendingStatuses);
+    }
+
+    /**
+     * Call last webhook and update status.
+     * @return void
+     */
+    protected function webhookCall(): void
+    {
+        if (!$this->isStatusPending($this->status)) {
+            $this->ctrl->redirectByClass($this->defaultClass, ilNolejFormGUI::CMD_SHOW);
             return;
         }
 
         $api = new ilNolejAPI();
         $result = $api->get(
-            sprintf("/documents/%s/lastwebhook", $this->documentId),
+            "/documents/{$this->documentId}/lastwebhook",
             "",
             false,
             false
@@ -260,39 +252,38 @@ class ilNolejActivityManagementGUI
     }
 
     /**
-     * Print a caller to the last webhook
+     * Print a caller to the last webhook.
+     * @return string
      */
     protected function getWebhookCallBox(): string
     {
         global $DIC;
-        $f = $DIC->ui()->factory();
+        $factory = $DIC->ui()->factory();
         $renderer = $DIC->ui()->renderer();
 
         $buttons = [
-            $f->button()->standard(
+            $factory->button()->standard(
                 $this->plugin->txt("cmd_webhook_call"),
                 $this->ctrl->getLinkTarget($this, self::CMD_WEBHOOK_CALL)
             )
         ];
 
         return $renderer->render(
-            $f->messageBox()
+            $factory->messageBox()
                 ->confirmation($this->plugin->txt("cmd_webhook_call_info"))
                 ->withButtons($buttons)
         );
     }
 
     /**
-     * Print the activity management workflow,
-     * depending on current status and requested cmd.
-     * @param string $cmd
-     * @return void
+     * Get the activity management workflow, follows current status.
+     * @return \ILIAS\UI\Component\Listing\Workflow\Linear
      */
-    protected function printWorkflow($cmd)
+    public function getWorkflow()
     {
         global $DIC;
-        $f = $DIC->ui()->factory()->listing()->workflow();
-        $renderer = $DIC->ui()->renderer();
+
+        $workflow = $DIC->ui()->factory()->listing()->workflow();
 
         if ($this->obj_gui == null) {
             return;
@@ -302,57 +293,13 @@ class ilNolejActivityManagementGUI
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
         $this->tpl->addJavaScript(ilNolejPlugin::PLUGIN_DIR . "/js/nolej.js");
 
-        $revisionSteps = [
-            $f->step(
-                $this->plugin->txt(self::SUBTAB_SUMMARY),
-                "",
-                $this->ctrl->getLinkTarget($this, self::CMD_SUMMARY)
-            )
-                ->withAvailability(Step::AVAILABLE)
-                ->withStatus(Step::IN_PROGRESS),
-            $f->step(
-                $this->plugin->txt(self::SUBTAB_CONCEPTS),
-                "",
-                $this->ctrl->getLinkTarget($this, self::CMD_CONCEPTS)
-            )
-                ->withAvailability(Step::AVAILABLE)
-                ->withStatus(Step::IN_PROGRESS),
-            $f->step(
-                $this->plugin->txt(self::SUBTAB_QUESTIONS),
-                "",
-                $this->ctrl->getLinkTarget($this, self::CMD_QUESTIONS)
-            )
-                ->withAvailability(Step::AVAILABLE)
-                ->withStatus(Step::IN_PROGRESS)
-        ];
-        $revisionWf = $f->linear("", $revisionSteps);
-        $renderedRevisionWf = "";
-        if ($this->status >= self::STATUS_REVISION) {
-            switch ($cmd) {
-                case self::CMD_REVIEW:
-                case self::CMD_REVISION:
-                case self::CMD_SUMMARY:
-                case self::CMD_SUMMARY_SAVE:
-                    $renderedRevisionWf = $renderer->render($revisionWf->withActive(0));
-                    break;
-                case self::CMD_CONCEPTS:
-                case self::CMD_CONCEPTS_SAVE:
-                    $renderedRevisionWf = $renderer->render($revisionWf->withActive(1));
-                    break;
-                case self::CMD_QUESTIONS:
-                case self::CMD_QUESTIONS_SAVE:
-                    $renderedRevisionWf = $renderer->render($revisionWf->withActive(2));
-                    break;
-            }
-        }
-
         $steps = [
-            $f->step(
-                $this->plugin->txt(self::TAB_CREATION),
+            $workflow->step(
+                $this->plugin->txt("tab_creation"),
                 $this->status == self::STATUS_CREATION_PENDING
                     ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_transcription")
                     : "",
-                $this->ctrl->getLinkTargetByClass(ilNolejCreationFormGUI::class, ilNolejCreationFormGUI::CMD_SHOW)
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejCreationFormGUI::class], ilNolejCreationFormGUI::CMD_SHOW)
             )
                 ->withAvailability(Step::AVAILABLE) // Always available
                 ->withStatus(
@@ -363,12 +310,12 @@ class ilNolejActivityManagementGUI
                             : Step::SUCCESSFULLY
                         )
                 ),
-            $f->step(
-                $this->plugin->txt(self::TAB_ANALYSIS),
+            $workflow->step(
+                $this->plugin->txt("tab_analysis"),
                 $this->status == self::STATUS_ANALISYS_PENDING
                     ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_analysis")
                     : "",
-                $this->ctrl->getLinkTarget($this, self::CMD_ANALYSIS)
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejTranscriptionFormGUI::class], ilNolejTranscriptionFormGUI::CMD_SHOW)
             )
                 ->withAvailability(
                     $this->status < self::STATUS_ANALISYS
@@ -383,10 +330,10 @@ class ilNolejActivityManagementGUI
                             : Step::SUCCESSFULLY
                         )
                 ),
-            $f->step(
-                $this->plugin->txt(self::TAB_REVIEW),
-                $renderedRevisionWf,
-                $this->ctrl->getLinkTarget($this, self::CMD_REVISION)
+            $workflow->step(
+                $this->plugin->txt("review_concepts"),
+                "",
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejConceptsFormGUI::class], ilNolejConceptsFormGUI::CMD_SHOW)
             )
                 ->withAvailability(
                     $this->status < self::STATUS_REVISION
@@ -401,12 +348,48 @@ class ilNolejActivityManagementGUI
                             : Step::SUCCESSFULLY
                         )
                 ),
-            $f->step(
-                $this->plugin->txt(self::TAB_ACTIVITIES),
+            $workflow->step(
+                $this->plugin->txt("review_questions"),
+                "",
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejQuestionsFormGUI::class], ilNolejQuestionsFormGUI::CMD_SHOW)
+            )
+                ->withAvailability(
+                    $this->status < self::STATUS_REVISION
+                        ? Step::NOT_AVAILABLE
+                        : Step::AVAILABLE
+                )
+                ->withStatus(
+                    $this->status <= self::STATUS_REVISION
+                        ? Step::NOT_STARTED
+                        : ($this->status == self::STATUS_REVISION_PENDING
+                            ? Step::IN_PROGRESS
+                            : Step::SUCCESSFULLY
+                        )
+                ),
+            $workflow->step(
+                $this->plugin->txt("review_summary"),
+                "",
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejSummaryFormGUI::class], ilNolejSummaryFormGUI::CMD_SHOW)
+            )
+                ->withAvailability(
+                    $this->status < self::STATUS_REVISION
+                        ? Step::NOT_AVAILABLE
+                        : Step::AVAILABLE
+                )
+                ->withStatus(
+                    $this->status <= self::STATUS_REVISION
+                        ? Step::NOT_STARTED
+                        : ($this->status == self::STATUS_REVISION_PENDING
+                            ? Step::IN_PROGRESS
+                            : Step::SUCCESSFULLY
+                        )
+                ),
+            $workflow->step(
+                $this->plugin->txt("tab_activities"),
                 $this->status == self::STATUS_ACTIVITIES_PENDING
                     ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_activities")
                     : "",
-                $this->ctrl->getLinkTarget($this, self::CMD_ACTIVITIES)
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejActivitiesFormGUI::class], ilNolejActivitiesFormGUI::CMD_SHOW)
             )
                 ->withAvailability(
                     $this->status < self::STATUS_ACTIVITIES
@@ -422,54 +405,28 @@ class ilNolejActivityManagementGUI
                         )
                 ),
         ];
-        $wf = $f->linear($this->plugin->txt("tab_activity_management"), $steps);
-        $renderedWf = "";
 
-        // switch ($cmd) {
-        //     case self::CMD_CREATION:
-        //     case self::CMD_CREATE:
-        //         $renderedWf = $renderer->render($wf->withActive(0));
-        //         break;
-        //     case self::CMD_ANALYSIS:
-        //     case self::CMD_ANALYZE:
-        //         $renderedWf = $renderer->render($wf->withActive(1));
-        //         break;
-        //     case self::CMD_REVISION:
-        //     case self::CMD_SUMMARY:
-        //     case self::CMD_SUMMARY_SAVE:
-        //     case self::CMD_QUESTIONS:
-        //     case self::CMD_QUESTIONS_SAVE:
-        //     case self::CMD_CONCEPTS:
-        //     case self::CMD_CONCEPTS_SAVE:
-        //     case self::CMD_REVIEW:
-        //         $renderedWf = $renderer->render($wf->withActive(2));
-        //         break;
-        //     case self::CMD_ACTIVITIES:
-        //     case self::CMD_GENERATE:
-        //         $renderedWf = $renderer->render($wf->withActive(3));
-        //         break;
+        return $workflow->linear($this->plugin->txt("tab_activity_management"), $steps);
+
+        // $pendingStatuses = [
+        //     self::STATUS_CREATION_PENDING => "transcription",
+        //     self::STATUS_ANALISYS_PENDING => "analysis",
+        //     self::STATUS_ACTIVITIES_PENDING => "activities"
+        // ];
+
+        // if (array_key_exists($this->status, $pendingStatuses)) {
+        //     $this->tpl->addOnLoadCode(
+        //         sprintf(
+        //             "checkNolejUpdates('%s')",
+        //             $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES)
+        //                 . "&document_id=" . $this->documentId
+        //                 . "&status=" . $pendingStatuses[$this->status]
+        //         )
+        //     );
+        //     $this->tpl->setLeftContent($renderedWf . $this->getWebhookCallBox());
+        // } else {
+        //     $this->tpl->setLeftContent($renderedWf);
         // }
-
-        $pendingStatuses = [
-            self::STATUS_CREATION_PENDING => "transcription",
-            self::STATUS_ANALISYS_PENDING => "analysis",
-            self::STATUS_REVISION_PENDING => "",
-            self::STATUS_ACTIVITIES_PENDING => "activities"
-        ];
-
-        if (array_key_exists($this->status, $pendingStatuses)) {
-            $this->tpl->addOnLoadCode(
-                sprintf(
-                    "checkNolejUpdates('%s')",
-                    $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES)
-                        . "&document_id=" . $this->documentId
-                        . "&status=" . $pendingStatuses[$this->status]
-                )
-            );
-            $this->tpl->setLeftContent($renderedWf . $this->getWebhookCallBox());
-        } else {
-            $this->tpl->setLeftContent($renderedWf);
-        }
     }
 
     /**
@@ -630,7 +587,7 @@ class ilNolejActivityManagementGUI
             [$newStatus, $this->documentId]
         );
         $this->statusCheck();
-        $this->printWorkflow($this->cmd);
+        // $this->printWorkflow($this->cmd);
     }
 
     /**

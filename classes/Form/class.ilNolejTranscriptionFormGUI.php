@@ -43,6 +43,10 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 
         $form = $this->form();
         $this->tpl->setContent($form->getHTML());
+
+        $this->tpl->setRightContent(
+            $this->renderer->render($this->manager->getWorkflow()->withActive(1))
+        );
     }
 
     /**
