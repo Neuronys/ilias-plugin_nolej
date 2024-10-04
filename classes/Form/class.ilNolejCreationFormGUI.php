@@ -323,6 +323,11 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $title->setMaxLength(250);
         $form->addItem($title);
 
+        // Content limits.
+        $limits = new ilNonEditableValueGUI();
+        $limits->setInfo($this->contentLimitsInfo());
+        $form->addItem($limits);
+
         /**
          * Choose a source to analyze.
          * - Web (url):
@@ -506,77 +511,44 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
     }
 
     /**
+     * Get the content limits popover.
      * @return string
      */
-    protected function contentLimitsInfo()
+    protected function contentLimitsInfo(): string
     {
-        $contentLimits = new ilInfoScreenGUI($this);
-
-        $contentLimits->addSection($this->plugin->txt("limit_content"));
-
-        $info = new ilInfoScreenGUI($this);
-        $info->hideFurtherSections(true);
-
-        $info->addSection("");
-        $info->addProperty("", "");
-        $info->addSection($this->plugin->txt("limit_audio"));
-        $info->addProperty(
-            $this->plugin->txt("limit_max_duration"),
-            sprintf($this->plugin->txt("limit_minutes"), 50)
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_min_characters"),
-            "500"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_max_size"),
-            "500 MB"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_type"),
-            implode(", ", ilNolejAPI::TYPE_AUDIO)
-        );
-        $info->addSection($this->plugin->txt("limit_video"));
-        $info->addProperty(
-            $this->plugin->txt("limit_max_duration"),
-            sprintf($this->plugin->txt("limit_minutes"), 50)
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_min_characters"),
-            "500"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_max_size"),
-            "500 MB"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_type"),
-            implode(", ", ilNolejAPI::TYPE_VIDEO)
-        );
-        $info->addSection($this->plugin->txt("limit_doc"));
-        $info->addProperty(
-            $this->plugin->txt("limit_max_pages"),
-            "50"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_min_characters"),
-            "500"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_max_size"),
-            "500 MB"
-        );
-        $info->addProperty(
-            $this->plugin->txt("limit_type"),
-            implode(", ", ilNolejAPI::TYPE_DOC)
-        );
-
-        $contentLimits->addProperty(
-            $this->plugin->txt("limit_content"),
-            $info->getHTML()
-        );
-
-        return $contentLimits->getHTML();
+        $popover = $this->factory->popover()->listing([
+            $this->factory->item()->group(
+                "",
+                [
+                    $this->factory->item()->standard($this->plugin->txt("limit_audio"))
+                        ->withProperties([
+                            $this->plugin->txt("limit_max_duration") => sprintf($this->plugin->txt("limit_minutes"), 50),
+                            $this->plugin->txt("limit_min_characters") => "500",
+                            $this->plugin->txt("limit_max_size") => "500 MB",
+                            $this->plugin->txt("limit_type") => implode(", ", ilNolejAPI::TYPE_AUDIO),
+                        ]),
+                    $this->factory->item()->standard($this->plugin->txt("limit_video"))
+                        ->withProperties([
+                            $this->plugin->txt("limit_max_duration") => sprintf($this->plugin->txt("limit_minutes"), 50),
+                            $this->plugin->txt("limit_min_characters") => "500",
+                            $this->plugin->txt("limit_max_size") => "500 MB",
+                            $this->plugin->txt("limit_type") => implode(", ", ilNolejAPI::TYPE_VIDEO),
+                        ]),
+                    $this->factory->item()->standard($this->plugin->txt("limit_doc"))
+                        ->withProperties([
+                            $this->plugin->txt("limit_max_pages") => 50,
+                            $this->plugin->txt("limit_min_characters") => "500",
+                            $this->plugin->txt("limit_max_size") => "500 MB",
+                            $this->plugin->txt("limit_type") => implode(", ", ilNolejAPI::TYPE_DOC),
+                        ]),
+                ]
+            ),
+        ])->withTitle($this->plugin->txt("limit_content"));
+     
+        $button = $this->factory->button()->standard($this->plugin->txt("limit_content"), "#")
+            ->withOnClick($popover->getShowSignal());
+     
+        return $this->renderer->render([$popover, $button]);
     }
 
     /**
