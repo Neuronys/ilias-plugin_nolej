@@ -21,8 +21,6 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     const PLUGIN_NAME = "Nolej";
     const PLUGIN_DIR = "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej";
     const PERMALINK = "xnlj_modules";
-    const CNAME = "Repository";
-    const SLOT_ID = "robj";
     const PREFIX = "rep_robj_xnlj";
 
     const TABLE_CONFIG = "rep_robj_xnlj_config";
@@ -33,18 +31,47 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     const TABLE_H5P = "rep_robj_xnlj_hfp";
     const TABLE_LP = "rep_robj_xnlj_lp";
 
+    /** @var self|null */
+    protected static $instance = null;
+
     /** @var PluginProviderCollection|null */
     protected static $pluginProviderCollection = null;
 
+    /** @var ilLogger */
+    public ilLogger $logger;
+
+    /** @var array */
+    protected static $config = [];
 
     /**
-     * Initialize plugin
+     * Initialize plugin.
+     * @return void
      */
     public function init(): void
     {
+        $this->logger = ilLoggerFactory::getLogger(self::PREFIX);
+
+        if (self::$instance == null) {
+            self::$instance = $this;
+        }
+    }
+
+    /**
+     * Used to initialize providers.
+     * @param \ILIAS\DI\Container $dic
+     * @return Closure
+     */
+    public function exchangeUIRendererAfterInitialization(\ILIAS\DI\Container $dic): Closure
+    {
+        // Add plugin providers.
         global $DIC;
 
-        $this->provider_collection = $this->getPluginProviderCollection(); // Fix overflow
+        if (isset($DIC["global_screen"])) {
+            self::$pluginProviderCollection = $this->getPluginProviderCollection(); // Fix overflow.
+        }
+
+        // This returns the callable of $c["ui.renderer"] without executing it.
+        return $dic->raw("ui.renderer");
     }
 
     /**
@@ -55,20 +82,38 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         global $DIC;
 
         if (!isset($DIC["global_screen"])) {
-            return $this->provider_collection;
+            return self::$pluginProviderCollection;
         }
 
-        require_once (self::PLUGIN_DIR . "/classes/MainBar/NolejMainBarProvider.php");
         require_once (self::PLUGIN_DIR . "/classes/Notification/NolejNotificationProvider.php");
+
         if (self::$pluginProviderCollection === null) {
             self::$pluginProviderCollection = new PluginProviderCollection();
 
-            // self::$pluginProviderCollection->setMetaBarProvider(self::helpMe()->metaBar());
-            // self::$pluginProviderCollection->setMainBarProvider(new NolejMainBarProvider($DIC, $this));
+            // self::$pluginProviderCollection->setMetaBarProvider(new NolejMetaBarProvider($DIC, $this));
             self::$pluginProviderCollection->setNotificationProvider(new NolejNotificationProvider($DIC, $this));
         }
 
         return self::$pluginProviderCollection;
+    }
+
+    /**
+     * @return self
+     */
+    public static function getInstance(): self
+    {
+        global $DIC;
+
+        if (self::$instance == null) {
+
+            /** @var ilComponentFactory */
+            $component_factory = $DIC["component.factory"];
+
+            $plugin = $component_factory->getPlugin(self::PLUGIN_ID);
+            self::$instance = $plugin;
+        }
+
+        return self::$instance;
     }
 
     /**
@@ -86,14 +131,14 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
      */
     public function getParentTypes(): array
     {
-        $par_types = array("root", "cat", "crs", "grp", "fold", "lso", "prg");
+        $par_types = ["root", "cat", "crs", "grp", "fold", "lso", "prg"];
         return $par_types;
     }
 
-    protected function afterActivation(): void
-    {
-    }
-
+    /**
+     * Delete plugin tables.
+     * @return void
+     */
     protected function uninstallCustom(): void
     {
         $tables = [
@@ -114,7 +159,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     }
 
     /**
-     * @inheritdoc
+     * Nolej objects cannot be copied.
      * @return bool
      */
     public function allowCopy(): bool
@@ -132,24 +177,115 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     }
 
     /**
+     * Get the url to the plugin configuration GUI.
      * @return string
      */
     public function getConfigurationLink()
     {
         global $DIC;
-        include_once (self::PLUGIN_DIR . "/classes/class.ilNolejConfigGUI.php");
 
-        return sprintf(
-            "%s&ref_id=31&plugin_id=%s&ctype=Services&cname=%s&slot_id=%s&pname=%s",
-            $DIC->ctrl()->getLinkTargetByClass(
-                ["ilAdministrationGUI", "ilObjComponentSettingsGUI", ilNolejConfigGUI::class],
-                ilNolejConfigGUI::CMD_CONFIGURE
-            ),
-            self::PLUGIN_ID,
-            self::CNAME,
-            self::SLOT_ID,
-            self::PLUGIN_NAME
+        $ctrl = $DIC->ctrl();
+
+        include_once self::PLUGIN_DIR . "/classes/class.ilNolejConfigGUI.php";
+
+        $ctrl->setParameterByClass(ilNolejConfigGUI::class, "ref_id", "31");
+        $ctrl->setParameterByClass(ilNolejConfigGUI::class, "ctype", "Services");
+        $ctrl->setParameterByClass(ilNolejConfigGUI::class, "cname", "Repository");
+        $ctrl->setParameterByClass(ilNolejConfigGUI::class, "slot_id", "robj");
+        $ctrl->setParameterByClass(ilNolejConfigGUI::class, "plugin_id", self::PLUGIN_ID);
+        $ctrl->setParameterByClass(ilNolejConfigGUI::class, "pname", self::PLUGIN_NAME);
+
+        return $ctrl->getLinkTargetByClass(
+            ["ilAdministrationGUI", "ilObjComponentSettingsGUI", ilNolejConfigGUI::class],
+            ilNolejConfigGUI::CMD_CONFIGURE
         );
     }
 
+    /**
+     * @param string $keyword
+     * @param string $defaultValue
+     * @return string
+     */
+    public static function getConfig($keyword, $defaultValue = "")
+    {
+        global $DIC;
+        $db = $DIC->database();
+
+        if (isset(self::$config[$keyword])) {
+            return self::$config[$keyword];
+        }
+
+        $res = $db->queryF(
+            "SELECT `value` FROM " . self::TABLE_CONFIG . " WHERE keyword = %s;",
+            ["text"],
+            [$keyword]
+        );
+
+        if (!$res || $db->numRows($res) <= 0) {
+            return $defaultValue;
+        }
+
+        $record = $db->fetchAssoc($res);
+        self::$config[$keyword] = $record["value"];
+        return $record["value"];
+    }
+
+    /**
+     * @param string $keyword
+     * @param string $value
+     */
+    public static function saveConfig($keyword, $value)
+    {
+        global $DIC;
+        $db = $DIC->database();
+
+        self::$config[$keyword] = $value;
+
+        $db->manipulateF(
+            "REPLACE INTO " . self::TABLE_CONFIG . " (keyword, value) VALUES (%s, %s);",
+            ["text", "text"],
+            [$keyword, $value]
+        );
+    }
+
+    /**
+     * Include H5P plugin.
+     * @return void
+     * @throws LogicException if it is not installed
+     */
+    public static function includeH5P(): void
+    {
+        $h5pDirectory = "./Customizing/global/plugins/Services/Repository/RepositoryObject/H5P";
+        $h5pAutoloader = $h5pDirectory . "/vendor/autoload.php";
+        $h5pPlugin = $h5pDirectory . "/classes/class.ilH5PPlugin.php";
+
+        if (!file_exists($h5pAutoloader) || !file_exists($h5pPlugin)) {
+            throw new LogicException("You cannot use this plugin without installing the H5P plugin first.");
+        }
+
+        if (!self::isH5PPluginLoaded()) {
+            require_once $h5pAutoloader;
+            require_once $h5pPlugin;
+        }
+    }
+
+    /**
+     * Check that H5P plugin class is loaded.
+     * @return bool
+     */
+    public static function isH5PPluginLoaded(): bool
+    {
+        return class_exists("ilH5PPlugin");
+    }
+
+    /**
+     * Log a message.
+     * @param string $a_message
+     * @param int $a_level (info, warning, error, debug)
+     * @return void
+     */
+    public function log($a_message, int $a_level = ilLogLevel::INFO): void
+    {
+        $this->logger->log($a_message, $a_level);
+    }
 }

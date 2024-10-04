@@ -11,8 +11,6 @@ action_analysis_ok_desc#:#L'analyse du document "%s" a été achevée sur %s, vo
 action_review#:#Révision en cours
 action_review_ko#:#Révision échouée
 action_review_ok#:#La révision est prête
-action_tac#:#TAC reçu !
-action_tic#:#TIC envoyé
 action_transcription#:#Transcription en cours
 action_transcription_ko#:#La transcription a échoué
 action_transcription_ko_desc#:#Malheureusement, la transcription du document "%s" a échoué sur %s. Message d'erreur : %s
@@ -66,7 +64,6 @@ cmd_review#:#Confirmer la révision
 cmd_review_info#:#Si vous avez passé en revue le résumé, ainsi que chaque question et chaque concept, vous pouvez procéder à la création d'activités H5P.
 cmd_save#:#Sauvegarder
 cmd_select#:#Sélectionner un média dans le pool de médias
-cmd_tic#:#Envoyer un TIC
 cmd_update#:#Mettre à jour
 cmd_webhook_call#:#Vérifier le statut actuel
 cmd_webhook_call_info#:#Si vous attendez depuis longtemps le résultat de l'opération, vous pouvez essayer de synchroniser le statut avec le serveur NOLEJ. En effet, il est possible, bien que rare, que la réponse se soit perdue en cours de route...
@@ -104,6 +101,7 @@ err_h5p_content#:#Désolé, cette activité ne peut pas être chargée. Veuillez
 err_h5p_package#:#paquet H5P invalide
 err_h5p_plugin#:#Désolé, votre version du plugin H5P n'est pas prise en charge. Veuillez la mettre à jour ou contacter un administrateur.
 err_json_decode#:#ne peut pas décoder le JSON
+err_media_format_unknown#:#Format not supported.
 err_questions_file#:#Le fichier de questions ne peut pas être récupéré. Veuillez réessayer.
 err_questions_put#:#NOLEJ a renvoyé une erreur, veuillez vérifier vos données et réessayer.
 err_questions_save#:#Le fichier de questions ne peut pas être enregistré. Réessayez, et si le problème persiste, demandez l'aide d'un administrateur.
@@ -114,7 +112,6 @@ err_settings_save#:#Le fichier de configuration des activités ne peut pas être
 err_summary_file#:#Le fichier de résumé ne peut être récupéré. Veuillez réessayer.
 err_summary_put#:#NOLEJ a renvoyé une erreur, veuillez vérifier vos données et réessayer.
 err_summary_save#:#Le fichier de résumé ne peut pas être sauvegardé. Réessayez et, si le problème persiste, demandez l'aide d'un administrateur.
-err_tic_response#:#L'API NOLEJ a renvoyé une réponse non valide.
 err_transcription_not_ready#:#La transcription n'est pas encore prête, veuillez attendre un peu et vérifier à nouveau. Cela devrait prendre un dixième de la durée de la source ; si après ce délai vous n'avez pas reçu de notification, veuillez contacter un administrateur.
 fold_create_xnlj#:#Créer un objet NOLEJ
 goto_activity_management#:#Aller à la gestion des activités
@@ -216,9 +213,6 @@ tab_insert_from_pool#:#Sélectionner un média dans le mediapool
 tab_modules#:#Modules NOLEJ
 tab_properties#:#Propriétés
 tab_review#:#Révision
-tac_received#:#TAC reçu !
-tac_received_info#:#Le TAC avec l'ID d'échange %s a été reçu sur %s.
-tic_sent#:#TIC envoyé.
 update_successful#:#Mise à jour réussie
 work_in_progress#:#NOLEJ AI travaille pour vous. Veuillez patienter encore un peu.
 xnlj_add#:#Créer

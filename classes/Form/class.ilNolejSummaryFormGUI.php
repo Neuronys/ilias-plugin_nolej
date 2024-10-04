@@ -10,16 +10,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$id = "xnlj";
-$version = "2.0";
+/**
+ * Summary Form GUI class.
+ *
+ * @ilCtrl_isCalledBy ilNolejSummaryFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ */
+class ilNolejSummaryFormGUI extends ilNolejFormGUI
+{
 
-$ilias_min_version = "8.0";
-$ilias_max_version = "8.999";
-
-$responsible = "OC Open Consulting SB srl";
-$responsible_mail = "plugins@oc-group.eu";
-
-$supports_export = false;
-
-// Enable learning progress
-$learning_progress = true;
+}

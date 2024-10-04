@@ -11,7 +11,6 @@
  */
 
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
 
 /**
@@ -19,8 +18,8 @@ require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManageme
  */
 class ilNolejWebhook
 {
-    /** @var ilNolejConfig */
-    protected $config;
+    /** @var ilNolejPlugin */
+    protected $plugin;
 
     /** @var array */
     protected $data;
@@ -30,15 +29,7 @@ class ilNolejWebhook
 
     public function __construct()
     {
-        $this->config = new ilNolejConfig();
-    }
-
-    /**
-     * @param string $msg
-     */
-    public function log($msg)
-    {
-        $this->config->logger->log($msg);
+        $this->plugin = ilNolejPlugin::getInstance();
     }
 
     /**
@@ -59,7 +50,7 @@ class ilNolejWebhook
             !is_string($data["action"])
         ) {
             $this->die_message(400, "Request not valid.");
-            $this->log("Received invalid request: " . var_export($data, true));
+            $this->plugin->log("Received invalid request: " . var_export($data, true));
         }
 
         $this->data = $data;
@@ -69,31 +60,31 @@ class ilNolejWebhook
                 break;
 
             case "transcription":
-                $this->log("Received transcription request: " . var_export($data, true));
+                $this->plugin->log("Received transcription request: " . var_export($data, true));
                 $this->checkTranscription();
                 break;
 
             case "analysis":
-                $this->log("Received analysis request: " . var_export($data, true));
+                $this->plugin->log("Received analysis request: " . var_export($data, true));
                 $this->checkAnalysis();
                 break;
 
             case "activities":
-                $this->log("Received activities request: " . var_export($data, true));
+                $this->plugin->log("Received activities request: " . var_export($data, true));
                 $this->checkActivities();
                 break;
 
             case "work in progress":
-                $this->log("Received work in progress.");
+                $this->plugin->log("Received work in progress.");
                 global $DIC, $tpl;
                 if (!$DIC->user()->isAnonymous()) {
-                    $tpl->setOnScreenMessage("info", ilNolejConfig::txt("work_in_progress"));
+                    $tpl->setOnScreenMessage("info", $this->plugin->txt("work_in_progress"));
                     return;
                 }
                 break;
 
             default:
-                $this->log("Received invalid action: " . var_export($data, true));
+                $this->plugin->log("Received invalid action: " . var_export($data, true));
         }
     }
 
@@ -107,7 +98,7 @@ class ilNolejWebhook
         $message = ""
     ) {
         if (!empty($message)) {
-            $this->log("Replied to Nolej with message: " . $message);
+            $this->plugin->log("Replied to Nolej with message: " . $message);
             if ($this->shouldDie) {
                 echo json_encode(["message" => $message]);
             }
@@ -235,7 +226,7 @@ class ilNolejWebhook
                 $documentId,
                 $documentId,
                 $documentId,
-                ilNolejActivityManagementGUI::STATUS_CREATION_PENDING
+                ilObjNolej::STATUS_CREATION_PENDING
             ]
         );
         if ($db->numRows($result) != 1) {
@@ -252,7 +243,7 @@ class ilNolejWebhook
             $this->data["status"] != "\"ok\"" &&
             $this->data["status"] != "ok"
         ) {
-            $this->log("Result: ko");
+            $this->plugin->log("Result: ko");
 
             $result = $db->manipulateF(
                 "UPDATE " . ilNolejPlugin::TABLE_DOC
@@ -264,7 +255,7 @@ class ilNolejWebhook
                     "text"
                 ],
                 [
-                    ilNolejActivityManagementGUI::STATUS_CREATION,
+                    ilObjNolej::STATUS_CREATION,
                     $this->data["consumedCredit"],
                     $documentId
                 ]
@@ -300,7 +291,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilNolejActivityManagementGUI::STATUS_ANALISYS,
+                ilObjNolej::STATUS_ANALISYS,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -381,7 +372,7 @@ class ilNolejWebhook
                 $documentId,
                 $documentId,
                 $documentId,
-                ilNolejActivityManagementGUI::STATUS_ANALISYS_PENDING
+                ilObjNolej::STATUS_ANALISYS_PENDING
             ]
         );
         if ($db->numRows($result) != 1) {
@@ -398,7 +389,7 @@ class ilNolejWebhook
             $this->data["status"] != "\"ok\"" &&
             $this->data["status"] != "ok"
         ) {
-            $this->log("Result: ko");
+            $this->plugin->log("Result: ko");
 
             $result = $db->manipulateF(
                 "UPDATE " . ilNolejPlugin::TABLE_DOC
@@ -410,7 +401,7 @@ class ilNolejWebhook
                     "text"
                 ],
                 [
-                    ilNolejActivityManagementGUI::STATUS_ANALISYS,
+                    ilObjNolej::STATUS_ANALISYS,
                     $this->data["consumedCredit"],
                     $documentId
                 ]
@@ -447,7 +438,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilNolejActivityManagementGUI::STATUS_REVISION,
+                ilObjNolej::STATUS_REVISION,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -528,7 +519,7 @@ class ilNolejWebhook
                 $documentId,
                 $documentId,
                 $documentId,
-                ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING
+                ilObjNolej::STATUS_ACTIVITIES_PENDING
             ]
         );
         if ($db->numRows($result) != 1) {
@@ -544,7 +535,7 @@ class ilNolejWebhook
             $this->data["status"] != "\"ok\"" &&
             $this->data["status"] != "ok"
         ) {
-            $this->log("Result: ko");
+            $this->plugin->log("Result: ko");
             $this->sendNotification(
                 $documentId,
                 (int) $document["user_id"],
@@ -573,7 +564,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilNolejActivityManagementGUI::STATUS_COMPLETED,
+                ilObjNolej::STATUS_COMPLETED,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -585,7 +576,7 @@ class ilNolejWebhook
         $activityManagement = new ilNolejActivityManagementGUI(null, $documentId);
         $fails = $activityManagement->downloadActivities();
         if (!empty($fails)) {
-            $this->log("Failed to download some activities: " . $fails . ".");
+            $this->plugin->log("Failed to download some activities: " . $fails . ".");
             $this->sendNotification(
                 $documentId,
                 (int) $document["user_id"],
@@ -654,14 +645,7 @@ class ilNolejWebhook
         /** Send Email */
         $lng = $this->setUserLang($userId);
 
-        if (class_exists("ilNotificationConfig")) {
-            $notification = new ilNotificationConfig("chat_invitation");
-        } else if (class_exists("ILIAS\Notifications\Model\ilNotificationConfig")) {
-            $notification = new ILIAS\Notifications\Model\ilNotificationConfig("chat_invitation");
-        } else {
-            $this->log("Warning: Notification cannot be sent!");
-            return;
-        }
+        $notification = new ILIAS\Notifications\Model\ilNotificationConfig("chat_invitation");
 
         $notification->setTitleVar(
             $lng->txt(

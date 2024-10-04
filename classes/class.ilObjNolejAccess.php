@@ -117,7 +117,6 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      */
     public static function _checkGoto(string $a_target): bool
     {
-        include_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejGUI.php");
         $target = substr($a_target, strlen(ilNolejPlugin::PLUGIN_ID) + 1); // Remove plugin ID
 
         if (

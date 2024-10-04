@@ -11,8 +11,6 @@ action_analysis_ok_desc#:#Il documento "%s" è stato analizzato con successo in 
 action_review#:#Revisione in corso
 action_review_ko#:#Revisione fallita
 action_review_ok#:#Revisione completata
-action_tac#:#TAC ricevuto!
-action_tic#:#TIC inviato
 action_transcription#:#Trascrizione in corso
 action_transcription_ko#:#Trascrizione fallita
 action_transcription_ko_desc#:#Sfortunatamente, la trascrizione del documento "%s" non ha avuto successo, in data %s. Messaggio di errore: %s
@@ -66,7 +64,6 @@ cmd_review#:#Conferma revisione
 cmd_review_info#:#Se hai revisionato il sommario, tutte le domande e i concetti, puoi procedere con la creazione degli oggetti H5P.
 cmd_save#:#Salva
 cmd_select#:#Seleziona un oggetto dal mediapool
-cmd_tic#:#Invia TIC
 cmd_update#:#Aggiorna
 cmd_webhook_call#:#Controlla lo stato attuale
 cmd_webhook_call_info#:#Se attendi da molto l'esito dell'operazione, puoi provare a sincronizzare lo stato con il server di NOLEJ. È possibile infatti, seppur raro, che la risposta si sia persa per strada...
@@ -104,6 +101,7 @@ err_h5p_content#:#Non è stato possibile caricare l'attività. Per favore, conta
 err_h5p_package#:#non è un valido pacchetto H5P
 err_h5p_plugin#:#La versione del plugin H5P installata non è supportata. Per favore, aggiorna il plugin o contatta un amministratore.
 err_json_decode#:#non può decodificare il JSON
+err_media_format_unknown#:#Formato non supportato.
 err_questions_file#:#Impossibile caricare le domande. Per favore, riprova.
 err_questions_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
 err_questions_save#:#Impossibile salvare il file delle domande. Riprova, e se persiste contatta un Amministratore.
@@ -114,7 +112,6 @@ err_settings_save#:#Impossibile salvare il file delle impostazioni delle attivit
 err_summary_file#:#Impossibile caricare il file di sommario. Per favore, riprova.
 err_summary_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
 err_summary_save#:#Impossibile salvare il file di sommario. Riprova, e se persiste contatta un Amministratore.
-err_tic_response#:#L'endpoint di NOLEJ ha restituito una risposta non prevista.
 err_transcription_not_ready#:#La trascrizione non è ancora completa, attendi ancora un po' di tempo e torna qui per verificare. L'attesa stimata è di circa un decimo rispetto alla durata del file scelto; se è trascorso molto più di questo tempo e non hai ancora ricevuto una notifica, per favore contatta un Amministratore.
 fold_create_xnlj#:#Crea un oggetto NOLEJ
 goto_activity_management#:#Vai in Gestione Attività
@@ -216,9 +213,6 @@ tab_insert_from_pool#:#Seleziona un media dal mediapool
 tab_modules#:#Moduli
 tab_properties#:#Proprietà
 tab_review#:#Revisione
-tac_received#:#TAC ricevuto!
-tac_received_info#:#TAC con exchange ID %s è stato ricevuto il %s.
-tic_sent#:#TIC inviato.
 update_successful#:#Aggiornamento completato.
 work_in_progress#:#NOLEJ AI sta lavorando per te. Per favore, attendi un altro po'.
 xnlj_add#:#Crea

@@ -12,24 +12,18 @@
 
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejMediaSelectorGUI.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
-
-require_once "./Services/Form/classes/class.ilCheckboxInputGUI.php";
 
 /**
  * GUI to manage every step of the Nolej module creation.
  *
- * @ilCtrl_isCalledBy ilNolejActivityManagementGUI: ilObjNolejGUI
- * @ilCtrl_Calls ilNolejActivityManagementGUI: ilformpropertydispatchgui, ilinternallinkgui
- * @ilCtrl_Calls ilNolejActivityManagementGUI: ilpropertyformgui, ilinternallinkgui
- * @ilCtrl_Calls ilNolejActivityManagementGUI: ilformpropertydispatchgui, illinkinputgui, ilinternallinkgui
+ * @ilCtrl_isCalledBy ilNolejActivityManagementGUI: ilObjPluginDispatchGUI, ilObjNolejGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilNolejCreationFormGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilNolejTranscriptionFormGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilNolejConceptsFormGUI, ilNolejQuestionsFormGUI, ilNolejSummaryFormGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilNolejActivitiesFormGUI
  */
 class ilNolejActivityManagementGUI
 {
-    const CMD_CREATION = "creation";
-    const CMD_SET_INT_LINK = "setInternalLink";
-    const CMD_CREATE = "create";
     const CMD_ANALYSIS = "analysis";
     const CMD_ANALYZE = "analyze";
     const CMD_REVISION = "revision";
@@ -53,39 +47,6 @@ class ilNolejActivityManagementGUI
     const SUBTAB_QUESTIONS = "review_questions";
     const SUBTAB_CONCEPTS = "review_concepts";
 
-    const PROP_TITLE = "title";
-    const PROP_MEDIA_SRC = "media_source";
-    const PROP_M_WEB = "web";
-    const PROP_WEB_SRC = "web_src";
-    const PROP_M_URL = "url";
-    const PROP_M_CONTENT = "content";
-    const PROP_M_AUDIO = "audio";
-    const PROP_M_VIDEO = "video";
-    const PROP_M_MOB = "mob";
-    const PROP_M_FILE = "file";
-    const PROP_M_DOC = "document";
-    const PROP_M_TEXT = "freetext";
-    const PROP_M_TEXTAREA = "textarea";
-    const PROP_INPUT_MOB = "input_mob";
-    const PROP_INPUT_FILE = "input_file";
-    const PROP_LANG = "language";
-    const PROP_AUTOMATIC = "automatic";
-
-    const TYPE_AUDIO = ["mp3", "wav", "opus", "ogg", "oga", "m4a"];
-    const TYPE_VIDEO = ["m4v", "mp4", "ogv", "avi", "webm"];
-    const TYPE_DOC = ["pdf", "doc", "docx", "odt"];
-    const TYPE_TEXT = ["txt", "htm", "html"];
-
-    const STATUS_CREATION = 0;
-    const STATUS_CREATION_PENDING = 1;
-    const STATUS_ANALISYS = 2;
-    const STATUS_ANALISYS_PENDING = 3;
-    const STATUS_REVISION = 4;
-    const STATUS_REVISION_PENDING = 5;
-    const STATUS_ACTIVITIES = 6;
-    const STATUS_ACTIVITIES_PENDING = 7;
-    const STATUS_COMPLETED = 8;
-
     /** @var ilCtrl */
     protected ilCtrl $ctrl;
 
@@ -99,13 +60,13 @@ class ilNolejActivityManagementGUI
     protected ilLanguage $lng;
 
     /** @var ilObjNolejGUI */
-    protected $gui_obj;
+    protected $obj_gui;
 
     /** @var int */
     protected int $status = 0;
 
     /** @var string */
-    protected string $defaultCmd = "";
+    protected string $defaultClass = "";
 
     /** @var string */
     protected string $cmd = "";
@@ -122,14 +83,14 @@ class ilNolejActivityManagementGUI
     /** @var request */
     protected $request;
 
-    /** @var ilNolejConfig */
-    protected $config;
+    /** @var ilNolejPlugin */
+    protected $plugin;
 
     /**
-     * @param ilObjNolejGUI|null $gui_obj
+     * @param ilObjNolejGUI $obj_gui
      * @param string|null $documentId
      */
-    public function __construct($gui_obj = null, $documentId = null)
+    public function __construct($obj_gui, $documentId = null)
     {
         global $DIC, $tpl;
         $this->ctrl = $DIC->ctrl();
@@ -138,34 +99,24 @@ class ilNolejActivityManagementGUI
         $this->lng = $DIC->language();
         $this->request = $DIC->http()->request();
 
-        $this->lng->loadLanguageModule(ilNolejPlugin::PREFIX);
-        $this->config = new ilNolejConfig();
+        $this->plugin = ilNolejPlugin::getInstance();
 
-        $this->gui_obj = $gui_obj;
-        $this->documentId = $gui_obj != null
-            ? $this->gui_obj->getObject()->getDocumentId()
-            : $documentId;
-        $this->dataDir = $this->config->dataDir() . $this->documentId;
+        $this->lng->loadLanguageModule(ilNolejPlugin::PREFIX);
+
+        $this->obj_gui = $obj_gui;
+        $this->documentId = $this->obj_gui->getObject()->getDocumentId();
+        $this->dataDir = $this->obj_gui->getObject()->getDataDir();
         $this->statusCheck();
 
-        $tpl->setTitle(
-            $this->gui_obj == null
-            ? $this->txt("plugin_title")
-            : $this->gui_obj->getObject()->getTitle(),
-            false
-        );
-        $tpl->setDescription($this->txt("plugin_description"));
+        if ($this->obj_gui == null) {
+            $tpl->setTitle($this->plugin->txt("plugin_title"), false);
+            $tpl->setDescription($this->plugin->txt("plugin_description"));
+        } else {
+            $tpl->setTitle($this->obj_gui->getObject()->getTitle(), false);
+            $tpl->setDescription($this->obj_gui->getObject()->getDescription());
+        }
 
-        ilNolejConfig::includeH5P();
-    }
-
-    /**
-     * @param string $key
-     * @return string
-     */
-    protected function txt(string $key): string
-    {
-        return ilNolejConfig::txt($key);
+        ilNolejPlugin::includeH5P();
     }
 
     /**
@@ -178,27 +129,38 @@ class ilNolejActivityManagementGUI
         $cmd = $this->ctrl->getCmd();
 
         switch ($next_class) {
-            case "ilinternallinkgui":
-                $this->lng->loadLanguageModule("content");
-                require_once ("./Services/Link/classes/class.ilInternalLinkGUI.php");
-                $link_gui = new ilInternalLinkGUI("Media_Media", 0);
-                $link_gui->filterLinkType("Media_Media");
-                $link_gui->setFilterWhiteList(true);
-                $link_gui->setSetLinkTargetScript(
-                    $this->ctrl->getLinkTarget(
-                        $this,
-                        self::CMD_SET_INT_LINK
-                    )
-                );
-                $this->ctrl->forwardCommand($link_gui);
+            case strtolower(ilNolejCreationFormGUI::class):
+                $formGui = new ilNolejCreationFormGUI($this->obj_gui);
+                $this->ctrl->forwardCommand($formGui);
+                break;
+
+            case strtolower(ilNolejTranscriptionFormGUI::class):
+                $formGui = new ilNolejTranscriptionFormGUI($this->obj_gui);
+                $this->ctrl->forwardCommand($formGui);
+                break;
+
+            case strtolower(ilNolejConceptsFormGUI::class):
+                $formGui = new ilNolejConceptsFormGUI($this->obj_gui);
+                $this->ctrl->forwardCommand($formGui);
+                break;
+
+            case strtolower(ilNolejQuestionsFormGUI::class):
+                $formGui = new ilNolejQuestionsFormGUI($this->obj_gui);
+                $this->ctrl->forwardCommand($formGui);
+                break;
+
+            case strtolower(ilNolejSummaryFormGUI::class):
+                $formGui = new ilNolejSummaryFormGUI($this->obj_gui);
+                $this->ctrl->forwardCommand($formGui);
+                break;
+
+            case strtolower(ilNolejActivitiesFormGUI::class):
+                $formGui = new ilNolejActivitiesFormGUI($this->obj_gui);
+                $this->ctrl->forwardCommand($formGui);
                 break;
 
             default:
                 switch ($cmd) {
-                    // Need to have permission to access modules
-                    case self::CMD_CREATION:
-                    case self::CMD_SET_INT_LINK:
-                    case self::CMD_CREATE:
                     case self::CMD_ANALYSIS:
                     case self::CMD_ANALYZE:
                     case self::CMD_REVISION:
@@ -214,17 +176,14 @@ class ilNolejActivityManagementGUI
                     case self::CMD_CHECK_UPDATES:
                     case self::CMD_WEBHOOK_CALL:
                         $this->cmd = $cmd;
-                        if ($this->gui_obj != null) {
+                        if ($this->obj_gui != null) {
                             $this->printWorkflow($cmd);
                             $this->$cmd();
                         }
                         break;
 
                     default:
-                        $cmd = $this->defaultCmd;
-                        $this->cmd = $cmd;
-                        $this->printWorkflow($cmd);
-                        $this->$cmd();
+                        $this->ctrl->redirectByClass($this->defaultClass);
                 }
         }
     }
@@ -235,31 +194,31 @@ class ilNolejActivityManagementGUI
      */
     protected function statusCheck()
     {
-        if ($this->gui_obj == null) {
+        if ($this->obj_gui == null) {
             $this->status = -1;
-            $this->defaultCmd = "";
+            $this->defaultClass = "";
             return;
         }
 
-        $this->status = $this->gui_obj->getObject()->getDocumentStatus();
+        $this->status = $this->obj_gui->getObject()->getDocumentStatus();
 
         switch ($this->status) {
-            case self::STATUS_CREATION:
-            case self::STATUS_CREATION_PENDING:
-                $this->defaultCmd = self::CMD_CREATION;
+            case ilObjNolej::STATUS_CREATION:
+            case ilObjNolej::STATUS_CREATION_PENDING:
+                $this->defaultClass = ilNolejCreationFormGUI::class;
                 break;
-            case self::STATUS_ANALISYS:
-            case self::STATUS_ANALISYS_PENDING:
-                $this->defaultCmd = self::CMD_ANALYSIS;
+            case ilObjNolej::STATUS_ANALISYS:
+            case ilObjNolej::STATUS_ANALISYS_PENDING:
+                $this->defaultClass = ilNolejTranscriptionFormGUI::class;
                 break;
-            case self::STATUS_REVISION:
-            case self::STATUS_REVISION_PENDING:
-                $this->defaultCmd = self::CMD_REVISION;
+            case ilObjNolej::STATUS_REVISION:
+            case ilObjNolej::STATUS_REVISION_PENDING:
+            case ilObjNolej::STATUS_COMPLETED:
+                $this->defaultClass = ilNolejConceptsFormGUI::class;
                 break;
-            case self::STATUS_ACTIVITIES:
-            case self::STATUS_ACTIVITIES_PENDING:
-            case self::STATUS_COMPLETED:
-                $this->defaultCmd = self::CMD_ACTIVITIES;
+            case ilObjNolej::STATUS_ACTIVITIES:
+            case ilObjNolej::STATUS_ACTIVITIES_PENDING:
+                $this->defaultClass = ilNolejActivitiesFormGUI::class;
                 break;
         }
     }
@@ -271,23 +230,22 @@ class ilNolejActivityManagementGUI
     {
         global $tpl;
 
-        $api_key = $this->config->get("api_key", "");
+        $api_key = $this->plugin->getConfig("api_key", "");
         if ($api_key == "") {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_api_key_missing"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_api_key_missing"));
             return;
         }
 
         $pendingStatuses = [
-            self::STATUS_CREATION_PENDING,
-            self::STATUS_ANALISYS_PENDING,
-            self::STATUS_REVISION_PENDING,
-            self::STATUS_ACTIVITIES_PENDING,
+            ilObjNolej::STATUS_CREATION_PENDING,
+            ilObjNolej::STATUS_ANALISYS_PENDING,
+            ilObjNolej::STATUS_REVISION_PENDING,
+            ilObjNolej::STATUS_ACTIVITIES_PENDING,
         ];
 
         if (!in_array($this->status, $pendingStatuses)) {
-            $cmd = $this->defaultCmd;
-            $this->printWorkflow($cmd);
-            $this->$cmd();
+            $class = $this->defaultClass;
+            $this->ctrl->redirectByClass($class, ilNolejFormGUI::CMD_SHOW);
             return;
         }
 
@@ -304,7 +262,7 @@ class ilNolejActivityManagementGUI
 
         $webhook = new ilNolejWebhook();
         $webhook->parse($data);
-        $this->ctrl->redirect($this, $this->defaultCmd);
+        $this->ctrl->redirectByClass($this->defaultClass, ilNolejFormGUI::CMD_SHOW);
     }
 
     /**
@@ -318,14 +276,14 @@ class ilNolejActivityManagementGUI
 
         $buttons = [
             $f->button()->standard(
-                $this->txt("cmd_webhook_call"),
+                $this->plugin->txt("cmd_webhook_call"),
                 $this->ctrl->getLinkTarget($this, self::CMD_WEBHOOK_CALL)
             )
         ];
 
         return $renderer->render(
             $f->messageBox()
-                ->confirmation($this->txt("cmd_webhook_call_info"))
+                ->confirmation($this->plugin->txt("cmd_webhook_call_info"))
                 ->withButtons($buttons)
         );
     }
@@ -342,7 +300,7 @@ class ilNolejActivityManagementGUI
         $f = $DIC->ui()->factory()->listing()->workflow();
         $renderer = $DIC->ui()->renderer();
 
-        if ($this->gui_obj == null) {
+        if ($this->obj_gui == null) {
             return;
         }
 
@@ -354,21 +312,21 @@ class ilNolejActivityManagementGUI
 
         $revisionSteps = [
             $f->step(
-                $this->txt(self::SUBTAB_SUMMARY),
+                $this->plugin->txt(self::SUBTAB_SUMMARY),
                 "",
                 $this->ctrl->getLinkTarget($this, self::CMD_SUMMARY)
             )
                 ->withAvailability($step::AVAILABLE)
                 ->withStatus($step::IN_PROGRESS),
             $f->step(
-                $this->txt(self::SUBTAB_CONCEPTS),
+                $this->plugin->txt(self::SUBTAB_CONCEPTS),
                 "",
                 $this->ctrl->getLinkTarget($this, self::CMD_CONCEPTS)
             )
                 ->withAvailability($step::AVAILABLE)
                 ->withStatus($step::IN_PROGRESS),
             $f->step(
-                $this->txt(self::SUBTAB_QUESTIONS),
+                $this->plugin->txt(self::SUBTAB_QUESTIONS),
                 "",
                 $this->ctrl->getLinkTarget($this, self::CMD_QUESTIONS)
             )
@@ -377,7 +335,7 @@ class ilNolejActivityManagementGUI
         ];
         $revisionWf = $f->linear("", $revisionSteps);
         $renderedRevisionWf = "";
-        if ($this->status >= self::STATUS_REVISION) {
+        if ($this->status >= ilObjNolej::STATUS_REVISION) {
             switch ($cmd) {
                 case self::CMD_REVIEW:
                 case self::CMD_REVISION:
@@ -398,81 +356,81 @@ class ilNolejActivityManagementGUI
 
         $steps = [
             $f->step(
-                $this->txt(self::TAB_CREATION),
-                $this->status == self::STATUS_CREATION_PENDING
-                ? self::glyphicon("refresh gly-spin") . $this->txt("action_transcription")
-                : "",
+                $this->plugin->txt(self::TAB_CREATION),
+                $this->status == ilObjNolej::STATUS_CREATION_PENDING
+                    ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_transcription")
+                    : "",
                 $this->ctrl->getLinkTarget($this, self::CMD_CREATION)
             )
                 ->withAvailability($step::AVAILABLE) // Always available
                 ->withStatus(
-                    $this->status == self::STATUS_CREATION
-                    ? $step::NOT_STARTED
-                    : ($this->status == self::STATUS_CREATION_PENDING
-                        ? $step::IN_PROGRESS
-                        : $step::SUCCESSFULLY
-                    )
+                    $this->status == ilObjNolej::STATUS_CREATION
+                        ? $step::NOT_STARTED
+                        : ($this->status == ilObjNolej::STATUS_CREATION_PENDING
+                            ? $step::IN_PROGRESS
+                            : $step::SUCCESSFULLY
+                        )
                 ),
             $f->step(
-                $this->txt(self::TAB_ANALYSIS),
-                $this->status == self::STATUS_ANALISYS_PENDING
-                ? self::glyphicon("refresh gly-spin") . $this->txt("action_analysis")
-                : "",
+                $this->plugin->txt(self::TAB_ANALYSIS),
+                $this->status == ilObjNolej::STATUS_ANALISYS_PENDING
+                    ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_analysis")
+                    : "",
                 $this->ctrl->getLinkTarget($this, self::CMD_ANALYSIS)
             )
                 ->withAvailability(
-                    $this->status < self::STATUS_ANALISYS
-                    ? $step::NOT_AVAILABLE
-                    : $step::AVAILABLE
+                    $this->status < ilObjNolej::STATUS_ANALISYS
+                        ? $step::NOT_AVAILABLE
+                        : $step::AVAILABLE
                 )
                 ->withStatus(
-                    $this->status <= self::STATUS_ANALISYS
-                    ? $step::NOT_STARTED
-                    : ($this->status == self::STATUS_ANALISYS_PENDING
-                        ? $step::IN_PROGRESS
-                        : $step::SUCCESSFULLY
-                    )
+                    $this->status <= ilObjNolej::STATUS_ANALISYS
+                        ? $step::NOT_STARTED
+                        : ($this->status == ilObjNolej::STATUS_ANALISYS_PENDING
+                            ? $step::IN_PROGRESS
+                            : $step::SUCCESSFULLY
+                        )
                 ),
             $f->step(
-                $this->txt(self::TAB_REVIEW),
+                $this->plugin->txt(self::TAB_REVIEW),
                 $renderedRevisionWf,
                 $this->ctrl->getLinkTarget($this, self::CMD_REVISION)
             )
                 ->withAvailability(
-                    $this->status < self::STATUS_REVISION
-                    ? $step::NOT_AVAILABLE
-                    : $step::AVAILABLE
+                    $this->status < ilObjNolej::STATUS_REVISION
+                        ? $step::NOT_AVAILABLE
+                        : $step::AVAILABLE
                 )
                 ->withStatus(
-                    $this->status <= self::STATUS_REVISION
-                    ? $step::NOT_STARTED
-                    : ($this->status == self::STATUS_REVISION_PENDING
-                        ? $step::IN_PROGRESS
-                        : $step::SUCCESSFULLY
-                    )
+                    $this->status <= ilObjNolej::STATUS_REVISION
+                        ? $step::NOT_STARTED
+                        : ($this->status == ilObjNolej::STATUS_REVISION_PENDING
+                            ? $step::IN_PROGRESS
+                            : $step::SUCCESSFULLY
+                        )
                 ),
             $f->step(
-                $this->txt(self::TAB_ACTIVITIES),
-                $this->status == self::STATUS_ACTIVITIES_PENDING
-                ? self::glyphicon("refresh gly-spin") . $this->txt("action_activities")
-                : "",
+                $this->plugin->txt(self::TAB_ACTIVITIES),
+                $this->status == ilObjNolej::STATUS_ACTIVITIES_PENDING
+                    ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_activities")
+                    : "",
                 $this->ctrl->getLinkTarget($this, self::CMD_ACTIVITIES)
             )
                 ->withAvailability(
-                    $this->status < self::STATUS_ACTIVITIES
-                    ? $step::NOT_AVAILABLE
-                    : $step::AVAILABLE
+                    $this->status < ilObjNolej::STATUS_ACTIVITIES
+                        ? $step::NOT_AVAILABLE
+                        : $step::AVAILABLE
                 )
                 ->withStatus(
-                    $this->status <= self::STATUS_ACTIVITIES
-                    ? $step::NOT_STARTED
-                    : ($this->status == self::STATUS_ACTIVITIES_PENDING
-                        ? $step::IN_PROGRESS
-                        : $step::SUCCESSFULLY
-                    )
+                    $this->status <= ilObjNolej::STATUS_ACTIVITIES
+                        ? $step::NOT_STARTED
+                        : ($this->status == ilObjNolej::STATUS_ACTIVITIES_PENDING
+                            ? $step::IN_PROGRESS
+                            : $step::SUCCESSFULLY
+                        )
                 ),
         ];
-        $wf = $f->linear($this->txt("tab_activity_management"), $steps);
+        $wf = $f->linear($this->plugin->txt("tab_activity_management"), $steps);
         $renderedWf = "";
 
         switch ($cmd) {
@@ -501,10 +459,10 @@ class ilNolejActivityManagementGUI
         }
 
         $pendingStatuses = [
-            self::STATUS_CREATION_PENDING => "transcription",
-            self::STATUS_ANALISYS_PENDING => "analysis",
-            self::STATUS_REVISION_PENDING => "",
-            self::STATUS_ACTIVITIES_PENDING => "activities"
+            ilObjNolej::STATUS_CREATION_PENDING => "transcription",
+            ilObjNolej::STATUS_ANALISYS_PENDING => "analysis",
+            ilObjNolej::STATUS_REVISION_PENDING => "",
+            ilObjNolej::STATUS_ACTIVITIES_PENDING => "activities"
         ];
 
         if (array_key_exists($this->status, $pendingStatuses)) {
@@ -512,8 +470,8 @@ class ilNolejActivityManagementGUI
                 sprintf(
                     "checkNolejUpdates('%s')",
                     $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES)
-                    . "&document_id=" . $this->documentId
-                    . "&status=" . $pendingStatuses[$this->status]
+                        . "&document_id=" . $this->documentId
+                        . "&status=" . $pendingStatuses[$this->status]
                 )
             );
             $tpl->setLeftContent($renderedWf . $this->getWebhookCallBox());
@@ -528,101 +486,6 @@ class ilNolejActivityManagementGUI
     public static function glyphicon($id)
     {
         return "<span class=\"glyphicon glyphicon-" . $id . "\" aria-hidden=\"true\"></span> ";
-    }
-
-    /**
-     * @return mixed|null
-     */
-    protected function get(string $key)
-    {
-        if (\ilSession::has(ilNolejPlugin::PLUGIN_ID . "_" . $key)) {
-            return \ilSession::get(ilNolejPlugin::PLUGIN_ID . "_" . $key);
-        }
-        return null;
-    }
-
-    /**
-     * @param mixed $val
-     */
-    protected function set(string $key, $val): void
-    {
-        \ilSession::set(ilNolejPlugin::PLUGIN_ID . "_" . $key, $val);
-    }
-
-    /**
-     * @param mixed $val
-     */
-    protected function clear(string $key): void
-    {
-        \ilSession::clear(ilNolejPlugin::PLUGIN_ID . "_" . $key);
-    }
-
-    public function setInternalLink(): void
-    {
-        if (
-            $_GET["linktype"] != "MediaObject" ||
-            substr($_GET["linktarget"], 0, 8) != "il__mob_" ||
-            $_GET["linktargetframe"] != "Media"
-        ) {
-            $this->clearInternalLink();
-            return;
-        }
-
-        $this->set("il_type", $_GET["linktype"]);
-        $this->set("il_target", $_GET["linktarget"]);
-        $this->set("il_targetframe", $_GET["linktargetframe"]);
-        $this->creation();
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getInternalLink(): array
-    {
-        return [
-            "type" => (string) $this->get("il_type"),
-            "target" => (string) $this->get("il_target"),
-            "target_frame" => (string) $this->get("il_targetframe"),
-            "obj_id" => (string) $this->get("il_obj_id")
-        ];
-    }
-
-    public function clearInternalLink(): void
-    {
-        $this->clear("il_type");
-        $this->clear("il_target");
-        $this->clear("il_targetframe");
-        $this->clear("il_obj_id");
-    }
-
-    /**
-     * Get text name of internal link
-     * @param string $a_target target object link id
-     * @param string $a_type type
-     * @param string $a_frame target frame
-     */
-    public function getIntLinkString(
-        string $a_target,
-        string $a_type,
-        string $a_frame
-    ): string {
-        $link_str = "";
-        $t_arr = explode("_", $a_target);
-
-        if ($a_type == "MediaObject") {
-            $mobId = $t_arr[count($t_arr) - 1];
-            $mob = new ilObjMediaObject($mobId);
-            $link_str = sprintf(
-                "%s: %s [%s]",
-                $this->lng->txt("mob"),
-                $mob->getTitle(),
-                $mobId
-            );
-        } else {
-            $this->clearInternalLink();
-        }
-
-        return $link_str;
     }
 
     /**
@@ -641,8 +504,8 @@ class ilNolejActivityManagementGUI
 
         $set = $this->db->queryF(
             "SELECT `action` FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . " WHERE document_id = %s AND user_id = %s"
-            . " ORDER BY tstamp DESC LIMIT 1",
+                . " WHERE document_id = %s AND user_id = %s"
+                . " ORDER BY tstamp DESC LIMIT 1",
             ["text", "integer"],
             [$_GET["document_id"], $DIC->user()->getId()]
         );
@@ -659,666 +522,6 @@ class ilNolejActivityManagementGUI
         }
 
         exit(0);
-    }
-
-    /**
-     * @return ilPropertyFormGUI
-     */
-    public function initCreationForm()
-    {
-        global $DIC, $ilUser, $tpl;
-
-        $renderer = $DIC->ui()->renderer();
-        $f = $DIC->ui()->factory();
-
-        $this->lng->loadLanguageModule("meta");
-
-        $form = new ilPropertyFormGUI();
-        $form->setTitle($this->txt("obj_xnlj"));
-        $form->setOpenTag(false);
-        $form->setCloseTag(false);
-
-        $status = $this->status;
-
-        if ($status == self::STATUS_CREATION) {
-
-            $formTpl = new ilTemplate("tpl.creation_form.html", true, true, ilNolejPlugin::PLUGIN_DIR);
-            $formTpl->setVariable("FORMACTION", $this->ctrl->getFormAction($this));
-
-            $formTpl->setCurrentBlock("int_link_prep");
-            $formTpl->setVariable(
-                "INT_LINK_PREP",
-                ilInternalLinkGUI::getInitHTML(
-                    $this->ctrl->getLinkTargetByClass(
-                        "ilinternallinkgui",
-                        "",
-                        false,
-                        true,
-                        false
-                    )
-                )
-            );
-            $formTpl->parseCurrentBlock();
-
-            /**
-             * Module title
-             * By default is the Object title, it can be changed here.
-             */
-            $title = new ilTextInputGUI($this->txt("prop_" . self::PROP_TITLE), self::PROP_TITLE);
-            $title->setInfo($this->txt("prop_" . self::PROP_TITLE . "_info"));
-            $title->setValue($this->gui_obj->getObject()->getTitle());
-            $title->setMaxLength(250);
-            $form->addItem($title);
-
-            /**
-             * Choose a source to analyze.
-             * - Web (url):
-             *   - Web page content;
-             *   - Audio streaming;
-             *   - Video streaming.
-             * - MediaPool (mob_id)
-             * - Document (file upload)
-             * - Text (textarea)
-             */
-            $mediaSource = new ilRadioGroupInputGUI($this->txt("prop_" . self::PROP_MEDIA_SRC), self::PROP_MEDIA_SRC);
-            $mediaSource->setRequired(true);
-            $form->addItem($mediaSource);
-
-            /* Source: WEB or Streaming Audio/Video */
-            $mediaWeb = new ilRadioOption($this->txt("prop_" . self::PROP_M_WEB), self::PROP_M_WEB);
-            $mediaWeb->setInfo($this->txt("prop_" . self::PROP_M_WEB . "_info"));
-            $mediaSource->addOption($mediaWeb);
-            /* Source URL */
-            $url = new ilUriInputGUI($this->txt("prop_" . self::PROP_M_URL), self::PROP_M_URL);
-            $url->setRequired(true);
-            $mediaWeb->addSubItem($url);
-            /* Web Source Type */
-            $mediaSourceType = new ilRadioGroupInputGUI($this->txt("prop_" . self::PROP_WEB_SRC), self::PROP_WEB_SRC);
-            $mediaSourceType->setRequired(true);
-            $mediaWeb->addSubItem($mediaSourceType);
-            /* Source Web page content */
-            $srcContent = new ilRadioOption($this->txt("prop_" . self::PROP_M_CONTENT), self::PROP_M_CONTENT);
-            $srcContent->setInfo($this->txt("prop_" . self::PROP_M_CONTENT . "_info"));
-            $mediaSourceType->addOption($srcContent);
-            /* Source Video: YouTube, Vimeo, Wistia */
-            $srcAudio = new ilRadioOption($this->txt("prop_" . self::PROP_M_AUDIO), self::PROP_M_AUDIO);
-            $srcAudio->setInfo($this->txt("prop_" . self::PROP_M_AUDIO . "_info"));
-            $mediaSourceType->addOption($srcAudio);
-            /* Source Video: YouTube, Vimeo, Wistia */
-            $srcVideo = new ilRadioOption($this->txt("prop_" . self::PROP_M_VIDEO), self::PROP_M_VIDEO);
-            $srcVideo->setInfo($this->txt("prop_" . self::PROP_M_VIDEO . "_info"));
-            $mediaSourceType->addOption($srcVideo);
-
-            /* Source: Media from MediaPool */
-            $mediaMob = new ilRadioOption($this->txt("prop_" . self::PROP_M_MOB), self::PROP_M_MOB);
-            $mediaMob->setInfo($this->txt("prop_" . self::PROP_M_MOB . "_info"));
-            $mediaSource->addOption($mediaMob);
-            /* Mob ID */
-            $mob = new ilNonEditableValueGUI("", "", true);
-            $link_str = "";
-            $int_link = $this->getInternalLink();
-            $preview = "";
-            if ($int_link["target"] != "") {
-                $link_str = $this->getIntLinkString(
-                    $int_link["target"],
-                    $int_link["type"],
-                    $int_link["target_frame"]
-                );
-                $t_arr = explode("_", $int_link["target"]);
-                $mobId = $t_arr[count($t_arr) - 1];
-                $path = ilObjMediaObject::_lookupItemPath($mobId);
-                $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                if (in_array($extension, self::TYPE_AUDIO)) {
-                    $audio = $f->player()->audio($path);
-                    $preview = $renderer->render($audio);
-                } else if (in_array($extension, self::TYPE_VIDEO)) {
-                    $video = $f->player()->video($path);
-                    $preview = $renderer->render($video);
-                } else if (in_array($extension, self::TYPE_DOC)) {
-                    $preview = "";
-                } else {
-                    $this->clearInternalLink();
-                    $link_str = "";
-                }
-
-                $mediaSource->setValue(self::PROP_M_MOB);
-            }
-            $this->lng->loadLanguageModule("content");
-            $mob->setValue(
-                sprintf(
-                    "%s<br>%s <a id='iosEditInternalLinkTrigger' href='#'>[%s]</a>",
-                    $preview,
-                    $link_str,
-                    $this->txt("prop_" . self::PROP_M_MOB . "_info")
-                )
-            );
-            $mediaMob->addSubItem($mob);
-
-            /**
-             * Source: File upload
-             * Upload audio/video/documents/text files in the plugin data directory.
-             * The media type is taken from the file extension.
-             */
-            $mediaFile = new ilRadioOption($this->txt("prop_" . self::PROP_M_FILE), self::PROP_M_FILE);
-            $mediaFile->setInfo($this->txt("prop_" . self::PROP_M_FILE . "_info"));
-            $mediaSource->addOption($mediaFile);
-            /* File upload */
-            $file = new ilFileInputGUI("", self::PROP_INPUT_FILE);
-            $file->setRequired(true);
-            $file->setSuffixes(
-                array_merge(
-                    self::TYPE_AUDIO,
-                    self::TYPE_VIDEO,
-                    self::TYPE_DOC,
-                    self::TYPE_TEXT
-                )
-            );
-            $mediaFile->addSubItem($file);
-
-            /**
-             * Source: Text
-             * Write an html text that need to be saved just like uploaded files
-             * (with .html extension).
-             */
-            $mediaText = new ilRadioOption($this->txt("prop_" . self::PROP_M_TEXT), self::PROP_M_TEXT);
-            $mediaText->setInfo($this->txt("prop_" . self::PROP_M_TEXT . "_info"));
-            $mediaSource->addOption($mediaText);
-            /* Text area */
-            $txt = new ilTextAreaInputGUI("", self::PROP_M_TEXTAREA);
-            $txt->setRows(50);
-            $txt->setMinNumOfChars(500);
-            $txt->setMaxNumOfChars(50000);
-            $txt->usePurifier(false);
-            if (ilObjAdvancedEditing::_getRichTextEditor() === "tinymce") {
-                $txt->setUseRte(true);
-                $txt->setRteTags([
-                    "h1",
-                    "h2",
-                    "h3",
-                    "p",
-                    "ul",
-                    "ol",
-                    "li",
-                    "br",
-                    "strong",
-                    "u",
-                    "i",
-                ]);
-                $txt->setRTERootBlockElement("");
-                $txt->disableButtons([
-                    "charmap",
-                    "justifyright",
-                    "justifyleft",
-                    "justifycenter",
-                    "justifyfull",
-                    "alignleft",
-                    "aligncenter",
-                    "alignright",
-                    "alignjustify",
-                    "anchor",
-                    "pasteword"
-                ]);
-                // $txt->setPurifier(\ilHtmlPurifierFactory::_getInstanceByType('frm_post'));
-            }
-            $txt->setRequired(true);
-            $mediaText->addSubItem($txt);
-
-            /**
-             * Source language
-             */
-            $language = new ilSelectInputGUI($this->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
-            $language->setInfo($this->txt("prop_" . self::PROP_LANG . "_info"));
-            // TODO in future version: get languages dinamically
-            $language->setOptions([
-                "en" => $this->lng->txt("meta_l_en"),
-                "fr" => $this->lng->txt("meta_l_fr"),
-                "it" => $this->lng->txt("meta_l_it"),
-                "de" => $this->lng->txt("meta_l_de"),
-                "pt" => $this->lng->txt("meta_l_pt"),
-                "es" => $this->lng->txt("meta_l_es"),
-                "nl" => $this->lng->txt("meta_l_nl")
-            ]);
-            $language->setRequired(true);
-            $form->addItem($language);
-
-            /**
-             * Automatic mode: skip to the h5p generation,
-             * just check audio/video transcription.
-             * Currently disabled.
-             *
-             * @todo enable option when all the other steps are done.
-             */
-            // $automaticMode = new ilCheckboxInputGUI($this->txt("prop_" . self::PROP_AUTOMATIC), self::PROP_AUTOMATIC);
-            // $automaticMode->setInfo($this->txt("prop_" . self::PROP_AUTOMATIC . "_info"));
-            // $automaticMode->setChecked(false);
-            // $automaticMode->setDisabled(true);
-            // $form->addItem($automaticMode);
-
-            $form->addCommandButton(self::CMD_CREATE, $this->txt("cmd_" . self::CMD_CREATE));
-            // $form->setFormAction($this->ctrl->getFormAction($this));
-
-            $formTpl->setVariable("FORM", $form->getHTML());
-            $this->formTpl = $formTpl->get();
-
-        } else {
-
-            $title = new ilNonEditableValueGUI($this->txt("prop_" . self::PROP_TITLE), self::PROP_TITLE);
-            $title->setValue($this->gui_obj->getObject()->getTitle());
-            $form->addItem($title);
-
-            $mediaSource = new ilNonEditableValueGUI($this->txt("prop_" . self::PROP_MEDIA_SRC), self::PROP_MEDIA_SRC);
-            $mediaSource->setValue($this->gui_obj->getObject()->getDocumentSource());
-            $mediaSource->setInfo($this->txt("prop_" . $this->gui_obj->getObject()->getDocumentMediaType()));
-            $form->addItem($mediaSource);
-
-            $language = new ilNonEditableValueGUI($this->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
-            $language->setValue($this->lng->txt("meta_l_" . $this->gui_obj->getObject()->getDocumentLang()));
-            $form->addItem($language);
-
-            // $automaticMode = new ilCheckboxInputGUI($this->txt("prop_" . self::PROP_AUTOMATIC), self::PROP_AUTOMATIC);
-            // $automaticMode->setChecked($this->gui_obj->getObject()->getDocumentAutomaticMode());
-            // $automaticMode->setDisabled(true);
-            // $form->addItem($automaticMode);
-        }
-
-        return $form;
-    }
-
-    /** @return string */
-    protected function contentLimitsInfo()
-    {
-        $contentLimits = new ilInfoScreenGUI($this);
-
-        $contentLimits->addSection($this->txt("limit_content"));
-
-        $info = new ilInfoScreenGUI($this);
-        $info->hideFurtherSections(true);
-
-        $info->addSection("");
-        $info->addProperty("", "");
-        $info->addSection($this->txt("limit_audio"));
-        $info->addProperty(
-            $this->txt("limit_max_duration"),
-            sprintf($this->txt("limit_minutes"), 50)
-        );
-        $info->addProperty(
-            $this->txt("limit_min_characters"),
-            "500"
-        );
-        $info->addProperty(
-            $this->txt("limit_max_size"),
-            "500 MB"
-        );
-        $info->addProperty(
-            $this->txt("limit_type"),
-            implode(", ", self::TYPE_AUDIO)
-        );
-        $info->addSection($this->txt("limit_video"));
-        $info->addProperty(
-            $this->txt("limit_max_duration"),
-            sprintf($this->txt("limit_minutes"), 50)
-        );
-        $info->addProperty(
-            $this->txt("limit_min_characters"),
-            "500"
-        );
-        $info->addProperty(
-            $this->txt("limit_max_size"),
-            "500 MB"
-        );
-        $info->addProperty(
-            $this->txt("limit_type"),
-            implode(", ", self::TYPE_VIDEO)
-        );
-        $info->addSection($this->txt("limit_doc"));
-        $info->addProperty(
-            $this->txt("limit_max_pages"),
-            "50"
-        );
-        $info->addProperty(
-            $this->txt("limit_min_characters"),
-            "500"
-        );
-        $info->addProperty(
-            $this->txt("limit_max_size"),
-            "500 MB"
-        );
-        $info->addProperty(
-            $this->txt("limit_type"),
-            implode(", ", self::TYPE_DOC)
-        );
-
-        $contentLimits->addProperty(
-            $this->txt("limit_content"),
-            $info->getHTML()
-        );
-
-        return $contentLimits->getHTML();
-    }
-
-    public function creation()
-    {
-        global $tpl;
-
-        $form = $this->initCreationForm();
-
-        $tpl->setContent(
-            ($this->status == self::STATUS_CREATION ? $this->contentLimitsInfo() : "")
-            . (empty($this->formTpl) ? $form->getHTML() : $this->formTpl)
-        );
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUploadDir()
-    {
-        $uploadDir = $this->config->dataDir() . "uploads/";
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-        return $uploadDir;
-    }
-
-    /**
-     * Generate a random and unique name for a file that
-     * needs to be uploaded in the upload directory.
-     * @param string $extension
-     * @return string
-     */
-    protected function getRandomFilename($extension)
-    {
-        $uploadDir = $this->getUploadDir();
-        $len = 7;
-        do {
-            $filename = $this->generateRandomString($len) . "." . $extension;
-            $len++;
-        } while (is_file($uploadDir . $filename));
-        return $filename;
-    }
-
-    /**
-     * https://stackoverflow.com/a/4356295
-     * @param int $length
-     * @return string
-     */
-    protected function generateRandomString($length = 10)
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
-    }
-
-    public function create()
-    {
-        global $DIC, $tpl;
-
-        $form = $this->initCreationForm();
-        $formHtml = empty($this->formTpl) ? $form->getHTML() : $this->formTpl;
-
-        $api_key = $this->config->get("api_key", "");
-        if ($api_key == "") {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_api_key_missing"));
-            $form->setValuesByPost();
-            $tpl->setContent($formHtml);
-            return;
-        }
-
-        if (!$form->checkInput()) {
-            // input not ok, then
-            $form->setValuesByPost();
-            $tpl->setContent($formHtml);
-            return;
-        }
-
-        $apiTitle = $form->getInput(self::PROP_TITLE);
-
-        /**
-         * Set $apiUrl (signed)
-         * Set $apiFormat
-         * Set $decrementedCredit (all to 1)
-         */
-        $mediaSrc = $form->getInput(self::PROP_MEDIA_SRC);
-        switch ($mediaSrc) {
-            case self::PROP_M_WEB:
-                /**
-                 * No need to sign the url, just check the
-                 * source type (content, or audio/video streaming)
-                 */
-                $apiUrl = $form->getInput(self::PROP_M_URL);
-                $format = $form->getInput(self::PROP_WEB_SRC);
-                switch ($format) {
-                    case self::PROP_M_CONTENT:
-                        $apiFormat = self::PROP_M_WEB;
-                        $decrementedCredit = 1;
-                        break;
-
-                    case self::PROP_M_AUDIO:
-                        $apiFormat = $format;
-                        $decrementedCredit = 1;
-                        break;
-
-                    case self::PROP_M_VIDEO:
-                        $apiFormat = $format;
-                        $decrementedCredit = 1;
-                        break;
-                }
-                break;
-
-            case self::PROP_M_MOB:
-                /**
-                 * Generate signed url
-                 * Detect media format
-                 * Decrement credit
-                 */
-                $decrementedCredit = 1;
-                $mobInput = $this->getInternalLink();
-                $t_arr = explode("_", $mobInput["target"]);
-                $objId = (int) $t_arr[count($t_arr) - 1];
-                $path = ilObjMediaObject::_lookupItemPath($objId, false, false);
-                $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                if (in_array($extension, self::TYPE_AUDIO)) {
-                    $apiFormat = self::PROP_M_AUDIO;
-                } else if (in_array($extension, self::TYPE_VIDEO)) {
-                    $apiFormat = self::PROP_M_VIDEO;
-                } else if (in_array($extension, self::TYPE_DOC)) {
-                    $apiFormat = self::PROP_M_DOC;
-                } else {
-                    $decrementedCredit = 0;
-                }
-                $apiUrl = ilNolejMediaSelectorGUI::getSignedUrl($objId, true, ilWACSignedPath::MAX_LIFETIME);
-                break;
-
-            case self::PROP_M_FILE:
-                /**
-                 * Save file to plugin data dir
-                 * @todo generate signed url
-                 * Detect media format
-                 * Decrement credit
-                 */
-                $apiUrl = "";
-                $apiFormat = "";
-                $decrementedCredit = 1;
-
-                $upload_path = $this->getUploadDir();
-
-                $file = $_FILES[self::PROP_INPUT_FILE];
-                if (!$file["tmp_name"]) {
-                    // todo: show error
-                    break;
-                }
-
-                $extension = pathinfo($file["name"], PATHINFO_EXTENSION);
-                $upload_filename = $this->getRandomFilename($extension);
-                $upload_filepath = $upload_path . $upload_filename;
-                if (class_exists("ilFileUtils") && method_exists("ilFileUtils", "moveUploadedFile")) {
-                    // Since ILIAS 8
-                    $success = ilFileUtils::moveUploadedFile(
-                        $file["tmp_name"],
-                        $upload_filename,
-                        $upload_filepath
-                    );
-                } else if (method_exists("ilUtil", "moveUploadedFile")) {
-                    $success = ilUtil::moveUploadedFile(
-                        $file["tmp_name"],
-                        $upload_filename,
-                        $upload_filepath
-                    );
-                } else {
-                    $this->config->logger->log("Method moveUploadedFile cannot be found.");
-                    $tpl->setOnScreenMessage("failure", $this->txt("err_file_upload"), true);
-                    $form->setValuesByPost();
-                    $tpl->setContent($formHtml);
-                    return;
-                }
-                if (!$success) {
-                    $tpl->setOnScreenMessage("failure", $this->txt("err_file_upload"), true);
-                    $form->setValuesByPost();
-                    $tpl->setContent($formHtml);
-                    return;
-                }
-
-                chmod($upload_filepath, 0775);
-                $apiUrl = preg_replace("/^\.\//", ILIAS_HTTP_PATH . "/", $upload_filepath);
-                if (in_array($extension, self::TYPE_DOC)) {
-                    $apiFormat = self::PROP_M_DOC;
-                } else if (in_array($extension, self::TYPE_VIDEO)) {
-                    $apiFormat = self::PROP_M_VIDEO;
-                } else if (in_array($extension, self::TYPE_AUDIO)) {
-                    $apiFormat = self::PROP_M_AUDIO;
-                }
-                break;
-
-            case self::PROP_M_TEXT:
-                /**
-                 * Save as file in the plugin data dir
-                 * @todo generate signed url
-                 */
-                $upload_path = $this->getUploadDir();
-                $textInput = $form->getInput(self::PROP_M_TEXTAREA);
-                $upload_filename = $this->getRandomFilename("htm");
-                $upload_filepath = $upload_path . $upload_filename;
-                file_put_contents($upload_filepath, $textInput);
-                chmod($upload_filepath, 0770);
-
-                $apiUrl = preg_replace("/^\.\//", ILIAS_HTTP_PATH . "/", $upload_filepath);
-                $apiFormat = "freetext";
-                $decrementedCredit = 1;
-
-                break;
-        }
-
-        if (!$apiUrl || $apiUrl == "") {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_media_url_empty"), true);
-            $form->setValuesByPost();
-            $tpl->setContent($formHtml);
-            return;
-        }
-
-        if (!$apiFormat || $apiFormat == "") {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_media_format_unknown"), true);
-            $form->setValuesByPost();
-            $tpl->setContent($formHtml);
-            return;
-        }
-
-        $apiLanguage = $form->getInput(self::PROP_LANG);
-        $apiAutomaticMode = false; // (bool) $form->getInput(self::PROP_AUTOMATIC);
-
-        // Update object title if it differs from the current one.
-        if ($apiTitle != "" && $apiTitle != $this->gui_obj->getObject()->getTitle()) {
-            $this->gui_obj->getObject()->setTitle($apiTitle);
-            $this->gui_obj->getObject()->update();
-        }
-
-        $api = new ilNolejAPI($api_key);
-        $webhookUrl = ILIAS_HTTP_PATH . "/goto.php?target=xnlj_webhook";
-
-        $this->clearInternalLink();
-
-        $result = $api->post(
-            "/documents",
-            [
-                "userID" => $DIC->user()->getId(),
-                "organisationID" => ($DIC->settings()->get('short_inst_name') ?? "ILIAS") . " [ILIAS Plugin]",
-                "title" => $apiTitle,
-                "decrementedCredit" => $decrementedCredit,
-                "docURL" => $apiUrl,
-                "webhookURL" => $webhookUrl,
-                "mediaType" => $apiFormat,
-                "automaticMode" => $apiAutomaticMode,
-                "language" => $apiLanguage
-            ],
-            true
-        );
-
-        if (!is_object($result) || !property_exists($result, "id") || !is_string($result->id)) {
-            $message = print_r($result, true);
-            if (property_exists($result, "errorMessage")) {
-                $message = sprintf(
-                    "<details><summary style='display: list-item;'>%s</summary><br><pre>%s</pre></details>",
-                    $result->errorMessage,
-                    print_r($result, true)
-                );
-            }
-            $tpl->setOnScreenMessage(
-                "failure",
-                sprintf(
-                    $this->txt("err_doc_response"),
-                    $message
-                )
-            );
-            $form->setValuesByPost();
-            $tpl->setContent($formHtml);
-            return;
-        }
-
-        $this->db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DATA . " SET"
-            . " document_id = %s WHERE id = %s;",
-            array("text", "integer"),
-            array($result->id, $this->gui_obj->getObject()->getId())
-        );
-
-        $this->db->manipulateF(
-            "INSERT INTO " . ilNolejPlugin::TABLE_DOC
-            . " (title, status, consumed_credit, doc_url, media_type, automatic_mode, language, document_id)"
-            . "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
-            array(
-                "text",
-                "integer",
-                "integer",
-                "text",
-                "text",
-                "text",
-                "text",
-                "text"
-            ),
-            array(
-                $this->gui_obj->getObject()->getTitle(),
-                self::STATUS_CREATION_PENDING,
-                $decrementedCredit,
-                $apiUrl,
-                $apiFormat,
-                ilUtil::tf2yn($apiAutomaticMode),
-                $apiLanguage,
-                $result->id
-            )
-        );
-
-        $ass = new NolejActivity($result->id, $DIC->user()->getId(), "transcription");
-        $ass->withStatus("ok")
-            ->withCode(0)
-            ->withErrorMessage("")
-            ->withConsumedCredit($decrementedCredit)
-            ->store();
-
-        $tpl->setOnScreenMessage("success", $this->txt("action_transcription"), true);
-        $this->ctrl->redirect($this, self::CMD_ANALYSIS);
     }
 
     /**
@@ -1354,7 +557,7 @@ class ilNolejActivityManagementGUI
     ) {
         $filepath = $this->dataDir . "/" . $saveAs;
 
-        $api_key = $this->config->get("api_key", "");
+        $api_key = $this->plugin->getConfig("api_key", "");
         $api = new ilNolejAPI($api_key);
 
         if (
@@ -1392,7 +595,7 @@ class ilNolejActivityManagementGUI
             return false;
         }
 
-        $api_key = $this->config->get("api_key", "");
+        $api_key = $this->plugin->getConfig("api_key", "");
         $api = new ilNolejAPI($api_key);
 
         $result = $api->put(
@@ -1433,7 +636,7 @@ class ilNolejActivityManagementGUI
     {
         $this->db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC
-            . " SET status = %s WHERE document_id = %s;",
+                . " SET status = %s WHERE document_id = %s;",
             ["integer", "text"],
             [$newStatus, $this->documentId]
         );
@@ -1451,13 +654,13 @@ class ilNolejActivityManagementGUI
         global $tpl;
         $status = $this->status;
 
-        if ($status < self::STATUS_ANALISYS) {
+        if ($status < ilObjNolej::STATUS_ANALISYS) {
             // Transctiption is not ready!
-            $tpl->setOnScreenMessage("failure", $this->txt("err_transcription_not_ready"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_not_ready"));
             return false;
         }
 
-        $api_key = $this->config->get("api_key", "");
+        $api_key = $this->plugin->getConfig("api_key", "");
         $api = new ilNolejAPI($api_key);
 
         $result = $api->get(
@@ -1471,7 +674,7 @@ class ilNolejActivityManagementGUI
             !property_exists($result, "result") ||
             !is_string($result->result)
         ) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_transcription_get") . sprintf($result));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_get") . sprintf($result));
             return false;
         }
 
@@ -1487,7 +690,7 @@ class ilNolejActivityManagementGUI
             file_get_contents($result->result)
         );
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_transcription_download") . print_r($result, true));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_download") . print_r($result, true));
             return false;
         }
 
@@ -1509,22 +712,22 @@ class ilNolejActivityManagementGUI
          * - $title: Title returned from transcription;
          * - $objTitle: Current module title.
          */
-        $title = $this->gui_obj->getObject()->getDocumentTitle();
-        $objTitle = $this->gui_obj->getObject()->getTitle();
+        $title = $this->obj_gui->getObject()->getDocumentTitle();
+        $objTitle = $this->obj_gui->getObject()->getTitle();
 
-        if ($status == self::STATUS_ANALISYS) {
+        if ($status == ilObjNolej::STATUS_ANALISYS) {
             $form = new ilPropertyFormGUI();
-            $form->setTitle($this->txt("obj_xnlj"));
+            $form->setTitle($this->plugin->txt("obj_xnlj"));
 
             if ($title != "" && $title != $objTitle) {
                 $titleInput = new ilTextInputGUI(
-                    $this->txt("prop_" . self::PROP_TITLE),
+                    $this->plugin->txt("prop_" . self::PROP_TITLE),
                     self::PROP_TITLE
                 );
                 $titleInput->setValue($title);
             } else {
                 $titleInput = new ilNonEditableValueGUI(
-                    $this->txt("prop_" . self::PROP_TITLE),
+                    $this->plugin->txt("prop_" . self::PROP_TITLE),
                     self::PROP_TITLE
                 );
                 $titleInput->setValue($objTitle);
@@ -1534,7 +737,7 @@ class ilNolejActivityManagementGUI
             /**
              * Transcription
              */
-            $txt = new ilTextAreaInputGUI($this->txt("prop_transcription"), self::PROP_M_TEXT);
+            $txt = new ilTextAreaInputGUI($this->plugin->txt("prop_transcription"), self::PROP_M_TEXT);
             $txt->setRequired(true);
             $txt->setRows(50);
             $txt->setMinNumOfChars(500);
@@ -1574,19 +777,19 @@ class ilNolejActivityManagementGUI
             $txt->setValue($this->readDocumentFile("transcription.htm"));
             $form->addItem($txt);
 
-            $form->addCommandButton(self::CMD_ANALYZE, $this->txt("cmd_" . self::CMD_ANALYZE));
+            $form->addCommandButton(self::CMD_ANALYZE, $this->plugin->txt("cmd_" . self::CMD_ANALYZE));
             $form->setFormAction($this->ctrl->getFormAction($this));
             return $form;
         }
 
         $info = new ilInfoScreenGUI($this);
-        $info->addSection($this->txt("obj_xnlj"));
+        $info->addSection($this->plugin->txt("obj_xnlj"));
         $info->addProperty(
-            $this->txt("prop_" . self::PROP_TITLE),
+            $this->plugin->txt("prop_" . self::PROP_TITLE),
             "<h1>" . $objTitle . "</h1>"
         );
         $info->addProperty(
-            $this->txt("prop_transcription"),
+            $this->plugin->txt("prop_transcription"),
             $this->readDocumentFile("transcription.htm")
         );
 
@@ -1599,12 +802,12 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_ANALISYS) {
+        if ($status < ilObjNolej::STATUS_ANALISYS) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_transcription_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_transcription_not_ready"))
                 )
             );
             return;
@@ -1627,9 +830,9 @@ class ilNolejActivityManagementGUI
 
         $form = $this->initAnalysisForm();
 
-        $api_key = $this->config->get("api_key", "");
+        $api_key = $this->plugin->getConfig("api_key", "");
         if ($api_key == "") {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_api_key_missing"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_api_key_missing"));
             $form->setValuesByPost();
             $tpl->setContent($form->getHTML());
             return;
@@ -1642,17 +845,17 @@ class ilNolejActivityManagementGUI
             return;
         }
 
-        $apiAutomaticMode = $this->gui_obj->getObject()->getDocumentAutomaticMode();
+        $apiAutomaticMode = $this->obj_gui->getObject()->getDocumentAutomaticMode();
         $api = new ilNolejAPI($api_key);
 
         /**
          * May update title
          */
         $title = $form->getInput(self::PROP_TITLE);
-        $objTitle = $this->gui_obj->getObject()->getTitle();
+        $objTitle = $this->obj_gui->getObject()->getTitle();
         if ($title != "" && $title != $objTitle) {
-            $this->gui_obj->getObject()->setTitle($title);
-            $this->gui_obj->getObject()->update();
+            $this->obj_gui->getObject()->setTitle($title);
+            $this->obj_gui->getObject()->update();
         }
 
         $url = ILIAS_HTTP_PATH . substr(ilWACSignedPath::signFile($this->dataDir . "/transcription.htm"), 1);
@@ -1679,7 +882,7 @@ class ilNolejActivityManagementGUI
             return;
         }
 
-        $this->updateDocumentStatus(self::STATUS_ANALISYS_PENDING);
+        $this->updateDocumentStatus(ilObjNolej::STATUS_ANALISYS_PENDING);
 
         $ass = new NolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
         $ass->withStatus("ok")
@@ -1688,7 +891,7 @@ class ilNolejActivityManagementGUI
             ->withConsumedCredit(0)
             ->store();
 
-        $tpl->setOnScreenMessage("success", $this->txt("action_analysis"), true);
+        $tpl->setOnScreenMessage("success", $this->plugin->txt("action_analysis"), true);
         $this->ctrl->redirect($this, self::CMD_REVISION);
     }
 
@@ -1711,14 +914,14 @@ class ilNolejActivityManagementGUI
 
         $buttons = [
             $f->button()->standard(
-                $this->txt("cmd_review"),
+                $this->plugin->txt("cmd_review"),
                 $this->ctrl->getLinkTarget($this, self::CMD_REVIEW)
             )
         ];
 
         return $renderer->render(
             $f->messageBox()
-                ->info($this->txt("cmd_review_info"))
+                ->info($this->plugin->txt("cmd_review_info"))
                 ->withButtons($buttons)
         );
     }
@@ -1738,7 +941,7 @@ class ilNolejActivityManagementGUI
         $this->getNolejContent("summary", "summary.json");
         $json = $this->readDocumentFile("summary.json");
         if (!$json) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_summary_file"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_summary_file"));
             return $form;
         }
 
@@ -1748,7 +951,7 @@ class ilNolejActivityManagementGUI
          * Summary -> summary
          */
         $section = new ilFormSectionHeaderGUI();
-        $section->setTitle($this->txt("review_summary"));
+        $section->setTitle($this->plugin->txt("review_summary"));
         $form->addItem($section);
         $length = count($summary->summary);
         $length_input = new ilHiddenInputGUI("summary_count");
@@ -1756,13 +959,13 @@ class ilNolejActivityManagementGUI
         $form->addItem($length_input);
         for ($i = 0; $i < $length; $i++) {
             $title = new ilTextInputGUI(
-                $this->txt("prop_" . self::PROP_TITLE),
+                $this->plugin->txt("prop_" . self::PROP_TITLE),
                 sprintf("summary_%d_title", $i)
             );
             $form->addItem($title);
 
             $txt = new ilTextAreaInputGUI(
-                $this->txt("prop_" . self::PROP_M_TEXT),
+                $this->plugin->txt("prop_" . self::PROP_M_TEXT),
                 sprintf("summary_%d_text", $i)
             );
             $txt->usePurifier(false);
@@ -1776,7 +979,6 @@ class ilNolejActivityManagementGUI
                 $txt->setValue($summary->summary[$i]->text);
                 $title->setValue($summary->summary[$i]->title);
             }
-
         }
 
         /**
@@ -1784,7 +986,7 @@ class ilNolejActivityManagementGUI
          */
         if (count($summary->summary) > 1) {
             $section = new ilFormSectionHeaderGUI();
-            $section->setTitle($this->txt("summary_abstract"));
+            $section->setTitle($this->plugin->txt("summary_abstract"));
             $form->addItem($section);
             $txt = new ilTextAreaInputGUI("", "abstract");
             $txt->usePurifier(false);
@@ -1801,7 +1003,7 @@ class ilNolejActivityManagementGUI
          * Summary -> keypoints
          */
         $section = new ilFormSectionHeaderGUI();
-        $section->setTitle($this->txt("summary_keypoints"));
+        $section->setTitle($this->plugin->txt("summary_keypoints"));
         $form->addItem($section);
         $length = count($summary->keypoints);
         $length_input = new ilHiddenInputGUI("keypoints_count");
@@ -1822,7 +1024,7 @@ class ilNolejActivityManagementGUI
             $form->addItem($txt);
         }
 
-        $form->addCommandButton(self::CMD_SUMMARY_SAVE, $this->txt("cmd_save"));
+        $form->addCommandButton(self::CMD_SUMMARY_SAVE, $this->plugin->txt("cmd_save"));
         $form->setFormAction($this->ctrl->getFormAction($this));
 
         return $form;
@@ -1834,23 +1036,23 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_ANALISYS) {
+        if ($status < ilObjNolej::STATUS_ANALISYS) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_transcription_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_transcription_not_ready"))
                 )
             );
             return;
         }
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
@@ -1859,7 +1061,7 @@ class ilNolejActivityManagementGUI
         $form = $this->initSummaryForm();
         $tpl->setContent($form->getHTML());
 
-        if ($this->status == self::STATUS_REVISION) {
+        if ($this->status == ilObjNolej::STATUS_REVISION) {
             $tpl->setRightContent($this->getReviewBox());
         }
     }
@@ -1870,12 +1072,12 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
@@ -1920,16 +1122,16 @@ class ilNolejActivityManagementGUI
 
         $success = $this->writeDocumentFile("summary.json", json_encode($summary));
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_summary_save"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_summary_save"));
             $this->summary();
             return;
         }
 
         $success = $this->putNolejContent("summary", "summary.json");
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_summary_put"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_summary_put"));
         } else {
-            $tpl->setOnScreenMessage("success", $this->txt("summary_saved"));
+            $tpl->setOnScreenMessage("success", $this->plugin->txt("summary_saved"));
         }
         $this->summary();
     }
@@ -1945,12 +1147,12 @@ class ilNolejActivityManagementGUI
         global $DIC, $tpl;
 
         $form = new ilPropertyFormGUI();
-        $form->setTitle($this->txt("review_questions"));
+        $form->setTitle($this->plugin->txt("review_questions"));
 
         $this->getNolejContent("questions", "questions.json");
         $json = $this->readDocumentFile("questions.json");
         if (!$json) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_questions_file"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_questions_file"));
             return $form;
         }
 
@@ -1978,7 +1180,7 @@ class ilNolejActivityManagementGUI
             }
 
             $section = new ilFormSectionHeaderGUI();
-            $section->setTitle(sprintf($this->txt("questions_n"), $i + 1));
+            $section->setTitle(sprintf($this->plugin->txt("questions_n"), $i + 1));
             $form->addItem($section);
 
             $id = new ilHiddenInputGUI(sprintf("question_%d_id", $i));
@@ -1987,7 +1189,7 @@ class ilNolejActivityManagementGUI
 
             if ($questions[$i]->question_type != "tf") {
                 $question = new ilTextAreaInputGUI(
-                    $this->txt("questions_question"),
+                    $this->plugin->txt("questions_question"),
                     sprintf("question_%d_question", $i)
                 );
                 $question->usePurifier(false);
@@ -2002,19 +1204,19 @@ class ilNolejActivityManagementGUI
             $form->addItem($questionType);
 
             $questionTypeLabel = new ilNonEditableValueGUI(
-                $this->txt("questions_question_type"),
+                $this->plugin->txt("questions_question_type"),
                 sprintf("question_%d_type_label", $i)
             );
             $questionTypeLabel->setValue(
-                $this->txt("questions_type_" . $questions[$i]->question_type)
+                $this->plugin->txt("questions_type_" . $questions[$i]->question_type)
             );
             $form->addItem($questionTypeLabel);
 
             $enable = new ilCheckBoxInputGUI(
-                $this->txt(
+                $this->plugin->txt(
                     $questions[$i]->question_type == "open"
-                    ? "questions_enable"
-                    : "questions_use_for_grading"
+                        ? "questions_enable"
+                        : "questions_use_for_grading"
                 ),
                 sprintf("question_%d_enable", $i)
             );
@@ -2022,7 +1224,7 @@ class ilNolejActivityManagementGUI
 
             if ($questions[$i]->question_type != "hoq") {
                 $answer = new ilTextAreaInputGUI(
-                    $this->txt("questions_answer"),
+                    $this->plugin->txt("questions_answer"),
                     sprintf("question_%d_answer", $i)
                 );
                 $answer->usePurifier(false);
@@ -2042,7 +1244,7 @@ class ilNolejActivityManagementGUI
             $enable->addSubItem($distractors);
             for ($j = 0; $j < $distractorsLength; $j++) {
                 $distractor = new ilTextAreaInputGUI(
-                    $j == 0 ? $this->txt("questions_distractors") : "",
+                    $j == 0 ? $this->plugin->txt("questions_distractors") : "",
                     sprintf("question_%d_distractor_%d", $i, $j)
                 );
                 $distractor->usePurifier(false);
@@ -2053,12 +1255,6 @@ class ilNolejActivityManagementGUI
                     $distractor->setValue($questions[$i]->distractors[$j]);
                 }
             }
-
-            // $useForGrading = new ilCheckBoxInputGUI(
-            //     $this->txt("questions_use_for_grading"),
-            //     sprintf("question_%d_ufg", $i)
-            // );
-            // $enable->addSubItem($useForGrading);
 
             if ($a_use_post) {
                 $enable->setValueByArray($this->request->getParsedBody());
@@ -2072,8 +1268,8 @@ class ilNolejActivityManagementGUI
             } else {
                 $enable->setChecked(
                     $questions[$i]->question_type == "open"
-                    ? $questions[$i]->enable
-                    : $questions[$i]->use_for_grading
+                        ? $questions[$i]->enable
+                        : $questions[$i]->use_for_grading
                 );
                 if (isset($answer)) {
                     $answer->setValue($questions[$i]->answer);
@@ -2094,7 +1290,7 @@ class ilNolejActivityManagementGUI
             $f->step(
                 sprintf(
                     "%s (%d)",
-                    $this->txt("questions_type_all"),
+                    $this->plugin->txt("questions_type_all"),
                     $length
                 ),
                 "",
@@ -2110,12 +1306,12 @@ class ilNolejActivityManagementGUI
             $steps[] = $f->step(
                 sprintf(
                     "%s (%d)",
-                    $this->txt("questions_type_" . $type),
+                    $this->plugin->txt("questions_type_" . $type),
                     $count
                 ),
                 "",
                 $this->ctrl->getLinkTarget($this, self::CMD_QUESTIONS)
-                . "&question_type=" . $type
+                    . "&question_type=" . $type
             )
                 ->withAvailability($step::AVAILABLE)
                 ->withStatus($step::IN_PROGRESS);
@@ -2124,14 +1320,14 @@ class ilNolejActivityManagementGUI
             }
             $i++;
         }
-        $wf = $f->linear($this->txt("questions_question_type"), $steps);
+        $wf = $f->linear($this->plugin->txt("questions_question_type"), $steps);
 
         $tpl->setRightContent(
             $renderer->render($wf->withActive($selectedIndex))
-            . ($this->status == self::STATUS_REVISION ? $this->getReviewBox() : "")
+                . ($this->status == ilObjNolej::STATUS_REVISION ? $this->getReviewBox() : "")
         );
 
-        $form->addCommandButton(self::CMD_QUESTIONS_SAVE, $this->txt("cmd_save"));
+        $form->addCommandButton(self::CMD_QUESTIONS_SAVE, $this->plugin->txt("cmd_save"));
         $form->setFormAction($this->ctrl->getFormAction($this));
 
         return $form;
@@ -2143,23 +1339,23 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_ANALISYS) {
+        if ($status < ilObjNolej::STATUS_ANALISYS) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_transcription_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_transcription_not_ready"))
                 )
             );
             return;
         }
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
@@ -2175,12 +1371,12 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
@@ -2196,7 +1392,7 @@ class ilNolejActivityManagementGUI
         $this->getNolejContent("questions", "questions.json");
         $json = $this->readDocumentFile("questions.json");
         if (!$json) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_questions_file"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_questions_file"));
             return $form;
         }
 
@@ -2255,16 +1451,16 @@ class ilNolejActivityManagementGUI
             json_encode(["questions" => $questions])
         );
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_questions_save"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_questions_save"));
             $this->questions();
             return;
         }
 
         $success = $this->putNolejContent("questions", "questions.json");
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_questions_put"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_questions_put"));
         } else {
-            $tpl->setOnScreenMessage("success", $this->txt("questions_saved"));
+            $tpl->setOnScreenMessage("success", $this->plugin->txt("questions_saved"));
         }
         $this->questions();
     }
@@ -2280,12 +1476,12 @@ class ilNolejActivityManagementGUI
         global $tpl;
 
         $form = new ilPropertyFormGUI();
-        $form->setTitle($this->txt("review_concepts"));
+        $form->setTitle($this->plugin->txt("review_concepts"));
 
         $this->getNolejContent("concepts", "concepts.json");
         $json = $this->readDocumentFile("concepts.json");
         if (!$json) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_concepts_file"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_concepts_file"));
             return $form;
         }
 
@@ -2298,7 +1494,7 @@ class ilNolejActivityManagementGUI
         $form->addItem($length_input);
         for ($i = 0; $i < $length; $i++) {
             $section = new ilFormSectionHeaderGUI();
-            $section->setTitle(sprintf($this->txt("concepts_n"), $i + 1));
+            $section->setTitle(sprintf($this->plugin->txt("concepts_n"), $i + 1));
             $form->addItem($section);
 
             $id = new ilHiddenInputGUI(sprintf("concept_%d_id", $i));
@@ -2306,20 +1502,20 @@ class ilNolejActivityManagementGUI
             $form->addItem($id);
 
             $label = new ilNonEditableValueGUI(
-                $this->txt("concepts_label"),
+                $this->plugin->txt("concepts_label"),
                 sprintf("concept_%d_label", $i)
             );
             $label->setValue($concepts[$i]->concept->label);
             $form->addItem($label);
 
             $enable = new ilCheckBoxInputGUI(
-                $this->txt("concepts_enable"),
+                $this->plugin->txt("concepts_enable"),
                 sprintf("concept_%d_enable", $i)
             );
             $form->addItem($enable);
 
             $definition = new ilTextAreaInputGUI(
-                $this->txt("concepts_definition"),
+                $this->plugin->txt("concepts_definition"),
                 sprintf("concept_%d_definition", $i)
             );
             $definition->usePurifier(false);
@@ -2328,22 +1524,22 @@ class ilNolejActivityManagementGUI
 
             $availableGames = $concepts[$i]->concept->available_games;
             $useForGaming = new ilCheckBoxInputGUI(
-                $this->txt("concepts_use_for_gaming"),
+                $this->plugin->txt("concepts_use_for_gaming"),
                 sprintf("concept_%d_gaming", $i)
             );
 
             $useForCW = new ilCheckBoxInputGUI(
-                $this->txt("concepts_use_for_cw"),
+                $this->plugin->txt("concepts_use_for_cw"),
                 sprintf("concept_%d_cw", $i)
             );
 
             $useForDTW = new ilCheckBoxInputGUI(
-                $this->txt("concepts_use_for_dtw"),
+                $this->plugin->txt("concepts_use_for_dtw"),
                 sprintf("concept_%d_dtw", $i)
             );
 
             $useForFTW = new ilCheckBoxInputGUI(
-                $this->txt("concepts_use_for_ftw"),
+                $this->plugin->txt("concepts_use_for_ftw"),
                 sprintf("concept_%d_ftw", $i)
             );
 
@@ -2364,17 +1560,10 @@ class ilNolejActivityManagementGUI
             }
 
             $useForPractice = new ilCheckBoxInputGUI(
-                $this->txt("concepts_use_for_practice"),
+                $this->plugin->txt("concepts_use_for_practice"),
                 sprintf("concept_%d_practice", $i)
             );
             $enable->addSubItem($useForPractice);
-
-            // deprecated
-            // $useForAssessment = new ilCheckBoxInputGUI(
-            //     $this->txt("concepts_use_for_assessment"),
-            //     sprintf("concept_%d_assessment", $i)
-            // );
-            // $enable->addSubItem($useForAssessment);
 
             $language = new ilHiddenInputGUI(sprintf("concept_%d_language", $i));
             $language->setValue($concepts[$i]->concept->language);
@@ -2407,7 +1596,7 @@ class ilNolejActivityManagementGUI
             }
         }
 
-        $form->addCommandButton(self::CMD_CONCEPTS_SAVE, $this->txt("cmd_save"));
+        $form->addCommandButton(self::CMD_CONCEPTS_SAVE, $this->plugin->txt("cmd_save"));
         $form->setFormAction($this->ctrl->getFormAction($this));
 
         return $form;
@@ -2419,23 +1608,23 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_ANALISYS) {
+        if ($status < ilObjNolej::STATUS_ANALISYS) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_transcription_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_transcription_not_ready"))
                 )
             );
             return;
         }
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
@@ -2444,7 +1633,7 @@ class ilNolejActivityManagementGUI
         $form = $this->initConceptsForm();
         $tpl->setContent($form->getHTML());
 
-        if ($this->status == self::STATUS_REVISION) {
+        if ($this->status == ilObjNolej::STATUS_REVISION) {
             $tpl->setRightContent($this->getReviewBox());
         }
     }
@@ -2455,12 +1644,12 @@ class ilNolejActivityManagementGUI
 
         $status = $this->status;
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $f = $DIC->ui()->factory();
             $renderer = $DIC->ui()->renderer();
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
@@ -2515,16 +1704,16 @@ class ilNolejActivityManagementGUI
             json_encode(["concepts" => $concepts])
         );
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_concepts_save"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_concepts_save"));
             $this->concepts();
             return;
         }
 
         $success = $this->putNolejContent("concepts", "concepts.json");
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_concepts_put"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_concepts_put"));
         } else {
-            $tpl->setOnScreenMessage("success", $this->txt("concepts_saved"));
+            $tpl->setOnScreenMessage("success", $this->plugin->txt("concepts_saved"));
         }
         $this->concepts();
     }
@@ -2532,7 +1721,7 @@ class ilNolejActivityManagementGUI
     public function review()
     {
         $this->cmd = self::CMD_ACTIVITIES;
-        $this->updateDocumentStatus(self::STATUS_ACTIVITIES);
+        $this->updateDocumentStatus(ilObjNolej::STATUS_ACTIVITIES);
 
         // Go to activities
         $this->activities();
@@ -2549,12 +1738,12 @@ class ilNolejActivityManagementGUI
         global $tpl;
 
         $form = new ilPropertyFormGUI();
-        $form->setTitle($this->txt("activities_settings"));
+        $form->setTitle($this->plugin->txt("activities_settings"));
 
         $this->getNolejContent("settings", "settings.json", !$a_use_post);
         $json = $this->readDocumentFile("settings.json");
         if (!$json) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_settings_file"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_settings_file"));
             return $form;
         }
 
@@ -2564,7 +1753,7 @@ class ilNolejActivityManagementGUI
 
         for ($i = 0, $len = count($availableActivities); $i < $len; $i++) {
             $activity = new ilCheckBoxInputGUI(
-                $this->txt("activities_" . $availableActivities[$i]),
+                $this->plugin->txt("activities_" . $availableActivities[$i]),
                 "activity_" . $availableActivities[$i]
             );
 
@@ -2584,7 +1773,7 @@ class ilNolejActivityManagementGUI
 
                 case "glossary":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "Glossary_include_IB"
                     );
                     if ($a_use_post) {
@@ -2597,7 +1786,7 @@ class ilNolejActivityManagementGUI
 
                 case "summary":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "Summary_include_IB"
                     );
                     if ($a_use_post) {
@@ -2610,7 +1799,7 @@ class ilNolejActivityManagementGUI
 
                 case "findtheword":
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_ftw_words"),
+                        $this->plugin->txt("activities_ftw_words"),
                         "FTW_number_word_current"
                     );
                     $number->allowDecimals(false);
@@ -2626,12 +1815,12 @@ class ilNolejActivityManagementGUI
 
                 case "dragtheword":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "DTW_include_IB"
                     );
 
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_dtw_words"),
+                        $this->plugin->txt("activities_dtw_words"),
                         "DTW_number_word_current"
                     );
                     $number->allowDecimals(false);
@@ -2650,7 +1839,7 @@ class ilNolejActivityManagementGUI
 
                 case "crossword":
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_cw_words"),
+                        $this->plugin->txt("activities_cw_words"),
                         "CW_number_word_current"
                     );
                     $number->allowDecimals(false);
@@ -2666,12 +1855,12 @@ class ilNolejActivityManagementGUI
 
                 case "practice":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "Practice_include_IB"
                     );
 
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_practice_flashcards"),
+                        $this->plugin->txt("activities_practice_flashcards"),
                         "Practice_number_flashcard_current"
                     );
                     $number->allowDecimals(false);
@@ -2690,12 +1879,12 @@ class ilNolejActivityManagementGUI
 
                 case "practiceq":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "PracticeQ_include_IB"
                     );
 
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_practiceq_flashcards"),
+                        $this->plugin->txt("activities_practiceq_flashcards"),
                         "PracticeQ_number_flashcard_current"
                     );
                     $number->allowDecimals(false);
@@ -2714,12 +1903,12 @@ class ilNolejActivityManagementGUI
 
                 case "grade":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "Grade_include_IB"
                     );
 
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_grade_questions"),
+                        $this->plugin->txt("activities_grade_questions"),
                         "Grade_number_question_current"
                     );
                     $number->allowDecimals(false);
@@ -2738,12 +1927,12 @@ class ilNolejActivityManagementGUI
 
                 case "gradeq":
                     $ibook = new ilCheckBoxInputGUI(
-                        $this->txt("activities_use_in_ibook"),
+                        $this->plugin->txt("activities_use_in_ibook"),
                         "GradeQ_include_IB"
                     );
 
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_gradeq_questions"),
+                        $this->plugin->txt("activities_gradeq_questions"),
                         "GradeQ_number_question_current"
                     );
                     $number->allowDecimals(false);
@@ -2762,7 +1951,7 @@ class ilNolejActivityManagementGUI
 
                 case "flashcards":
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_flashcards_flashcards"),
+                        $this->plugin->txt("activities_flashcards_flashcards"),
                         "Flashcards_number_flashcard_current"
                     );
                     $number->allowDecimals(false);
@@ -2778,7 +1967,7 @@ class ilNolejActivityManagementGUI
 
                 case "ivideo":
                     $number = new ilNumberInputGUI(
-                        $this->txt("activities_ivideo_questions"),
+                        $this->plugin->txt("activities_ivideo_questions"),
                         "IV_number_question_perset_current"
                     );
                     $number->allowDecimals(false);
@@ -2796,7 +1985,7 @@ class ilNolejActivityManagementGUI
             $form->addItem($activity);
         }
 
-        $form->addCommandButton(self::CMD_GENERATE, $this->txt("cmd_generate"));
+        $form->addCommandButton(self::CMD_GENERATE, $this->plugin->txt("cmd_generate"));
         $form->setFormAction($this->ctrl->getFormAction($this));
 
         return $form;
@@ -2808,8 +1997,8 @@ class ilNolejActivityManagementGUI
 
         $form = $this->initActivitiesForm(true);
 
-        if ($this->status == self::STATUS_CREATION_PENDING) {
-            $tpl->setOnScreenMessage("info", $this->txt("activities_generation_start"));
+        if ($this->status == ilObjNolej::STATUS_CREATION_PENDING) {
+            $tpl->setOnScreenMessage("info", $this->plugin->txt("activities_generation_start"));
             $tpl->setContent($form->getHTML());
             return;
         }
@@ -2822,7 +2011,7 @@ class ilNolejActivityManagementGUI
 
         $json = $this->readDocumentFile("settings.json");
         if (!$json) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_settings_file"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_settings_file"));
             return $form;
         }
         $settings = json_decode($json, true);
@@ -2920,16 +2109,16 @@ class ilNolejActivityManagementGUI
             json_encode($settingsToSave)
         );
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_settings_save"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_settings_save"));
             $this->activities();
             return;
         }
 
-        $this->updateDocumentStatus(self::STATUS_ACTIVITIES_PENDING);
+        $this->updateDocumentStatus(ilObjNolej::STATUS_ACTIVITIES_PENDING);
 
         $success = $this->putNolejContent("settings", "settings.json");
         if (!$success) {
-            $tpl->setOnScreenMessage("failure", $this->txt("err_settings_put"));
+            $tpl->setOnScreenMessage("failure", $this->plugin->txt("err_settings_put"));
             $this->activities();
             return;
         }
@@ -2941,7 +2130,7 @@ class ilNolejActivityManagementGUI
             ->withConsumedCredit(0)
             ->store();
 
-        $tpl->setOnScreenMessage("success", $this->txt("activities_generation_start"));
+        $tpl->setOnScreenMessage("success", $this->plugin->txt("activities_generation_start"));
         $tpl->setContent($form->getHTML());
     }
 
@@ -2972,7 +2161,7 @@ class ilNolejActivityManagementGUI
             true
         );
         if (!$json) {
-            return $this->txt("err_json_decode");
+            return $this->plugin->txt("err_json_decode");
         }
         $activities = json_decode($json);
         $fails = [];
@@ -3009,7 +2198,7 @@ class ilNolejActivityManagementGUI
     {
         $result = $this->db->queryF(
             "SELECT id FROM " . ilNolejPlugin::TABLE_DATA
-            . " WHERE document_id = %s",
+                . " WHERE document_id = %s",
             ["integer"],
             [$documentId]
         );
@@ -3032,16 +2221,10 @@ class ilNolejActivityManagementGUI
         $filePath = substr($filePath, 1);
         $absolutePath = ILIAS_ABSOLUTE_PATH . $filePath;
 
-        $this->config->logger->log("Importing H5P activity " . $type . " of document " . $this->documentId);
+        $this->plugin->log("Importing H5P activity " . $type . " of document " . $this->documentId);
 
-        if (method_exists("ilH5PPlugin", "getInstance")) {
-            $h5p_plugin = ilH5PPlugin::getInstance();
-        } else {
-            /** @var ilComponentFactory */
-            $component_factory = $DIC['component.factory'];
-            /** @var ilH5PPlugin */
-            $h5p_plugin = $component_factory->getPlugin(ilH5PPlugin::PLUGIN_ID);
-        }
+        $component_factory = $DIC['component.factory'];
+        $h5p_plugin = $component_factory->getPlugin(ilH5PPlugin::PLUGIN_ID);
 
         /** @var IContainer */
         $h5p_container = $h5p_plugin->getContainer();
@@ -3067,8 +2250,8 @@ class ilNolejActivityManagementGUI
         /** @var H5PValidator */
         $h5p_validator = $h5p_container->getKernelValidator();
         if (!$h5p_validator->isValidPackage()) {
-            $this->config->logger->log("Import validation failed " . $type . " of document " . $this->documentId);
-            return $this->txt("err_h5p_package");
+            $this->plugin->log("Import validation failed " . $type . " of document " . $this->documentId);
+            return $this->plugin->txt("err_h5p_package");
         }
 
         $h5p_storage->savePackage([
@@ -3081,7 +2264,7 @@ class ilNolejActivityManagementGUI
                 "licenseExtras" => $h5p_kernel->mainJsonData["licenseExtras"] ?? "",
                 "licenseVersion" => $h5p_kernel->mainJsonData["licenseVersion"] ?? "",
                 "source" => $h5p_kernel->mainJsonData["source"] ?? "",
-                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->txt("activities_$type"),
+                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->plugin->txt("activities_$type"),
                 "yearFrom" => $h5p_kernel->mainJsonData["yearFrom"] ?? "",
                 "yearTo" => $h5p_kernel->mainJsonData["yearTo"] ?? "",
                 "obj_id" => $this->getObjIdFromDocumentId($this->documentId),
@@ -3095,19 +2278,19 @@ class ilNolejActivityManagementGUI
         $contentId = $h5p_storage->contentId;
 
         if ($contentId == null || $contentId < 1) {
-            $this->config->logger->log("Import failed " . $type . " of document " . $this->documentId);
-            return $this->txt("err_content_id");
+            $this->plugin->log("Import failed " . $type . " of document " . $this->documentId);
+            return $this->plugin->txt("err_content_id");
         }
 
         $this->db->manipulateF(
             "INSERT INTO " . ilNolejPlugin::TABLE_H5P
-            . " (document_id, type, `generated`, content_id)"
-            . " VALUES (%s, %s, %s, %s);",
+                . " (document_id, type, `generated`, content_id)"
+                . " VALUES (%s, %s, %s, %s);",
             ["text", "text", "integer", "integer"],
             [$this->documentId, $type, $time, $contentId]
         );
 
-        $this->config->logger->log("Import completed " . $type . " of document " . $this->documentId);
+        $this->plugin->log("Import completed " . $type . " of document " . $this->documentId);
         return "";
     }
 
@@ -3123,37 +2306,37 @@ class ilNolejActivityManagementGUI
         $renderer = $DIC->ui()->renderer();
         $status = $this->status;
 
-        if ($status < self::STATUS_ANALISYS) {
+        if ($status < ilObjNolej::STATUS_ANALISYS) {
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_transcription_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_transcription_not_ready"))
                 )
             );
             return;
         }
 
-        if ($status < self::STATUS_REVISION) {
+        if ($status < ilObjNolej::STATUS_REVISION) {
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_analysis_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_analysis_not_ready"))
                 )
             );
             return;
         }
 
-        if ($status < self::STATUS_ACTIVITIES) {
+        if ($status < ilObjNolej::STATUS_ACTIVITIES) {
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("err_review_not_ready"))
+                    $f->messageBox()->info($this->plugin->txt("err_review_not_ready"))
                 )
             );
             return;
         }
 
-        if (!$hideInfo && $status == self::STATUS_ACTIVITIES_PENDING) {
+        if (!$hideInfo && $status == ilObjNolej::STATUS_ACTIVITIES_PENDING) {
             $tpl->setContent(
                 $renderer->render(
-                    $f->messageBox()->info($this->txt("activities_generation_start"))
+                    $f->messageBox()->info($this->plugin->txt("activities_generation_start"))
                 )
             );
             return;

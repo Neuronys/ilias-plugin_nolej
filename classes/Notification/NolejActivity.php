@@ -11,7 +11,6 @@
  */
 
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejNotificationPrefRepository.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
 
 /**
  * Set and retrieve user notification about Nolej
@@ -21,6 +20,9 @@ class NolejActivity
 {
     /** @var ilDBInterface */
     protected $db;
+
+    /** @var ilNolejPlugin */
+    protected $plugin;
 
     /** @var string */
     protected $document_id;
@@ -58,9 +60,6 @@ class NolejActivity
     /** @var int|null */
     protected $refId = null;
 
-    /** @var ilNolejConfig */
-    protected $config;
-
     /**
      * @param string|null $a_doc_id
      * @param int|null $a_user_id
@@ -74,6 +73,8 @@ class NolejActivity
         global $DIC;
 
         $this->db = $DIC->database();
+        $this->plugin = ilNolejPlugin::getInstance();
+
         if ($a_doc_id && $a_user_id && $a_action) {
             $this->setDocumentId($a_doc_id);
             $this->setUserId($a_user_id);
@@ -81,8 +82,6 @@ class NolejActivity
 
             $this->read($a_doc_id, $a_user_id, $a_action);
         }
-
-        $this->config = new ilNolejConfig();
     }
 
     /**
@@ -418,7 +417,7 @@ class NolejActivity
             !$this->getAction()
         ) {
             $tpl->setOnScreenMessage("failure", "Some value null", true);
-            $this->config->logger->log("Notification: some values are null: " . print_r([
+            $this->plugin->log("Notification: some values are null: " . print_r([
                 "documentId" => $this->getDocumentId(),
                 "userId" => $this->getUserId(),
                 "action" => $this->getAction()
