@@ -30,11 +30,23 @@ class ilNolejFormGUI
     /** @var ilGlobalPageTemplate */
     protected ilGlobalPageTemplate $tpl;
 
+    /** @var \Psr\Http\Message\ServerRequestInterface */
+    protected $request;
+
+    /** @var \ILIAS\UI\Renderer */
+    protected \ILIAS\UI\Renderer $renderer;
+
+    /** @var \ILIAS\UI\Factory */
+    protected \ILIAS\UI\Factory $factory;
+
     /** @var ilNolejPlugin */
     protected $plugin;
 
     /** @var ilObjNolejGUI */
     protected $obj_gui;
+
+    /** @var ilNolejActivityManagementGUI */
+    protected $manager;
 
     /** @var string */
     protected string $documentId = "";
@@ -44,17 +56,23 @@ class ilNolejFormGUI
 
     /**
      * @param ilObjNolejGUI $obj_gui
+     * @param ilNolejActivityManagementGUI $manager
      */
-    public function __construct($obj_gui)
+    public function __construct($obj_gui, $manager)
     {
         global $DIC;
         $this->ctrl = $DIC->ctrl();
         $this->db = $DIC->database();
         $this->lng = $DIC->language();
         $this->tpl = $DIC->ui()->mainTemplate();
-        $this->plugin = ilNolejPlugin::getInstance();
+        $this->request = $DIC->http()->request();
+        $this->factory = $DIC->ui()->factory();
+        $this->renderer = $DIC->ui()->renderer();
 
         $this->obj_gui = $obj_gui;
+        $this->manager = $manager;
+        $this->plugin = ilNolejPlugin::getInstance();
+
         $this->documentId = $this->obj_gui->getObject()->getDocumentId();
         $this->status = $this->obj_gui->getObject()->getDocumentStatus();
 
@@ -69,6 +87,17 @@ class ilNolejFormGUI
      */
     public function executeCommand(): void
     {
+        $cmd = $this->ctrl->getCmd(self::CMD_SHOW);
+
+        switch ($cmd) {
+            case self::CMD_SHOW:
+            case self::CMD_SAVE:
+                $this->$cmd();
+                break;
+
+            default:
+                throw new ilException("Unknown command: '$cmd'");
+        }
     }
 
     /**
@@ -94,5 +123,15 @@ class ilNolejFormGUI
     protected function form(): ilPropertyFormGUI
     {
         return new ilPropertyFormGUI();
+    }
+
+    /**
+     * Render an information box.
+     */
+    protected function infoBox(string $message): string
+    {
+        return $this->renderer->render(
+            $this->factory->messageBox()->info($message)
+        );
     }
 }

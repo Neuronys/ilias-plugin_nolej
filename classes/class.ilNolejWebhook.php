@@ -10,9 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
-
 /**
  * This class takes care of the calls to the webhook.
  */
@@ -29,6 +26,8 @@ class ilNolejWebhook
 
     public function __construct()
     {
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
         $this->plugin = ilNolejPlugin::getInstance();
     }
 
@@ -55,10 +54,6 @@ class ilNolejWebhook
 
         $this->data = $data;
         switch ($data["action"]) {
-            case "tac":
-                $this->checkTac();
-                break;
-
             case "transcription":
                 $this->plugin->log("Received transcription request: " . var_export($data, true));
                 $this->checkTranscription();
@@ -110,67 +105,6 @@ class ilNolejWebhook
 
         http_response_code($code);
         exit;
-    }
-
-    public function checkTac()
-    {
-        global $DIC;
-
-        if (
-            !isset($this->data["exchangeId"], $this->data["message"], $this->data["s3URL"]) ||
-            !is_string($this->data["exchangeId"]) ||
-            !is_string($this->data["message"]) ||
-            !is_string($this->data["s3URL"])
-        ) {
-            $this->die_message(400, "Request not valid.");
-            return;
-        }
-
-        $db = $DIC->database();
-        $exchangeId = $this->data["exchangeId"];
-
-        $result = $db->queryF(
-            "SELECT * FROM " . ilNolejPlugin::TABLE_TIC
-            . " WHERE exchange_id = %s AND response_on IS NULL;",
-            ["text"],
-            [$exchangeId]
-        );
-        if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Exchange not found.");
-            return;
-        }
-
-        $exchange = $db->fetchAssoc($result);
-
-        $now = strtotime("now");
-        $this->setUserLang($exchange["user_id"]);
-
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_TIC
-            . " SET response_on = %s, response_url = %s WHERE exchange_id = %s;",
-            ["integer", "text", "text"],
-            [$now, $this->data["s3URL"], $exchangeId]
-        );
-        if (!$result) {
-            $this->die_message(404, "Exchange not found.");
-        }
-
-        $this->sendNotification(
-            $exchangeId,
-            (int) $exchange["user_id"],
-            "tac",
-            "ok",
-            0,
-            $this->data["message"],
-            0,
-            "tac_received_info",
-            [
-                $exchangeId,
-                ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX))
-            ]
-        );
-
-        $this->die_message(200, "TAC received!");
     }
 
     public function checkTranscription()
@@ -226,7 +160,7 @@ class ilNolejWebhook
                 $documentId,
                 $documentId,
                 $documentId,
-                ilObjNolej::STATUS_CREATION_PENDING
+                ilNolejActivityManagementGUI::STATUS_CREATION_PENDING
             ]
         );
         if ($db->numRows($result) != 1) {
@@ -255,7 +189,7 @@ class ilNolejWebhook
                     "text"
                 ],
                 [
-                    ilObjNolej::STATUS_CREATION,
+                    ilNolejActivityManagementGUI::STATUS_CREATION,
                     $this->data["consumedCredit"],
                     $documentId
                 ]
@@ -291,7 +225,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilObjNolej::STATUS_ANALISYS,
+                ilNolejActivityManagementGUI::STATUS_ANALISYS,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -372,7 +306,7 @@ class ilNolejWebhook
                 $documentId,
                 $documentId,
                 $documentId,
-                ilObjNolej::STATUS_ANALISYS_PENDING
+                ilNolejActivityManagementGUI::STATUS_ANALISYS_PENDING
             ]
         );
         if ($db->numRows($result) != 1) {
@@ -401,7 +335,7 @@ class ilNolejWebhook
                     "text"
                 ],
                 [
-                    ilObjNolej::STATUS_ANALISYS,
+                    ilNolejActivityManagementGUI::STATUS_ANALISYS,
                     $this->data["consumedCredit"],
                     $documentId
                 ]
@@ -438,7 +372,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilObjNolej::STATUS_REVISION,
+                ilNolejActivityManagementGUI::STATUS_REVISION,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -519,7 +453,7 @@ class ilNolejWebhook
                 $documentId,
                 $documentId,
                 $documentId,
-                ilObjNolej::STATUS_ACTIVITIES_PENDING
+                ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING
             ]
         );
         if ($db->numRows($result) != 1) {
@@ -564,7 +498,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilObjNolej::STATUS_COMPLETED,
+                ilNolejActivityManagementGUI::STATUS_COMPLETED,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -632,7 +566,7 @@ class ilNolejWebhook
         $errorMessage,
         $credits,
         $bodyVar,
-        $vars = array()
+        $vars = []
     ) {
         /** Send Notification */
         $ass = new NolejActivity($documentId, $userId, $action);

@@ -10,9 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
-
 /**
  * Plugin configuration GUI class
  *
@@ -55,6 +52,8 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
 
         $tpl->setTitleIcon(ilNolejPlugin::PLUGIN_DIR . "/templates/images/icon_xnlj.svg");
         $tpl->setTitle($this->plugin->txt("plugin_title"), false);
+
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
     }
 
     /**
@@ -120,7 +119,7 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
         $api_key->setDisableHtmlAutoComplete(true);
         $api_key->setRequired(true);
         $api_key->setInfo($this->plugin->txt("api_key_info"));
-        $api_key->setValue(ilNolejAPI::hasKey() ? self::SECRET : "");
+        $api_key->setValue(ilNolejAPI::hasKey() ? self::SECRET : ""); // Hide key for security.
         $form->addItem($api_key);
 
         $form->addCommandButton(self::CMD_SAVE, $this->plugin->txt("cmd_save"));

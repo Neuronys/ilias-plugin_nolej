@@ -18,16 +18,6 @@ require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/
  */
 class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
 {
-    public const STATUS_CREATION = 0;
-    public const STATUS_CREATION_PENDING = 1;
-    public const STATUS_ANALISYS = 2;
-    public const STATUS_ANALISYS_PENDING = 3;
-    public const STATUS_REVISION = 4;
-    public const STATUS_REVISION_PENDING = 5;
-    public const STATUS_ACTIVITIES = 6;
-    public const STATUS_ACTIVITIES_PENDING = 7;
-    public const STATUS_COMPLETED = 8;
-
     /** @var bool */
     protected bool $online = false;
 

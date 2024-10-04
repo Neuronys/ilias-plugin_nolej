@@ -153,7 +153,7 @@ class NolejActivity
 
         $ilDB = $DIC->database();
 
-        $res = array();
+        $res = [];
 
         $set = $ilDB->query(
             "SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
@@ -178,13 +178,13 @@ class NolejActivity
 
         $ilDB = $DIC->database();
 
-        $res = array();
+        $res = [];
 
         $set = $ilDB->queryF(
             "SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
             . " WHERE document_id = %s",
-            array("text"),
-            array($a_doc_id)
+            ["text"],
+            [$a_doc_id]
         );
         while ($row = $ilDB->fetchAssoc($set)) {
             $obj = new self();
@@ -200,7 +200,7 @@ class NolejActivity
      */
     public static function getAssignedUsers($a_doc_id)
     {
-        $res = array();
+        $res = [];
 
         foreach (self::getInstancesByDocumentId($a_doc_id) as $ass) {
             $res[] = $ass->getUserId();
@@ -359,8 +359,8 @@ class NolejActivity
         $set = $ilDB->queryF(
             "SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
             . " WHERE document_id = %s AND user_id = %s AND action = %s",
-            array("text", "integer", "text"),
-            array($a_doc_id, $a_user_id, $a_action)
+            ["text", "integer", "text"],
+            [$a_doc_id, $a_user_id, $a_action]
         );
         $row = $ilDB->fetchAssoc($set);
         if ($row && $row["user_id"]) {
@@ -375,32 +375,32 @@ class NolejActivity
      */
     protected function getPropertiesForStorage()
     {
-        return array(
-            "tstamp" => array(
+        return [
+            "tstamp" => [
                 "integer",
                 (bool) $this->stored ? $this->getTimestamp() : time()
-            ),
-            "status" => array(
+            ],
+            "status" => [
                 "text",
                 $this->status
-            ),
-            "code" => array(
+            ],
+            "code" => [
                 "integer",
                 $this->code
-            ),
-            "error_message" => array(
+            ],
+            "error_message" => [
                 "text",
                 $this->error_message
-            ),
-            "consumed_credit" => array(
+            ],
+            "consumed_credit" => [
                 "integer",
                 $this->consumed_credit
-            ),
-            "notified" => array(
+            ],
+            "notified" => [
                 "text",
                 $this->notified
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -425,11 +425,11 @@ class NolejActivity
             return;
         }
 
-        $keys = array(
-            "document_id" => array("text", $this->getDocumentId()),
-            "user_id" => array("integer", $this->getUserId()),
-            "action" => array("text", $this->getAction())
-        );
+        $keys = [
+            "document_id" => ["text", $this->getDocumentId()],
+            "user_id" => ["integer", $this->getUserId()],
+            "action" => ["text", $this->getAction()]
+        ];
         $fields = $this->getPropertiesForStorage();
 
         if (!(bool) $this->stored) {
@@ -457,8 +457,8 @@ class NolejActivity
         $ilDB->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_ACTIVITY
             . " SET notified = 'y' WHERE document_id = %s AND user_id = %s",
-            array("integer", "integer"),
-            array($this->getDocumentId(), $this->getUserId())
+            ["integer", "integer"],
+            [$this->getDocumentId(), $this->getUserId()]
         );
     }
 
@@ -509,8 +509,8 @@ class NolejActivity
             . "   GROUP BY user_id, document_id"
             . " )"
             . " ORDER BY tstamp DESC;",
-            array("integer", "integer", "integer", "integer", "integer", "integer"),
-            array($a_user_id, $a_ts_from, $a_ts_to, $a_user_id, $a_ts_from, $a_ts_to)
+            ["integer", "integer", "integer", "integer", "integer", "integer"],
+            [$a_user_id, $a_ts_from, $a_ts_to, $a_user_id, $a_ts_from, $a_ts_to]
         );
         $res = [];
         while ($rec = $db->fetchAssoc($set)) {
@@ -537,8 +537,8 @@ class NolejActivity
         $res = $db->queryF(
             "SELECT id FROM " . ilNolejPlugin::TABLE_DATA
             . " WHERE document_id = %s;",
-            array("text"),
-            array($this->getDocumentId())
+            ["text"],
+            [$this->getDocumentId()]
         );
         $row = $db->fetchAssoc($res);
         $this->objId = (int) $row["id"];

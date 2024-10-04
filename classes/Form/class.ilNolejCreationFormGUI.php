@@ -82,11 +82,6 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
      */
     public function showForm(): void
     {
-        if (!ilNolejAPI::hasKey()) {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_api_key_missing"));
-            return;
-        }
-
         $form = $this->form();
         $this->tpl->setContent($form->getHTML());
     }
@@ -98,11 +93,6 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
     public function saveForm(): void
     {
         global $DIC;
-
-        if (!ilNolejAPI::hasKey()) {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_api_key_missing"));
-            return;
-        }
 
         $form = $this->form();
 
@@ -314,7 +304,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             ["text", "integer", "integer", "text", "text", "text", "text", "text"],
             [
                 $this->obj_gui->getObject()->getTitle(),
-                ilObjNolej::STATUS_CREATION_PENDING,
+                ilNolejActivityManagementGUI::STATUS_CREATION_PENDING,
                 $decrementedCredit,
                 $apiUrl,
                 $apiFormat,
@@ -341,18 +331,13 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
      */
     protected function form(): ilPropertyFormGUI
     {
-        global $DIC;
-
-        $renderer = $DIC->ui()->renderer();
-        $factory = $DIC->ui()->factory();
-
         $this->lng->loadLanguageModule("meta");
         $this->lng->loadLanguageModule("content");
 
         $form = new ilPropertyFormGUI();
         $form->setTitle($this->plugin->txt("tab_creation"));
 
-        if ($this->status != ilObjNolej::STATUS_CREATION) {
+        if ($this->status != ilNolejActivityManagementGUI::STATUS_CREATION) {
             // Show module information.
 
             $form->setOpenTag(false);
@@ -439,17 +424,17 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $tree = $this->getPoolSelectorGUI();
         $tree->handleCommand();
 
-        $selectorModal = $factory->modal()->roundtrip(
+        $selectorModal = $this->factory->modal()->roundtrip(
             $this->lng->txt("cont_select_media_pool"),
-            [$factory->legacy($tree->getHTML())]
+            [$this->factory->legacy($tree->getHTML())]
         );
 
-        $selectorButton = $factory->button()->shy(
+        $selectorButton = $this->factory->button()->shy(
             $this->lng->txt("cont_mob_from_media_pool"),
             "#"
         )->withOnClick($selectorModal->getShowSignal());
 
-        $mobSelector = $factory->item()->standard($selectorButton);
+        $mobSelector = $this->factory->item()->standard($selectorButton);
 
         if (isset($_GET["mob_id"]) && $this->isValidMobId((int) $_GET["mob_id"])) {
             $mobId = (int) $_GET["mob_id"];
@@ -462,19 +447,20 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                     $this->lng->txt("mob") => $title,
                 ]);
 
+            // Add media preview.
             $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
             if (in_array($extension, ilNolejAPI::TYPE_AUDIO)) {
-                $audio = $factory->player()->audio($path);
-                $mobSelector = $mobSelector->withLeadText($renderer->render($audio));
+                $audio = $this->factory->player()->audio($path);
+                $mobSelector = $mobSelector->withLeadText($this->renderer->render($audio));
             } else if (in_array($extension, ilNolejAPI::TYPE_VIDEO)) {
-                $video = $factory->player()->video($path);
-                $mobSelector = $mobSelector->withLeadText($renderer->render($video));
+                $video = $this->factory->player()->video($path);
+                $mobSelector = $mobSelector->withLeadText($this->renderer->render($video));
             }
 
             $mediaSource->setValue(self::PROP_MOB);
             $mobIdInput->setValue($mobId);
         }
-        $mob->setInfo($renderer->render([$mobSelector, $selectorModal]));
+        $mob->setInfo($this->renderer->render([$mobSelector, $selectorModal]));
         $mediaMob->addSubItem($mob);
         $mediaMob->addSubItem($mobIdInput);
 
@@ -693,7 +679,6 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $this->ctrl->saveParameter($this, ["pool_ref_id"]);
 
         $toolbar = new ilToolbarGUI();
-        $factory = $DIC->ui()->factory();
 
         $this->lng->loadLanguageModule("mep");
         $this->lng->loadLanguageModule("content");
@@ -704,6 +689,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         }
 
         // Override back target.
+        $DIC->tabs()->clearTargets();
         $DIC->tabs()->setBackTarget($this->lng->txt("back"), $this->ctrl->getLinkTarget($this, self::CMD_SHOW));
 
         // View mode: pool view (folders/all media objects).
@@ -717,7 +703,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
 
         $this->ctrl->setParameter($this, "pool_view", $pool_view);
         $aria_label = $this->lng->txt("cont_change_pool_view");
-        $view_control = $factory->viewControl()
+        $view_control = $this->factory->viewControl()
             ->mode($actions, $aria_label)
             ->withActive($this->lng->txt($pool_view == "folder" ? "folders" : "mep_all_mobs"));
 

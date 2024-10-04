@@ -41,9 +41,6 @@ class ilNolejAPI
     /** @var int Max bytes for uploaded files (500 MB) */
     public const MAX_SIZE = 524288000;
 
-    /** @var ilNolejPlugin */
-    protected $plugin;
-
     /** @var ?string */
     private static $key = null;
 
@@ -52,7 +49,6 @@ class ilNolejAPI
      */
     public function __construct()
     {
-        $this->plugin = ilNolejPlugin::getInstance();
         self::$key = self::getKey();
     }
 
@@ -82,7 +78,7 @@ class ilNolejAPI
      * @param array $data
      * @param bool $decode
      */
-    public function post($path, $data = array(), $decode = true)
+    public function post($path, $data = [], $decode = true)
     {
         $data_json = json_encode($data);
         $url = self::API_URL . $path;
@@ -112,7 +108,7 @@ class ilNolejAPI
      * @param bool $encode input's data
      * @param bool $decode output
      */
-    public function put($path, $data = array(), $encode = false, $decode = true)
+    public function put($path, $data = [], $encode = false, $decode = true)
     {
         $data_json = $encode ? json_encode($data) : $data;
         $url = self::API_URL . $path;

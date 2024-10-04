@@ -26,7 +26,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 {
     use Hasher;
 
-    const LP_SESSION_ID = 'xnlj_lp_session_state';
+    const LP_SESSION_ID = "xnlj_lp_session_state";
 
     const CMD_PROPERTIES_EDIT = "editProperties";
     const CMD_PROPERTIES_UPDATE = "updateProperties";
@@ -59,10 +59,12 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
     /**
      * Initialization.
+     * @return void
      */
     protected function afterConstructor(): void
     {
         global $DIC;
+
         $this->ctrl = $DIC->ctrl();
         $this->tabs = $DIC->tabs();
         $this->tpl = $DIC->ui()->mainTemplate();
@@ -72,7 +74,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Get object type.
      * @return string
      */
-    final function getType(): string
+    final public function getType(): string
     {
         return ilNolejPlugin::PLUGIN_ID;
     }
@@ -95,7 +97,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
             default:
                 switch ($cmd) {
-                    // Need write permission
+                    // Need write permission.
                     case self::CMD_PROPERTIES_EDIT:
                     case self::CMD_PROPERTIES_UPDATE:
                     case self::CMD_PROPERTIES_SAVE:
@@ -103,7 +105,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
                         $this->$cmd();
                         break;
 
-                    // Need read permission
+                    // Need read permission.
                     case self::CMD_CONTENT_SHOW:
                     case self::CMD_STATUS_COMPLETED:
                     case self::CMD_STATUS_FAILED:
@@ -124,7 +126,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * After object has been created -> jump to this command
      * @return string
      */
-    function getAfterCreationCmd(): string
+    public function getAfterCreationCmd(): string
     {
         return self::CMD_PROPERTIES_EDIT;
     }
@@ -133,7 +135,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      * Get standard command
      * @return string
      */
-    function getStandardCmd(): string
+    public function getStandardCmd(): string
     {
         return self::CMD_CONTENT_SHOW;
     }
@@ -341,7 +343,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
         $this->tabs->activateTab(self::TAB_CONTENT);
 
-        if ($this->object->getDocumentStatus() != ilObjNolej::STATUS_COMPLETED) {
+        if ($this->object->getDocumentStatus() != ilNolejActivityManagementGUI::STATUS_COMPLETED) {
             $this->tpl->setOnScreenMessage("info", $this->plugin->txt("activities_not_yet_generated"));
             return;
         }
