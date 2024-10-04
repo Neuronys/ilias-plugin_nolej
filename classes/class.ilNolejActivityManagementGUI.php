@@ -245,7 +245,6 @@ class ilNolejActivityManagementGUI
         }
 
         $api = new ilNolejAPI();
-
         $result = $api->get(
             sprintf("/documents/%s/lastwebhook", $this->documentId),
             "",
