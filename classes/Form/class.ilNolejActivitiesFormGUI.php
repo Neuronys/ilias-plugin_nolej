@@ -13,7 +13,7 @@
 /**
  * Activities settings Form GUI class.
  *
- * @ilCtrl_isCalledBy ilNolejSummaryFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejActivitiesFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
  */
 class ilNolejActivitiesFormGUI extends ilNolejFormGUI
 {

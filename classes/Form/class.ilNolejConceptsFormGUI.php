@@ -13,7 +13,7 @@
 /**
  * Concepts Form GUI class.
  *
- * @ilCtrl_isCalledBy ilNolejSummaryFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejConceptsFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
  */
 class ilNolejConceptsFormGUI extends ilNolejFormGUI
 {

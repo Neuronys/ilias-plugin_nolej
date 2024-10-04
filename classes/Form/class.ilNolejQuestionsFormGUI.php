@@ -15,7 +15,7 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
 /**
  * Questions Form GUI class.
  *
- * @ilCtrl_isCalledBy ilNolejSummaryFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejQuestionsFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
  */
 class ilNolejQuestionsFormGUI extends ilNolejFormGUI
 {
