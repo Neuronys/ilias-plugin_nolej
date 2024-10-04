@@ -159,7 +159,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
             $label->setValue($concepts[$i]->concept->label);
             $form->addItem($label);
 
-            $enable = new ilCheckBoxInputGUI(
+            $enable = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_enable"),
                 sprintf("concept_%d_enable", $i)
             );
@@ -174,22 +174,22 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
             $enable->addSubItem($definition);
 
             $availableGames = $concepts[$i]->concept->available_games;
-            $useForGaming = new ilCheckBoxInputGUI(
+            $useForGaming = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_gaming"),
                 sprintf("concept_%d_gaming", $i)
             );
 
-            $useForCW = new ilCheckBoxInputGUI(
+            $useForCW = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_cw"),
                 sprintf("concept_%d_cw", $i)
             );
 
-            $useForDTW = new ilCheckBoxInputGUI(
+            $useForDTW = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_dtw"),
                 sprintf("concept_%d_dtw", $i)
             );
 
-            $useForFTW = new ilCheckBoxInputGUI(
+            $useForFTW = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_ftw"),
                 sprintf("concept_%d_ftw", $i)
             );
@@ -210,7 +210,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
                 }
             }
 
-            $useForPractice = new ilCheckBoxInputGUI(
+            $useForPractice = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_practice"),
                 sprintf("concept_%d_practice", $i)
             );

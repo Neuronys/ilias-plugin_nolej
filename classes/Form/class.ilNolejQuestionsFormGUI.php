@@ -211,7 +211,7 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
             );
             $form->addItem($questionTypeLabel);
 
-            $enable = new ilCheckBoxInputGUI(
+            $enable = new ilCheckboxInputGUI(
                 $this->plugin->txt(
                     $questions[$i]->question_type == "open"
                         ? "questions_enable"

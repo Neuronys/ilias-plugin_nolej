@@ -214,7 +214,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
         $settings = $settings->settings;
 
         for ($i = 0, $len = count($availableActivities); $i < $len; $i++) {
-            $activity = new ilCheckBoxInputGUI(
+            $activity = new ilCheckboxInputGUI(
                 $this->plugin->txt("activities_" . $availableActivities[$i]),
                 "activity_" . $availableActivities[$i]
             );
@@ -234,7 +234,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "glossary":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "Glossary_include_IB"
                     );
@@ -247,7 +247,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "summary":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "Summary_include_IB"
                     );
@@ -276,7 +276,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "dragtheword":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "DTW_include_IB"
                     );
@@ -316,7 +316,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "practice":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "Practice_include_IB"
                     );
@@ -340,7 +340,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "practiceq":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "PracticeQ_include_IB"
                     );
@@ -364,7 +364,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "grade":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "Grade_include_IB"
                     );
@@ -388,7 +388,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
                     break;
 
                 case "gradeq":
-                    $ibook = new ilCheckBoxInputGUI(
+                    $ibook = new ilCheckboxInputGUI(
                         $this->plugin->txt("activities_use_in_ibook"),
                         "GradeQ_include_IB"
                     );
