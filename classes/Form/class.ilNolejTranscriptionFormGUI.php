@@ -81,7 +81,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         $api = new ilNolejAPI();
         $url = ILIAS_HTTP_PATH . substr(ilWACSignedPath::signFile($this->manager->dataDir . "/transcription.htm"), 1);
         $result = $api->put(
-            sprintf("/documents/%s/transcription", $this->documentId),
+            "/documents/{$this->documentId}/transcription",
             [
                 "s3URL" => $url,
                 "automaticMode" => false,
@@ -132,7 +132,8 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         if ($status != ilNolejActivityManagementGUI::STATUS_ANALISYS) {
             $transcription = new ilFormSectionHeaderGUI();
             $transcription->setTitle($objTitle);
-            $transcription->setInfo($this->manager->readDocumentFile("transcription.htm"));
+            $content = $this->manager->readDocumentFile("transcription.htm");
+            $transcription->setInfo($content == false ? "--" : $content);
             $form->addItem($transcription);
             return $form;
         }
@@ -205,9 +206,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         }
 
         $api = new ilNolejAPI();
-        $result = $api->get(
-            sprintf("/documents/%s/transcription", $this->documentId)
-        );
+        $result = $api->get("/documents/{$this->documentId}/transcription");
 
         if (
             !is_object($result) ||
@@ -216,7 +215,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             !property_exists($result, "result") ||
             !is_string($result->result)
         ) {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_get") . sprintf($result));
+            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_get") . print_r($result));
             return false;
         }
 

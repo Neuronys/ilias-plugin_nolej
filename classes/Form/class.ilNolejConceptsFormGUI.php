@@ -41,10 +41,6 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
         $this->tpl->setRightContent(
             $this->renderer->render($this->manager->getWorkflow()->withActive(2))
         );
-
-        // if ($this->status == ilNolejActivityManagementGUI::STATUS_REVISION) {
-        //     $this->tpl->setRightContent($this->getReviewBox());
-        // }
     }
 
     /**

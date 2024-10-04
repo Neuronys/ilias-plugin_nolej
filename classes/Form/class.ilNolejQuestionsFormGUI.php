@@ -321,7 +321,6 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
         // TODO: Use toolbar selector.
         $this->tpl->setLeftContent(
             $this->renderer->render($wf->withActive($selectedIndex))
-            // . ($this->status == ilNolejActivityManagementGUI::STATUS_REVISION ? $this->getReviewBox() : "")
         );
 
         $form->addCommandButton(self::CMD_SAVE, $this->lng->txt("save"));

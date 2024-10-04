@@ -41,10 +41,6 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         $this->tpl->setRightContent(
             $this->renderer->render($this->manager->getWorkflow()->withActive(4))
         );
-
-        // if ($this->status == ilNolejActivityManagementGUI::STATUS_REVISION) {
-        //     $this->tpl->setRightContent($this->getReviewBox());
-        // }
     }
 
     /**
@@ -76,8 +72,8 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         // Summary.
         $length = $form->getInput("summary_count");
         for ($i = 0; $i < $length; $i++) {
-            $title = $form->getInput(sprintf("summary_%d_title", $i));
-            $txt = $form->getInput(sprintf("summary_%d_text", $i));
+            $title = $form->getInput("summary_{$i}_title");
+            $txt = $form->getInput("summary_{$i}_text");
             if (!empty($title) && !empty($txt)) {
                 $summary["summary"][] = [
                     "title" => $title,

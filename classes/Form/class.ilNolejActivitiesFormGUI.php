@@ -25,6 +25,10 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
     {
         $status = $this->status;
 
+        $this->tpl->setRightContent(
+            $this->renderer->render($this->manager->getWorkflow()->withActive(5))
+        );
+
         if ($status < ilNolejActivityManagementGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
@@ -35,11 +39,6 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
             return;
         }
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_ACTIVITIES) {
-            $this->tpl->setContent($this->infoBox($this->plugin->txt("err_review_not_ready")));
-            return;
-        }
-
         if ($status == ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("activities_generation_start")));
             return;
@@ -47,10 +46,6 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
 
         $form = $this->form();
         $this->tpl->setContent($form->getHTML());
-
-        $this->tpl->setRightContent(
-            $this->renderer->render($this->manager->getWorkflow()->withActive(5))
-        );
     }
 
     /**
@@ -231,10 +226,6 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
 
             switch ($availableActivities[$i]) {
                 case "ibook":
-                    // ibook must always be generated
-                    $activity->setChecked(true);
-                    // and disabled for user input
-                    $activity->setDisabled(true);
                     break;
 
                 case "glossary":

@@ -343,10 +343,7 @@ class ilNolejActivityManagementGUI
                 ->withStatus(
                     $this->status <= self::STATUS_REVISION
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_REVISION_PENDING
-                            ? Step::IN_PROGRESS
-                            : Step::SUCCESSFULLY
-                        )
+                        : Step::IN_PROGRESS
                 ),
             $workflow->step(
                 $this->plugin->txt("review_questions"),
@@ -361,10 +358,7 @@ class ilNolejActivityManagementGUI
                 ->withStatus(
                     $this->status <= self::STATUS_REVISION
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_REVISION_PENDING
-                            ? Step::IN_PROGRESS
-                            : Step::SUCCESSFULLY
-                        )
+                        : Step::IN_PROGRESS
                 ),
             $workflow->step(
                 $this->plugin->txt("review_summary"),
@@ -379,10 +373,7 @@ class ilNolejActivityManagementGUI
                 ->withStatus(
                     $this->status <= self::STATUS_REVISION
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_REVISION_PENDING
-                            ? Step::IN_PROGRESS
-                            : Step::SUCCESSFULLY
-                        )
+                        : Step::IN_PROGRESS
                 ),
             $workflow->step(
                 $this->plugin->txt("tab_activities"),
@@ -392,12 +383,12 @@ class ilNolejActivityManagementGUI
                 $this->ctrl->getLinkTargetByClass([self::class, ilNolejActivitiesFormGUI::class], ilNolejActivitiesFormGUI::CMD_SHOW)
             )
                 ->withAvailability(
-                    $this->status < self::STATUS_ACTIVITIES
+                    $this->status < self::STATUS_REVISION
                         ? Step::NOT_AVAILABLE
                         : Step::AVAILABLE
                 )
                 ->withStatus(
-                    $this->status <= self::STATUS_ACTIVITIES
+                    $this->status <= self::STATUS_REVISION
                         ? Step::NOT_STARTED
                         : ($this->status == self::STATUS_ACTIVITIES_PENDING
                             ? Step::IN_PROGRESS
@@ -480,6 +471,18 @@ class ilNolejActivityManagementGUI
      * @return string|false return the content if the file exists,
      *   false otherwise.
      */
+    public function hasDocumentFile($filename)
+    {
+        return file_exists($this->dataDir . "/" . $filename);
+    }
+
+    /**
+     * Read a file of the current document, if exists.
+     *
+     * @param string $filename the name of the file.
+     * @return string|false return the content if the file exists,
+     *   false otherwise.
+     */
     public function readDocumentFile($filename)
     {
         return file_get_contents($this->dataDir . "/" . $filename);
@@ -497,7 +500,7 @@ class ilNolejActivityManagementGUI
     public function writeDocumentFile($filename, $content)
     {
         if (!is_dir($this->dataDir)) {
-            mkdir($this->dataDir, 0777, true);
+            mkdir($this->dataDir, 0775, true);
         }
 
         return file_put_contents(
@@ -587,30 +590,6 @@ class ilNolejActivityManagementGUI
             [$newStatus, $this->documentId]
         );
         $this->statusCheck();
-        // $this->printWorkflow($this->cmd);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getReviewBox(): string
-    {
-        global $DIC;
-        $factory = $DIC->ui()->factory();
-        $renderer = $DIC->ui()->renderer();
-
-        $buttons = [
-            $factory->button()->standard(
-                $this->plugin->txt("cmd_review"),
-                $this->ctrl->getLinkTarget($this, self::CMD_REVIEW)
-            )
-        ];
-
-        return $renderer->render(
-            $factory->messageBox()
-                ->info($this->plugin->txt("cmd_review_info"))
-                ->withButtons($buttons)
-        );
     }
 
     /**
@@ -621,10 +600,10 @@ class ilNolejActivityManagementGUI
     {
         $h5pDir = $this->dataDir . "/h5p";
         if (!is_dir($h5pDir)) {
-            mkdir($h5pDir, 0777, true);
+            mkdir($h5pDir, 0775, true);
         }
 
-        // Delete previouses h5p files
+        // Delete previouses h5p files.
         $dirIterator = new DirectoryIterator($h5pDir);
         foreach ($dirIterator as $item) {
             if (!$item->isDot() && $item->isFile()) {
@@ -738,7 +717,7 @@ class ilNolejActivityManagementGUI
                 "licenseExtras" => $h5p_kernel->mainJsonData["licenseExtras"] ?? "",
                 "licenseVersion" => $h5p_kernel->mainJsonData["licenseVersion"] ?? "",
                 "source" => $h5p_kernel->mainJsonData["source"] ?? "",
-                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->plugin->txt("activities_$type"),
+                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->plugin->txt("activities_{$type}"),
                 "yearFrom" => $h5p_kernel->mainJsonData["yearFrom"] ?? "",
                 "yearTo" => $h5p_kernel->mainJsonData["yearTo"] ?? "",
                 "obj_id" => $this->getObjIdFromDocumentId($this->documentId),
