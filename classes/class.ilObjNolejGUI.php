@@ -13,7 +13,6 @@
 require_once "./Services/Tracking/classes/class.ilLearningProgress.php";
 require_once "./Services/Tracking/classes/class.ilLPStatusWrapper.php";
 require_once "./Services/Tracking/classes/status/class.ilLPStatusPlugin.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
 
 use ILIAS\GlobalScreen\Scope\MainMenu\Collector\Renderer\Hasher;
 

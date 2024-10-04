@@ -80,7 +80,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             sprintf("/documents/%s/transcription", $this->documentId),
             [
                 "s3URL" => $url,
-                "automaticMode" => $this->obj_gui->getObject()->getDocumentAutomaticMode()
+                "automaticMode" => false,
             ],
             true,
             true

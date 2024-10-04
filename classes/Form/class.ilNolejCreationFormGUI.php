@@ -104,6 +104,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         }
 
         $apiTitle = $form->getInput(self::PROP_TITLE);
+        $decrementedCredit = 1;
 
         /**
          * Set $apiUrl (signed)
@@ -122,111 +123,59 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                 switch ($format) {
                     case self::PROP_CONTENT:
                         $apiFormat = self::PROP_WEB;
-                        $decrementedCredit = 1;
                         break;
 
                     case self::PROP_AUDIO:
-                        $apiFormat = $format;
-                        $decrementedCredit = 1;
-                        break;
-
                     case self::PROP_VIDEO:
                         $apiFormat = $format;
-                        $decrementedCredit = 1;
                         break;
                 }
                 break;
 
             case self::PROP_MOB:
-                /**
-                 * Generate signed url
-                 * Detect media format
-                 * Decrement credit
-                 */
-                $decrementedCredit = 1;
+                // Use selected mob.
                 $mobId = (int) $form->getInput(self::PROP_MOB_ID);
                 if ($this->isValidMobId($mobId)) {
-                    $path = ilObjMediaObject::_lookupItemPath($mobId, false, false);
-                    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                    if (in_array($extension, ilNolejAPI::TYPE_AUDIO)) {
-                        $apiFormat = self::PROP_AUDIO;
-                    } else if (in_array($extension, ilNolejAPI::TYPE_VIDEO)) {
-                        $apiFormat = self::PROP_VIDEO;
-                    } else if (in_array($extension, ilNolejAPI::TYPE_DOC)) {
-                        $apiFormat = self::PROP_DOC;
-                    } else {
-                        $decrementedCredit = 0;
-                    }
+                    $apiFormat = $this->getMobFormat($mobId);
                     $apiUrl = $this->getSignedUrl($mobId, ilWACSignedPath::MAX_LIFETIME);
                 }
                 break;
 
             case self::PROP_FILE:
-                /**
-                 * Save file to plugin data dir
-                 * @todo generate signed url
-                 * Detect media format
-                 * Decrement credit
-                 */
-                $apiUrl = "";
-                $apiFormat = "";
-                $decrementedCredit = 1;
-
-                $upload_path = $this->getUploadDir();
-
-                $file = $_FILES[self::PROP_INPUT_FILE];
-                if (!$file["tmp_name"]) {
-                    // todo: show error
-                    break;
-                }
-
-                $extension = pathinfo($file["name"], PATHINFO_EXTENSION);
-                $upload_filename = $this->getRandomFilename($extension);
-                $upload_filepath = $upload_path . $upload_filename;
-
-                $success = ilFileUtils::moveUploadedFile(
-                    $file["tmp_name"],
-                    $upload_filename,
-                    $upload_filepath
-                );
-
-                if (!$success) {
+                // Save uploaded file as a media object.
+                if (!isset(
+                    $_FILES[self::PROP_INPUT_FILE],
+                    $_FILES[self::PROP_INPUT_FILE]["tmp_name"]
+                )) {
+                    // File not set.
                     $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"), true);
                     $form->setValuesByPost();
                     $this->tpl->setContent($form->getHTML());
                     return;
                 }
 
-                chmod($upload_filepath, 0775);
-                $apiUrl = preg_replace("/^\.\//", ILIAS_HTTP_PATH . "/", $upload_filepath);
-                if (in_array($extension, ilNolejAPI::TYPE_DOC)) {
-                    $apiFormat = self::PROP_DOC;
-                } else if (in_array($extension, ilNolejAPI::TYPE_VIDEO)) {
-                    $apiFormat = self::PROP_VIDEO;
-                } else if (in_array($extension, ilNolejAPI::TYPE_AUDIO)) {
-                    $apiFormat = self::PROP_AUDIO;
+                $mob = $this->saveMob();
+                if ($mob == null) {
+                    $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"), true);
+                    $form->setValuesByPost();
+                    $this->tpl->setContent($form->getHTML());
+                    return;
                 }
+
+                $apiFormat = $this->getMobFormat($mob->getId());
+                $apiUrl = $this->getSignedUrl($mob->getId(), ilWACSignedPath::MAX_LIFETIME);
                 break;
 
             case self::PROP_TEXT:
-                /**
-                 * Save as file in the plugin data dir
-                 * @todo generate signed url
-                 */
-                $upload_path = $this->getUploadDir();
-                $textInput = $form->getInput(self::PROP_TEXTAREA);
-                $upload_filename = $this->getRandomFilename("htm");
-                $upload_filepath = $upload_path . $upload_filename;
-                file_put_contents($upload_filepath, $textInput);
-                chmod($upload_filepath, 0775);
-
-                $apiUrl = preg_replace("/^\.\//", ILIAS_HTTP_PATH . "/", $upload_filepath);
+                // Save text as media object.
+                $content = $form->getInput(self::PROP_TEXTAREA);
+                $mob = $this->saveMob($content);
                 $apiFormat = "freetext";
-                $decrementedCredit = 1;
-
+                $apiUrl = $this->getSignedUrl($mob->getId(), ilWACSignedPath::MAX_LIFETIME);
                 break;
         }
 
+        // Check url.
         if (!$apiUrl || $apiUrl == "") {
             $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_media_url_empty"), true);
             $form->setValuesByPost();
@@ -234,6 +183,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             return;
         }
 
+        // Check format.
         if (!$apiFormat || $apiFormat == "") {
             $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_media_format_unknown"), true);
             $form->setValuesByPost();
@@ -827,12 +777,12 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
     /**
      * Get the signed URL for Nolej to see the media object via webhook.
      * @param int $mobId
-     * @param int $ttl
+     * @param int $ttl in seconds
      * @return string url
      */
     protected function getSignedUrl(int $mobId, int $ttl = 10): string
     {
-        $path = ilObjMediaObject::_lookupItemPath($mobId);
+        $path = ilObjMediaObject::_lookupItemPath($mobId, false, true);
 
         $tokenMaxLifetimeInSeconds = ilWACSignedPath::getTokenMaxLifetimeInSeconds();
         ilWACSignedPath::setTokenMaxLifetimeInSeconds($ttl);
@@ -844,49 +794,72 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
     }
 
     /**
-     * Get the general upload directory.
-     * @return string
+     * Save uploaded media item.
+     * @param ?string $content (null for uploaded file)
+     * @return ilObjMediaObject
      */
-    protected function getUploadDir(): string
+    protected function saveMob($content = null)
     {
-        $uploadDir = ilObjNolej::dataDir() . "uploads/";
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0775, true);
+        $filename = $content == null
+            ? ilObjMediaObject::fixFilename($_FILES[self::PROP_INPUT_FILE]["name"])
+            : "freetext.htm";
+
+        // Create media object.
+        $mob = new ilObjMediaObject();
+        $mob->setTitle($filename);
+        $mob->setDescription("");
+        $mob->create();
+
+        // Determine and create mob directory, move uploaded file to directory.
+        $mob->createDirectory();
+        $mob_dir = ilObjMediaObject::_getDirectory($mob->getId());
+
+        $media_item = new ilMediaItem();
+        $mob->addMediaItem($media_item);
+        $media_item->setPurpose("Standard");
+
+        // Save file to its path.
+        $path = $mob_dir . "/" . $filename;
+        if ($content == null) {
+            ilFileUtils::moveUploadedFile(
+                $_FILES[self::PROP_INPUT_FILE]["tmp_name"],
+                $filename,
+                $path
+            );
+        } else {
+            file_put_contents($path, $content);
         }
-        return $uploadDir;
+
+        // Set real meta and object data.
+        $media_item->setFormat(ilObjMediaObject::getMimeType($path));
+        $media_item->setLocation($filename);
+        $media_item->setLocationType("LocalFile");
+
+        ilObjMediaObject::renameExecutables($mob_dir);
+        ilMediaSvgSanitizer::sanitizeDir($mob_dir);	// see #20339
+        $mob->update();
+
+        return $mob;
     }
 
     /**
-     * Generate a random and unique name for a file that
-     * needs to be uploaded in the upload directory.
-     * @param string $extension
-     * @return string
+     * Get the format of the document to use with Nolej API.
+     * @param int $mobId
+     * @return string format (empty if not valid)
      */
-    protected function getRandomFilename($extension): string
+    protected function getMobFormat(int $mobId): string
     {
-        $uploadDir = $this->getUploadDir();
-        $len = 7;
-        do {
-            $filename = $this->generateRandomString($len) . "." . $extension;
-            $len++;
-        } while (is_file($uploadDir . $filename));
-        return $filename;
-    }
-
-    /**
-     * Generate a random file name.
-     * @see https://stackoverflow.com/a/4356295
-     * @param int $length
-     * @return string
-     */
-    protected function generateRandomString($length = 10): string
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        $path = ilObjMediaObject::_lookupItemPath($mobId, false, false);
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if (in_array($extension, ilNolejAPI::TYPE_AUDIO)) {
+            return self::PROP_AUDIO;
         }
-        return $randomString;
+        if (in_array($extension, ilNolejAPI::TYPE_VIDEO)) {
+            return self::PROP_VIDEO;
+        }
+        if (in_array($extension, ilNolejAPI::TYPE_DOC)) {
+            return self::PROP_DOC;
+        }
+        return "";
     }
 }
