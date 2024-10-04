@@ -86,6 +86,7 @@ concepts_use_for_practice#:#Use for Concept cards
 configuration_title#:#Configure
 content_loading#:#Content is loading...
 crs_create_xnlj#:#Create NOLEJ object
+document_id#:#Document ID
 err_access_denied#:#You cannot access this course.
 err_activities_get#:#Cannot retrieve some of the generated activities: %s. Please, try again to generate the activities.
 err_analysis_not_ready#:#The analysis is not ready yet, please wait some time and check again.

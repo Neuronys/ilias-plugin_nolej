@@ -86,6 +86,7 @@ Concepts_use_for_practice#:#Für Konzeptkarten verwenden
 configuration_title#:#Konfigurieren
 content_loading#:#Inhalt wird geladen...
 crs_create_xnlj#:#NOLEJ-Objekt erstellen
+document_id#:#Document ID
 err_access_denied#:#Sie können nicht auf diesen Kurs zugreifen.
 err_activities_get#:#Einige der generierten Aktivitäten können nicht abgerufen werden: %s. Bitte versuchen Sie erneut, die Aktivitäten zu generieren.
 err_analysis_not_ready#:#Die Analyse ist noch nicht fertig, bitte warten Sie und überprüfen Sie es erneut.

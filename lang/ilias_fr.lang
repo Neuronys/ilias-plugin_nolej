@@ -86,6 +86,7 @@ concepts_use_for_practice#:#Utiliser pour les cartes conceptuelles
 configuration_title#:#Configurer
 content_loading#:#Le contenu est en cours de chargement...
 crs_create_xnlj#:#Créer un objet NOLEJ
+document_id#:#Document ID
 err_access_denied#:#Vous ne pouvez pas accéder à ce cours.
 err_activities_get#:#Impossible de récupérer certaines des activités générées : %s. Veuillez réessayer de générer les activités.
 err_analysis_not_ready#:#L'analyse n'est pas encore prête, veuillez attendre un peu et vérifier à nouveau.

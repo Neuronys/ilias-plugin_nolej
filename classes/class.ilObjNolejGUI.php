@@ -193,10 +193,10 @@ class ilObjNolejGUI extends ilObjectPluginGUI
             );
         }
 
-        // standard info screen tab
+        // Standard info screen tab.
         $this->addInfoTab();
 
-        // "properties" and "manage licenses" tabs
+        // Properties tabs.
         if ($this->object->hasWritePermission()) {
             $this->tabs->addTab(
                 self::TAB_PROPERTIES,
@@ -207,6 +207,20 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
         // Standard permission tab.
         $this->addPermissionTab();
+    }
+
+    /**
+     * Add items to info screen.
+     * @param ilInfoScreenGUI $info
+     * @return void
+     */
+    public function addInfoItems(ilInfoScreenGUI $info): void
+    {
+        $info->addSection($this->plugin->txt("plugin_title"));
+        $info->addProperty(
+            $this->plugin->txt("document_id"),
+            $this->object->getDocumentId()
+        );
     }
 
     /**
