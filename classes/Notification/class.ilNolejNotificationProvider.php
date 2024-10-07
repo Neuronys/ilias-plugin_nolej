@@ -12,16 +12,13 @@
 
 declare(strict_types=1);
 
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejNotificationPrefRepository.php";
-
 use ILIAS\GlobalScreen\Identification\IdentificationInterface;
 use ILIAS\GlobalScreen\Scope\Notification\Provider\AbstractNotificationPluginProvider;
 
 /**
  * This class provides the notifications in ILIAS
  */
-class NolejNotificationProvider extends AbstractNotificationPluginProvider
+class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
 {
     /**
      * @inheritDoc
@@ -33,7 +30,10 @@ class NolejNotificationProvider extends AbstractNotificationPluginProvider
         $user = $this->dic->user();
         $plugin = ilNolejPlugin::getInstance();
 
-        $noti_repo = new NolejNotificationPrefRepository($user);
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejActivity.php";
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejNotificationPrefRepository.php";
+
+        $noti_repo = new ilNolejNotificationPrefRepository($user);
 
         // $lng->loadLanguageModule("badge");
 
@@ -42,7 +42,7 @@ class NolejNotificationProvider extends AbstractNotificationPluginProvider
             return $this->if->identifier($id);
         };
 
-        $new_activities = NolejActivity::getActivitiesForUser(
+        $new_activities = ilNolejActivity::getActivitiesForUser(
             $user->getId(),
             $noti_repo->getLastCheckedTimestamp()
         );

@@ -291,7 +291,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
      */
     public function resetLPOfUser(int $user_id): void
     {
-        // TODO in future version
+        // No LP recorded yet.
     }
 
     /**

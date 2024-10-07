@@ -26,7 +26,7 @@ class ilNolejWebhook
 
     public function __construct()
     {
-        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejActivity.php";
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
         $this->plugin = ilNolejPlugin::getInstance();
     }
@@ -48,7 +48,7 @@ class ilNolejWebhook
             !isset($data["action"]) ||
             !is_string($data["action"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             $this->plugin->log("Received invalid request: " . var_export($data, true));
         }
 
@@ -88,7 +88,7 @@ class ilNolejWebhook
      * @param int $code
      * @param string $message
      */
-    protected function die_message(
+    protected function exitWithMessage(
         $code = 400,
         $message = ""
     ) {
@@ -129,7 +129,7 @@ class ilNolejWebhook
             !is_integer($this->data["code"]) ||
             !is_integer($this->data["consumedCredit"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             return;
         }
 
@@ -164,7 +164,7 @@ class ilNolejWebhook
             ]
         );
         if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Document ID not found.");
+            $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
 
@@ -195,7 +195,7 @@ class ilNolejWebhook
                 ]
             );
             if (!$result) {
-                $this->die_message(404, "Document not found.");
+                $this->exitWithMessage(404, "Document not found.");
             }
 
             $this->sendNotification(
@@ -231,7 +231,7 @@ class ilNolejWebhook
             ]
         );
         if (!$result) {
-            $this->die_message(404, "Document not found.");
+            $this->exitWithMessage(404, "Document not found.");
         }
 
         $this->sendNotification(
@@ -250,7 +250,7 @@ class ilNolejWebhook
             ]
         );
 
-        $this->die_message(200, "Transcription received!");
+        $this->exitWithMessage(200, "Transcription received!");
     }
 
     public function checkAnalysis()
@@ -275,7 +275,7 @@ class ilNolejWebhook
             !is_integer($this->data["code"]) ||
             !is_integer($this->data["consumedCredit"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             return;
         }
 
@@ -310,7 +310,7 @@ class ilNolejWebhook
             ]
         );
         if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Document ID not found.");
+            $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
 
@@ -341,7 +341,7 @@ class ilNolejWebhook
                 ]
             );
             if (!$result) {
-                $this->die_message(404, "Document not found.");
+                $this->exitWithMessage(404, "Document not found.");
             }
 
             $this->sendNotification(
@@ -378,7 +378,7 @@ class ilNolejWebhook
             ]
         );
         if (!$result) {
-            $this->die_message(404, "Document not found.");
+            $this->exitWithMessage(404, "Document not found.");
         }
 
         $this->sendNotification(
@@ -397,7 +397,7 @@ class ilNolejWebhook
             ]
         );
 
-        $this->die_message(200, "Analysis received!");
+        $this->exitWithMessage(200, "Analysis received!");
     }
 
     public function checkActivities()
@@ -422,7 +422,7 @@ class ilNolejWebhook
             !is_integer($this->data["code"]) ||
             !is_integer($this->data["consumedCredit"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             return;
         }
 
@@ -457,7 +457,7 @@ class ilNolejWebhook
             ]
         );
         if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Document ID not found.");
+            $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
 
@@ -504,7 +504,7 @@ class ilNolejWebhook
             ]
         );
         if (!$result) {
-            $this->die_message(404, "Document not found.");
+            $this->exitWithMessage(404, "Document not found.");
         }
 
         $activityManagement = new ilNolejActivityManagementGUI(null, $documentId);
@@ -523,7 +523,7 @@ class ilNolejWebhook
                 [$fails]
             );
 
-            $this->die_message(200, "Activities received, but something went wrong while retrieving them.");
+            $this->exitWithMessage(200, "Activities received, but something went wrong while retrieving them.");
             return;
         }
 
@@ -541,7 +541,7 @@ class ilNolejWebhook
                 ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX))
             ]
         );
-        $this->die_message(200, "Activities received!");
+        $this->exitWithMessage(200, "Activities received!");
     }
 
     /**
@@ -569,7 +569,7 @@ class ilNolejWebhook
         $vars = []
     ) {
         /** Send Notification */
-        $ass = new NolejActivity($documentId, $userId, $action);
+        $ass = new ilNolejActivity($documentId, $userId, $action);
         $ass->withStatus($status)
             ->withCode($code)
             ->withErrorMessage($errorMessage)

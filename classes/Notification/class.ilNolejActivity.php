@@ -10,13 +10,11 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejNotificationPrefRepository.php";
-
 /**
  * Set and retrieve user notification about Nolej
  * activity generation progresses.
  */
-class NolejActivity
+class ilNolejActivity
 {
     /** @var ilDBInterface */
     protected $db;
@@ -75,6 +73,8 @@ class NolejActivity
         $this->db = $DIC->database();
         $this->plugin = ilNolejPlugin::getInstance();
 
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/ilNolejNotificationPrefRepository.php";
+
         if ($a_doc_id && $a_user_id && $a_action) {
             $this->setDocumentId($a_doc_id);
             $this->setUserId($a_user_id);
@@ -97,7 +97,7 @@ class NolejActivity
         $db = $DIC->database();
 
         $user = new ilObjUser($a_user_id);
-        $noti_repo = new NolejNotificationPrefRepository($user);
+        $noti_repo = new ilNolejNotificationPrefRepository($user);
 
         $last = $noti_repo->getLastCheckedTimestamp();
 

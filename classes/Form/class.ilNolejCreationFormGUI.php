@@ -147,10 +147,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
 
             case self::PROP_FILE:
                 // Save uploaded file as a media object.
-                if (!isset(
-                    $_FILES[self::PROP_INPUT_FILE],
-                    $_FILES[self::PROP_INPUT_FILE]["tmp_name"]
-                )) {
+                if (!isset($_FILES[self::PROP_INPUT_FILE], $_FILES[self::PROP_INPUT_FILE]["tmp_name"])) {
                     // File not set.
                     $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"), true);
                     $form->setValuesByPost();
@@ -268,7 +265,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             ]
         );
 
-        $ass = new NolejActivity($result->id, $DIC->user()->getId(), "transcription");
+        $ass = new ilNolejActivity($result->id, $DIC->user()->getId(), "transcription");
         $ass->withStatus("ok")
             ->withCode(0)
             ->withErrorMessage("")
@@ -812,7 +809,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $media_item->setLocationType("LocalFile");
 
         ilObjMediaObject::renameExecutables($mob_dir);
-        ilMediaSvgSanitizer::sanitizeDir($mob_dir);	// see #20339
+        ilMediaSvgSanitizer::sanitizeDir($mob_dir);
         $mob->update();
 
         return $mob;

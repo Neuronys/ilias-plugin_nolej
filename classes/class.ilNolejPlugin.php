@@ -85,13 +85,13 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
             return self::$pluginProviderCollection;
         }
 
-        require_once self::PLUGIN_DIR . "/classes/Notification/NolejNotificationProvider.php";
+        require_once self::PLUGIN_DIR . "/classes/Notification/class.ilNolejNotificationProvider.php";
 
         if (self::$pluginProviderCollection === null) {
             self::$pluginProviderCollection = new PluginProviderCollection();
 
             // self::$pluginProviderCollection->setMetaBarProvider(new NolejMetaBarProvider($DIC, $this));
-            self::$pluginProviderCollection->setNotificationProvider(new NolejNotificationProvider($DIC, $this));
+            self::$pluginProviderCollection->setNotificationProvider(new ilNolejNotificationProvider($DIC, $this));
         }
 
         return self::$pluginProviderCollection;
