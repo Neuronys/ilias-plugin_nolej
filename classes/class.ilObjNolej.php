@@ -10,9 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once "./Services/Tracking/interfaces/interface.ilLPStatusPlugin.php";
-require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejPlugin.php";
-
 /**
  * Repository plugin object class
  */
@@ -31,6 +28,8 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     public function __construct($a_ref_id = 0)
     {
         parent::__construct($a_ref_id);
+
+        require_once "./Services/Tracking/interfaces/interface.ilLPStatusPlugin.php";
     }
 
     /**
