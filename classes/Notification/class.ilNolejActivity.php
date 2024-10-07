@@ -73,7 +73,7 @@ class ilNolejActivity
         $this->db = $DIC->database();
         $this->plugin = ilNolejPlugin::getInstance();
 
-        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/ilNolejNotificationPrefRepository.php";
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejNotificationPrefRepository.php";
 
         if ($a_doc_id && $a_user_id && $a_action) {
             $this->setDocumentId($a_doc_id);
