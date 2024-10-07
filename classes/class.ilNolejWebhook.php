@@ -400,7 +400,7 @@ class ilNolejWebhook
         $this->die_message(200, "Analysis received!");
     }
 
-    function checkActivities()
+    public function checkActivities()
     {
         global $DIC;
 

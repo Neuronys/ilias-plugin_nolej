@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * This file is part of Nolej Repository Object Plugin for ILIAS,
@@ -10,6 +9,8 @@ declare(strict_types=1);
  * @copyright 2024 OC Open Consulting SB Srl
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+declare(strict_types=1);
 
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
 require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejNotificationPrefRepository.php";

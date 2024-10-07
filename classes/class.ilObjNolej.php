@@ -360,5 +360,4 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     {
         return 0;
     }
-
 }
