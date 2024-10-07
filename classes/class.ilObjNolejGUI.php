@@ -366,11 +366,6 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      */
     public function showContent(): void
     {
-        global $DIC;
-
-        $renderer = $DIC->ui()->renderer();
-        $factory = $DIC->ui()->factory();
-
         $this->setContentSubTabs();
 
         if ($this->object->getDocumentStatus() != ilNolejActivityManagementGUI::STATUS_COMPLETED) {
@@ -392,16 +387,8 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
         $contentId = $this->object->getContentIdOfType($this->selectedType);
 
-        // Display activities.
-        $this->tpl->setContent(
-            ($contentId != -1)
-            ? $this->getH5PHtml($contentId)
-            : $renderer->render(
-                $factory
-                    ->messageBox()
-                    ->failure($this->plugin->txt("err_h5p_content"))
-            )
-        );
+        // Display activity.
+        $this->tpl->setContent(ilNolejPlugin::renderH5P($contentId));
     }
 
     /**
@@ -415,47 +402,13 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
     /**
      * Get the HTML of an H5P activity.
+     * @deprecated
      * @param int $contentId
      * @return string html
      */
     public static function getH5PHtml($contentId): string
     {
-        global $DIC, $tpl;
-
-        $nolej = ilNolejPlugin::getInstance();
-        $renderer = $DIC->ui()->renderer();
-        $factory = $DIC->ui()->factory();
-
-        ilNolejPlugin::includeH5P();
-        $component_factory = $DIC["component.factory"];
-        $h5p_plugin = $component_factory->getPlugin(ilH5PPlugin::PLUGIN_ID);
-
-        /** @var IContainer */
-        $h5p_container = $h5p_plugin->getContainer();
-
-        /** @var IRepositoryFactory */
-        $repositories = $h5p_container->getRepositoryFactory();
-
-        $tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
-
-        $content = $repositories->content()->getContent((int) $contentId);
-
-        $component = (null === $content)
-            ? $factory
-                ->messageBox()
-                ->failure($nolej->txt("err_h5p_content"))
-            : $h5p_container
-                ->getComponentFactory()
-                ->content($content)
-                ->withLoadingMessage(
-                    ilNolejActivityManagementGUI::glyphicon("refresh gly-spin")
-                    . $nolej->txt("content_loading")
-                );
-
-        return sprintf(
-            "<div style=\"margin-top: 25px;\">%s</div>",
-            $renderer->render($component)
-        );
+        return ilNolejPlugin::renderH5P($contentId);
     }
 
     /**

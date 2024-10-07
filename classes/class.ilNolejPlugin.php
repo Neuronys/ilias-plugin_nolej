@@ -279,6 +279,59 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     }
 
     /**
+     * Get the HTML of an H5P activity.
+     * @param int $contentId
+     * @return string html
+     */
+    public static function renderH5P($contentId): string
+    {
+        global $DIC;
+
+        $nolej = self::getInstance();
+        $renderer = $DIC->ui()->renderer();
+        $factory = $DIC->ui()->factory();
+
+        if ($contentId == -1) {
+            return $renderer->render(
+                $factory
+                    ->messageBox()
+                    ->failure($nolej->txt("err_h5p_content"))
+            );
+        }
+
+        self::includeH5P();
+        $component_factory = $DIC["component.factory"];
+        $h5p_plugin = $component_factory->getPlugin(ilH5PPlugin::PLUGIN_ID);
+
+        /** @var IContainer */
+        $h5p_container = $h5p_plugin->getContainer();
+
+        /** @var IRepositoryFactory */
+        $repositories = $h5p_container->getRepositoryFactory();
+
+        $DIC->ui()->mainTemplate()->addCss(self::PLUGIN_DIR . "/css/nolej.css");
+
+        $content = $repositories->content()->getContent((int) $contentId);
+
+        $component = (null === $content)
+            ? $factory
+                ->messageBox()
+                ->failure($nolej->txt("err_h5p_content"))
+            : $h5p_container
+                ->getComponentFactory()
+                ->content($content)
+                ->withLoadingMessage(
+                    ilNolejActivityManagementGUI::glyphicon("refresh gly-spin")
+                    . $nolej->txt("content_loading")
+                );
+
+        return sprintf(
+            "<div style=\"margin-top: 25px;\">%s</div>",
+            $renderer->render($component)
+        );
+    }
+
+    /**
      * Log a message.
      * @param string $a_message
      * @param int $a_level (info, warning, error, debug)
