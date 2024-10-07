@@ -92,7 +92,7 @@ class ilObjNolejAccess extends ilObjectPluginAccess
             [$a_obj_id]
         );
         $rec = $ilDB->fetchAssoc($set);
-        return !((boolean) $rec["is_online"]);
+        return !((bool) $rec["is_online"]);
     }
 
     /**

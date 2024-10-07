@@ -190,7 +190,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
      * Get the document language.
      * @return string
      */
-    function getDocumentLang(): string
+    public function getDocumentLang(): string
     {
         return $this->lookupDocumentData("language");
     }
@@ -199,7 +199,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
      * Get the document title.
      * @return string
      */
-    function getDocumentTitle(): string
+    public function getDocumentTitle(): string
     {
         return $this->lookupDocumentData("title");
     }

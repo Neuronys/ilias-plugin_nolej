@@ -23,8 +23,8 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
  */
 class ilNolejActivityManagementGUI
 {
-    const CMD_CHECK_UPDATES = "checkUpdates";
-    const CMD_WEBHOOK_CALL = "webhookCall";
+    public const CMD_CHECK_UPDATES = "checkUpdates";
+    public const CMD_WEBHOOK_CALL = "webhookCall";
 
     public const STATUS_CREATION = 0;
     public const STATUS_CREATION_PENDING = 1;
@@ -303,12 +303,9 @@ class ilNolejActivityManagementGUI
             )
                 ->withAvailability(Step::AVAILABLE) // Always available
                 ->withStatus(
-                    $this->status == self::STATUS_CREATION
+                    $this->status <= self::STATUS_CREATION_PENDING
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_CREATION_PENDING
-                            ? Step::IN_PROGRESS
-                            : Step::SUCCESSFULLY
-                        )
+                        : Step::SUCCESSFULLY
                 ),
             $workflow->step(
                 $this->plugin->txt("tab_analysis"),
@@ -325,10 +322,7 @@ class ilNolejActivityManagementGUI
                 ->withStatus(
                     $this->status <= self::STATUS_ANALISYS
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_ANALISYS_PENDING
-                            ? Step::IN_PROGRESS
-                            : Step::SUCCESSFULLY
-                        )
+                        : ($this->status == self::STATUS_ANALISYS_PENDING ? Step::IN_PROGRESS : Step::SUCCESSFULLY)
                 ),
             $workflow->step(
                 $this->plugin->txt("review_concepts"),
@@ -390,10 +384,7 @@ class ilNolejActivityManagementGUI
                 ->withStatus(
                     $this->status <= self::STATUS_REVISION
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_ACTIVITIES_PENDING
-                            ? Step::IN_PROGRESS
-                            : Step::SUCCESSFULLY
-                        )
+                        : Step::IN_PROGRESS
                 ),
         ];
 

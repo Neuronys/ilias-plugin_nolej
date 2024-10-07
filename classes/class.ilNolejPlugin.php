@@ -17,19 +17,19 @@ use ILIAS\GlobalScreen\Provider\PluginProviderCollection;
  */
 class ilNolejPlugin extends ilRepositoryObjectPlugin
 {
-    const PLUGIN_ID = "xnlj";
-    const PLUGIN_NAME = "Nolej";
-    const PLUGIN_DIR = "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej";
-    const PERMALINK = "xnlj_modules";
-    const PREFIX = "rep_robj_xnlj";
+    public const PLUGIN_ID = "xnlj";
+    public const PLUGIN_NAME = "Nolej";
+    public const PLUGIN_DIR = "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej";
+    public const PERMALINK = "xnlj_modules";
+    public const PREFIX = "rep_robj_xnlj";
 
-    const TABLE_CONFIG = "rep_robj_xnlj_config";
-    const TABLE_ACTIVITY = "rep_robj_xnlj_activity";
-    const TABLE_TIC = "rep_robj_xnlj_tic";
-    const TABLE_DOC = "rep_robj_xnlj_doc";
-    const TABLE_DATA = "rep_robj_xnlj_data";
-    const TABLE_H5P = "rep_robj_xnlj_hfp";
-    const TABLE_LP = "rep_robj_xnlj_lp";
+    public const TABLE_CONFIG = "rep_robj_xnlj_config";
+    public const TABLE_ACTIVITY = "rep_robj_xnlj_activity";
+    public const TABLE_TIC = "rep_robj_xnlj_tic";
+    public const TABLE_DOC = "rep_robj_xnlj_doc";
+    public const TABLE_DATA = "rep_robj_xnlj_data";
+    public const TABLE_H5P = "rep_robj_xnlj_hfp";
+    public const TABLE_LP = "rep_robj_xnlj_lp";
 
     /** @var self|null */
     protected static $instance = null;
@@ -85,7 +85,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
             return self::$pluginProviderCollection;
         }
 
-        require_once (self::PLUGIN_DIR . "/classes/Notification/NolejNotificationProvider.php");
+        require_once self::PLUGIN_DIR . "/classes/Notification/NolejNotificationProvider.php";
 
         if (self::$pluginProviderCollection === null) {
             self::$pluginProviderCollection = new PluginProviderCollection();
@@ -105,7 +105,6 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         global $DIC;
 
         if (self::$instance == null) {
-
             /** @var ilComponentFactory */
             $component_factory = $DIC["component.factory"];
 
@@ -250,8 +249,8 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
 
     /**
      * Include H5P plugin.
+     * @throws LogicException if H5P is not installed
      * @return void
-     * @throws LogicException if it is not installed
      */
     public static function includeH5P(): void
     {

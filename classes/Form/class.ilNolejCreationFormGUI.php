@@ -411,7 +411,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             if (in_array($extension, ilNolejAPI::TYPE_AUDIO)) {
                 $audio = $this->factory->player()->audio($path);
                 $mobSelector = $mobSelector->withLeadText($this->renderer->render($audio));
-            } else if (in_array($extension, ilNolejAPI::TYPE_VIDEO)) {
+            } elseif (in_array($extension, ilNolejAPI::TYPE_VIDEO)) {
                 $video = $this->factory->player()->video($path);
                 $mobSelector = $mobSelector->withLeadText($this->renderer->render($video));
             }
@@ -544,10 +544,10 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                 ]
             ),
         ])->withTitle($this->plugin->txt("limit_content"));
-     
+
         $button = $this->factory->button()->standard($this->plugin->txt("limit_content"), "#")
             ->withOnClick($popover->getShowSignal());
-     
+
         return $this->renderer->render([$popover, $button]);
     }
 

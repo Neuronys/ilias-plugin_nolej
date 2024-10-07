@@ -117,12 +117,12 @@ class ilNolejWebhook
 
         if (
             !isset(
-            $this->data["documentID"],
-            $this->data["status"],
-            $this->data["code"],
-            $this->data["error_message"],
-            $this->data["consumedCredit"]
-        ) ||
+                $this->data["documentID"],
+                $this->data["status"],
+                $this->data["code"],
+                $this->data["error_message"],
+                $this->data["consumedCredit"]
+            ) ||
             !is_string($this->data["documentID"]) ||
             !is_string($this->data["status"]) ||
             !is_string($this->data["error_message"]) ||
@@ -263,12 +263,12 @@ class ilNolejWebhook
 
         if (
             !isset(
-            $this->data["documentID"],
-            $this->data["status"],
-            $this->data["code"],
-            $this->data["error_message"],
-            $this->data["consumedCredit"]
-        ) ||
+                $this->data["documentID"],
+                $this->data["status"],
+                $this->data["code"],
+                $this->data["error_message"],
+                $this->data["consumedCredit"]
+            ) ||
             !is_string($this->data["documentID"]) ||
             !is_string($this->data["status"]) ||
             !is_string($this->data["error_message"]) ||
@@ -410,12 +410,12 @@ class ilNolejWebhook
 
         if (
             !isset(
-            $this->data["documentID"],
-            $this->data["status"],
-            $this->data["code"],
-            $this->data["error_message"],
-            $this->data["consumedCredit"]
-        ) ||
+                $this->data["documentID"],
+                $this->data["status"],
+                $this->data["code"],
+                $this->data["error_message"],
+                $this->data["consumedCredit"]
+            ) ||
             !is_string($this->data["documentID"]) ||
             !is_string($this->data["status"]) ||
             !is_string($this->data["error_message"]) ||

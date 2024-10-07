@@ -10,8 +10,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use ILIAS\UI\Component\Listing\Workflow\Step;
 use ILIAS\GlobalScreen\Scope\MainMenu\Collector\Renderer\Hasher;
+use ILIAS\UI\Component\Listing\Workflow\Step;
 
 /**
  * @ilCtrl_isCalledBy ilObjNolejGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
@@ -22,21 +22,21 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 {
     use Hasher;
 
-    const LP_SESSION_ID = "xnlj_lp_session_state";
+    public const LP_SESSION_ID = "xnlj_lp_session_state";
 
-    const CMD_PROPERTIES_EDIT = "editProperties";
-    const CMD_PROPERTIES_UPDATE = "updateProperties";
-    const CMD_PROPERTIES_SAVE = "saveProperties";
-    const CMD_CONTENT_SHOW = "showContent";
-    const CMD_CONTENT_EDIT = "editContent";
+    public const CMD_PROPERTIES_EDIT = "editProperties";
+    public const CMD_PROPERTIES_UPDATE = "updateProperties";
+    public const CMD_PROPERTIES_SAVE = "saveProperties";
+    public const CMD_CONTENT_SHOW = "showContent";
+    public const CMD_CONTENT_EDIT = "editContent";
 
-    const TAB_PROPERTIES = "properties";
-    const TAB_CONTENT = "content";
-    const TAB_ACTIVITY_MANAGEMENT = "activity_management";
+    public const TAB_PROPERTIES = "properties";
+    public const TAB_CONTENT = "content";
+    public const TAB_ACTIVITY_MANAGEMENT = "activity_management";
 
-    const PROP_TITLE = "title";
-    const PROP_DESCRIPTION = "description";
-    const PROP_ONLINE = "online";
+    public const PROP_TITLE = "title";
+    public const PROP_DESCRIPTION = "description";
+    public const PROP_ONLINE = "online";
 
     /** @var ilCtrl */
     protected ilCtrl $ctrl;
@@ -90,17 +90,17 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
             default:
                 switch ($cmd) {
-                    // Need write permission.
                     case self::CMD_PROPERTIES_EDIT:
                     case self::CMD_PROPERTIES_UPDATE:
                     case self::CMD_PROPERTIES_SAVE:
                     case self::CMD_CONTENT_EDIT:
+                        // Needs write permission.
                         $this->checkPermission("write");
                         $this->$cmd();
                         break;
 
-                    // Need read permission.
                     case self::CMD_CONTENT_SHOW:
+                        // Needs read permission.
                         $this->checkPermission("read");
                         $this->$cmd();
                         break;
@@ -431,7 +431,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     {
         $target = $a_target[0];
 
-        include_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php");
+        include_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php";
 
         if ($target == "webhook") {
             $webhook = new ilNolejWebhook();

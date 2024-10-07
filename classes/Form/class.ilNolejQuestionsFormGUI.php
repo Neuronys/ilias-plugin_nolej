@@ -170,7 +170,6 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
         $length_input->setValue($length);
         $form->addItem($length_input);
         for ($i = 0; $i < $length; $i++) {
-
             // Counter.
             if (!isset($questionTypes[$questions[$i]->question_type])) {
                 $questionTypes[$questions[$i]->question_type] = 0;
