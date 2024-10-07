@@ -10,10 +10,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once "./Services/Tracking/classes/class.ilLearningProgress.php";
-require_once "./Services/Tracking/classes/class.ilLPStatusWrapper.php";
-require_once "./Services/Tracking/classes/status/class.ilLPStatusPlugin.php";
-
+use ILIAS\UI\Component\Listing\Workflow\Step;
 use ILIAS\GlobalScreen\Scope\MainMenu\Collector\Renderer\Hasher;
 
 /**
@@ -31,10 +28,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     const CMD_PROPERTIES_UPDATE = "updateProperties";
     const CMD_PROPERTIES_SAVE = "saveProperties";
     const CMD_CONTENT_SHOW = "showContent";
-    const CMD_STATUS_COMPLETED = "setStatusToCompleted";
-    const CMD_STATUS_FAILED = "setStatusToFailed";
-    const CMD_STATUS_IN_PROGRESS = "setStatusToInProgress";
-    const CMD_STATUS_NOT_ATTEMPTED = "setStatusToNotAttempted";
+    const CMD_CONTENT_EDIT = "editContent";
 
     const TAB_PROPERTIES = "properties";
     const TAB_CONTENT = "content";
@@ -89,7 +83,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         switch ($nextClass) {
             case strtolower(ilNolejActivityManagementGUI::class):
                 $this->checkPermission("write");
-                $this->tabs->activateTab(self::TAB_ACTIVITY_MANAGEMENT);
+                $this->setContentSubTabs(self::TAB_ACTIVITY_MANAGEMENT);
                 $activityManagement = new ilNolejActivityManagementGUI($this);
                 $this->ctrl->forwardCommand($activityManagement);
                 break;
@@ -100,23 +94,19 @@ class ilObjNolejGUI extends ilObjectPluginGUI
                     case self::CMD_PROPERTIES_EDIT:
                     case self::CMD_PROPERTIES_UPDATE:
                     case self::CMD_PROPERTIES_SAVE:
+                    case self::CMD_CONTENT_EDIT:
                         $this->checkPermission("write");
                         $this->$cmd();
                         break;
 
                     // Need read permission.
                     case self::CMD_CONTENT_SHOW:
-                    case self::CMD_STATUS_COMPLETED:
-                    case self::CMD_STATUS_FAILED:
-                    case self::CMD_STATUS_IN_PROGRESS:
-                    case self::CMD_STATUS_NOT_ATTEMPTED:
                         $this->checkPermission("read");
                         $this->$cmd();
                         break;
 
                     default:
-                        $this->checkPermission("read");
-                        $this->showContent();
+                        $this->ctrl->redirect($this, $this->getStandardCmd());
                 }
         }
     }
@@ -127,7 +117,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      */
     public function getAfterCreationCmd(): string
     {
-        return self::CMD_PROPERTIES_EDIT;
+        return self::CMD_CONTENT_EDIT;
     }
 
     /**
@@ -184,15 +174,6 @@ class ilObjNolejGUI extends ilObjectPluginGUI
             );
         }
 
-        if ($this->checkPermissionBool("write")) {
-            $activityManagement = new ilNolejActivityManagementGUI($this);
-            $this->tabs->addTab(
-                self::TAB_ACTIVITY_MANAGEMENT,
-                $this->txt("tab_" . self::TAB_ACTIVITY_MANAGEMENT),
-                $this->ctrl->getLinkTarget($activityManagement, "")
-            );
-        }
-
         // Standard info screen tab.
         $this->addInfoTab();
 
@@ -207,6 +188,41 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
         // Standard permission tab.
         $this->addPermissionTab();
+    }
+
+    /**
+     * Set content sub tabs.
+     * @param string $active_subtab
+     * @return void
+     */
+    protected function setContentSubTabs($active_subtab = ""): void
+    {
+        $this->tabs->activateTab(self::TAB_CONTENT);
+
+        if (!$this->checkPermissionBool("write")) {
+            // Nothing to add.
+        }
+
+        $this->tabs->addSubTab(
+            self::TAB_CONTENT,
+            $this->txt("tab_" . self::TAB_CONTENT),
+            $this->ctrl->getLinkTarget($this, self::CMD_CONTENT_SHOW)
+        );
+
+        $this->tabs->addSubTab(
+            self::TAB_ACTIVITY_MANAGEMENT,
+            $this->txt("tab_" . self::TAB_ACTIVITY_MANAGEMENT),
+            $this->ctrl->getLinkTargetByClass(ilNolejActivityManagementGUI::class)
+        );
+
+        switch ($active_subtab) {
+            case self::TAB_ACTIVITY_MANAGEMENT:
+                $this->tabs->activateSubTab(self::TAB_ACTIVITY_MANAGEMENT);
+                break;
+
+            default:
+                $this->tabs->activateSubTab(self::TAB_CONTENT);
+        }
     }
 
     /**
@@ -301,7 +317,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         global $DIC;
 
         $db = $DIC->database();
-        $f = $DIC->ui()->factory()->listing()->workflow();
+        $workflow = $DIC->ui()->factory()->listing()->workflow();
         $renderer = $DIC->ui()->renderer();
 
         $result = $db->queryF(
@@ -315,7 +331,6 @@ class ilObjNolejGUI extends ilObjectPluginGUI
             [$this->object->getDocumentId(), $this->object->getDocumentId()]
         );
 
-        $step = $f->step('', '');
         $steps = [];
         $indexes = [];
 
@@ -324,37 +339,39 @@ class ilObjNolejGUI extends ilObjectPluginGUI
             if ($i == 0) {
                 $this->selectedType = $row["type"];
             }
-            $steps[] = $f->step(
+
+            $this->ctrl->setParameter($this, "type", $row["type"]);
+            $steps[] = $workflow->step(
                 $this->txt("activities_" . $row["type"]),
                 "",
                 $this->ctrl->getLinkTarget($this, self::CMD_CONTENT_SHOW)
-                . "&type=" . $row["type"]
             )
-                ->withAvailability($step::AVAILABLE)
-                ->withStatus($step::IN_PROGRESS);
+                ->withAvailability(Step::AVAILABLE)
+                ->withStatus(Step::IN_PROGRESS);
+
             $indexes[$row["type"]] = $i++;
         }
 
-        $wf = $f->linear($this->txt("tab_activities"), $steps);
+        $selector = $workflow->linear($this->txt("tab_activities"), $steps);
         if (isset($_GET["type"]) && array_key_exists($_GET["type"], $indexes)) {
             $this->selectedType = $_GET["type"];
-            $wf = $wf->withActive($indexes[$_GET["type"]]);
+            $selector = $selector->withActive($indexes[$_GET["type"]]);
         }
-        $this->tpl->setRightContent($renderer->render($wf));
+        $this->tpl->setRightContent($renderer->render($selector));
     }
 
     /**
      * Show the object content.
      * @return void
      */
-    protected function showContent(): void
+    public function showContent(): void
     {
         global $DIC;
 
         $renderer = $DIC->ui()->renderer();
         $factory = $DIC->ui()->factory();
 
-        $this->tabs->activateTab(self::TAB_CONTENT);
+        $this->setContentSubTabs();
 
         if ($this->object->getDocumentStatus() != ilNolejActivityManagementGUI::STATUS_COMPLETED) {
             $this->tpl->setOnScreenMessage("info", $this->plugin->txt("activities_not_yet_generated"));
@@ -385,6 +402,15 @@ class ilObjNolejGUI extends ilObjectPluginGUI
                     ->failure($this->plugin->txt("err_h5p_content"))
             )
         );
+    }
+
+    /**
+     * Redirect to creation workflow.
+     * @return void
+     */
+    public function editContent(): void
+    {
+        $this->ctrl->redirectByClass(ilNolejActivityManagementGUI::class);
     }
 
     /**
@@ -433,18 +459,6 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     }
 
     /**
-     * @return string
-     */
-    public function buildIcon($id, $alt = ""): string
-    {
-        return sprintf(
-            '<img border="0" align="middle" src="%s" alt="%s" /> ',
-            ilUtil::getImagePath($id . ".svg"),
-            empty($alt) ? "" : $this->lng->txt($alt)
-        );
-    }
-
-    /**
      * @param $object ilObjNolej
      * @param $form ilPropertyFormGUI
      */
@@ -462,8 +476,6 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      */
     public static function _goto(array $a_target): void
     {
-        global $DIC;
-        $ilCtrl = $DIC->ctrl();
         $target = $a_target[0];
 
         include_once (ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php");
