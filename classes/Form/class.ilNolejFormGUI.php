@@ -15,7 +15,10 @@
  */
 class ilNolejFormGUI
 {
+    /** @var string */
     public const CMD_SHOW = "showForm";
+
+    /** @var string */
     public const CMD_SAVE = "saveForm";
 
     /** @var ilCtrl */
@@ -73,8 +76,8 @@ class ilNolejFormGUI
         $this->manager = $manager;
         $this->plugin = ilNolejPlugin::getInstance();
 
-        $this->documentId = $this->obj_gui->getObject()->getDocumentId();
-        $this->status = $this->obj_gui->getObject()->getDocumentStatus();
+        $this->documentId = $this->manager->documentId;
+        $this->status = $this->manager->status;
 
         ilNolejPlugin::includeH5P();
     }

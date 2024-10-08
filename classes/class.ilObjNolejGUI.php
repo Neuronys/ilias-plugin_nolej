@@ -22,20 +22,40 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 {
     use Hasher;
 
+    /** @var string */
     public const LP_SESSION_ID = "xnlj_lp_session_state";
 
+    /** @var string */
     public const CMD_PROPERTIES_EDIT = "editProperties";
+
+    /** @var string */
     public const CMD_PROPERTIES_UPDATE = "updateProperties";
+
+    /** @var string */
     public const CMD_PROPERTIES_SAVE = "saveProperties";
+
+    /** @var string */
     public const CMD_CONTENT_SHOW = "showContent";
+
+    /** @var string */
     public const CMD_CONTENT_EDIT = "editContent";
 
+    /** @var string */
     public const TAB_PROPERTIES = "properties";
+
+    /** @var string */
     public const TAB_CONTENT = "content";
+
+    /** @var string */
     public const TAB_ACTIVITY_MANAGEMENT = "activity_management";
 
+    /** @var string */
     public const PROP_TITLE = "title";
+
+    /** @var string */
     public const PROP_DESCRIPTION = "description";
+
+    /** @var string */
     public const PROP_ONLINE = "online";
 
     /** @var ilCtrl */

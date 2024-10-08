@@ -23,17 +23,37 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
  */
 class ilNolejActivityManagementGUI
 {
+    /** @var string */
     public const CMD_CHECK_UPDATES = "checkUpdates";
+
+    /** @var string */
     public const CMD_WEBHOOK_CALL = "webhookCall";
 
+    /** @var int */
     public const STATUS_CREATION = 0;
+
+    /** @var int */
     public const STATUS_CREATION_PENDING = 1;
+
+    /** @var int */
     public const STATUS_ANALISYS = 2;
+
+    /** @var int */
     public const STATUS_ANALISYS_PENDING = 3;
+
+    /** @var int */
     public const STATUS_REVISION = 4;
+
+    /** @var int */
     public const STATUS_REVISION_PENDING = 5;
+
+    /** @var int */
     public const STATUS_ACTIVITIES = 6;
+
+    /** @var int */
     public const STATUS_ACTIVITIES_PENDING = 7;
+
+    /** @var int */
     public const STATUS_COMPLETED = 8;
 
     /** @var ilCtrl */
@@ -54,29 +74,26 @@ class ilNolejActivityManagementGUI
     /** @var ilObjNolejGUI */
     protected $obj_gui;
 
-    /** @var int */
-    protected int $status = 0;
+    /** @var ilNolejPlugin */
+    protected $plugin;
 
     /** @var string */
     protected string $defaultClass = "";
 
-    /** @var string */
-    protected string $cmd = "";
+    /** @var int */
+    public int $status = 0;
 
     /** @var string */
-    protected string $documentId = "";
+    public string $documentId = "";
 
     /** @var string */
     public string $dataDir = "";
-
-    /** @var ilNolejPlugin */
-    protected $plugin;
 
     /**
      * @param ilObjNolejGUI $obj_gui
      * @param string|null $documentId
      */
-    public function __construct($obj_gui, $documentId = null)
+    public function __construct($obj_gui)
     {
         global $DIC;
         $this->ctrl = $DIC->ctrl();
@@ -94,18 +111,45 @@ class ilNolejActivityManagementGUI
         $this->dataDir = $this->obj_gui->getObject()->getDataDir();
         $this->statusCheck();
 
-        if ($this->obj_gui == null) {
-            $this->tpl->setTitle($this->plugin->txt("plugin_title"), false);
-            $this->tpl->setDescription($this->plugin->txt("plugin_description"));
-        } else {
-            $this->tpl->setTitle($this->obj_gui->getObject()->getTitle(), false);
-            $this->tpl->setDescription($this->obj_gui->getObject()->getDescription());
-        }
-
         ilNolejPlugin::includeH5P();
 
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php";
+    }
+
+    /**
+     * Get the obj_id from the document_id
+     * @param string $documentId
+     * @return int
+     */
+    public static function getObjIdFromDocumentId($documentId)
+    {
+        global $DIC;
+
+        $db = $DIC->databse();
+
+        $result = $db->queryF(
+            "SELECT id FROM " . ilNolejPlugin::TABLE_DATA . " WHERE document_id = %s",
+            ["text"],
+            [$documentId]
+        );
+        if ($row = $db->fetchAssoc($result)) {
+            return (int) $row["id"];
+        }
+        return -1;
+    }
+
+    /**
+     * Get the management instance by document id.
+     * @param string $documentId
+     * @return self
+     */
+    public static function getInstanceByDocumentId($documentId)
+    {
+        $objId = self::getObjIdFromDocumentId($documentId);
+        $refId = reset(ilObject::_getAllReferences($objId));
+        $obj_gui = new ilObjNolejGUI($refId);
+        return new self($obj_gui);
     }
 
     /**
@@ -119,6 +163,9 @@ class ilNolejActivityManagementGUI
             $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_api_key_missing"));
             return;
         }
+
+        $this->tpl->setTitle($this->obj_gui->getObject()->getTitle(), false);
+        $this->tpl->setDescription($this->obj_gui->getObject()->getDescription());
 
         $next_class = $this->ctrl->getNextClass();
 
@@ -158,11 +205,7 @@ class ilNolejActivityManagementGUI
                 switch ($cmd) {
                     case self::CMD_CHECK_UPDATES:
                     case self::CMD_WEBHOOK_CALL:
-                        $this->cmd = $cmd;
-                        if ($this->obj_gui != null) {
-                            // $this->printWorkflow($cmd);
-                            $this->$cmd();
-                        }
+                        $this->$cmd();
                         break;
 
                     default:
@@ -177,12 +220,6 @@ class ilNolejActivityManagementGUI
      */
     protected function statusCheck()
     {
-        if ($this->obj_gui == null) {
-            $this->status = -1;
-            $this->defaultClass = "";
-            return;
-        }
-
         $this->status = $this->obj_gui->getObject()->getDocumentStatus();
 
         switch ($this->status) {
@@ -216,13 +253,14 @@ class ilNolejActivityManagementGUI
      */
     protected function isStatusPending($status)
     {
-        $pendingStatuses = [
-            self::STATUS_CREATION_PENDING,
-            self::STATUS_ANALISYS_PENDING,
-            self::STATUS_ACTIVITIES_PENDING,
-        ];
-
-        return array_key_exists($status, $pendingStatuses);
+        return in_array(
+            $status,
+            [
+                self::STATUS_CREATION_PENDING,
+                self::STATUS_ANALISYS_PENDING,
+                self::STATUS_ACTIVITIES_PENDING,
+            ]
+        );
     }
 
     /**
@@ -255,7 +293,7 @@ class ilNolejActivityManagementGUI
      * Print a caller to the last webhook.
      * @return string
      */
-    protected function getWebhookCallBox(): string
+    public function getWebhookCallBox(): string
     {
         global $DIC;
         $factory = $DIC->ui()->factory();
@@ -285,13 +323,16 @@ class ilNolejActivityManagementGUI
 
         $workflow = $DIC->ui()->factory()->listing()->workflow();
 
-        if ($this->obj_gui == null) {
-            return;
-        }
-
         ilYuiUtil::initConnection($this->tpl);
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
         $this->tpl->addJavaScript(ilNolejPlugin::PLUGIN_DIR . "/js/nolej.js");
+
+        if ($this->isStatusPending($this->status)) {
+            $this->ctrl->setParameter($this, "document_id", $this->documentId);
+            $this->ctrl->setParameter($this, "status", $this->status);
+            $updateUrl = $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES);
+            $this->tpl->addOnLoadCode("xnlj_check_updates('{$updateUrl}')");
+        }
 
         $steps = [
             $workflow->step(
@@ -301,7 +342,7 @@ class ilNolejActivityManagementGUI
                     : "",
                 $this->ctrl->getLinkTargetByClass([self::class, ilNolejCreationFormGUI::class], ilNolejCreationFormGUI::CMD_SHOW)
             )
-                ->withAvailability(Step::AVAILABLE) // Always available
+                ->withAvailability(Step::AVAILABLE)
                 ->withStatus(
                     $this->status <= self::STATUS_CREATION_PENDING
                         ? Step::NOT_STARTED
@@ -389,26 +430,6 @@ class ilNolejActivityManagementGUI
         ];
 
         return $workflow->linear($this->plugin->txt("tab_activity_management"), $steps);
-
-        // $pendingStatuses = [
-        //     self::STATUS_CREATION_PENDING => "transcription",
-        //     self::STATUS_ANALISYS_PENDING => "analysis",
-        //     self::STATUS_ACTIVITIES_PENDING => "activities"
-        // ];
-
-        // if (array_key_exists($this->status, $pendingStatuses)) {
-        //     $this->tpl->addOnLoadCode(
-        //         sprintf(
-        //             "checkNolejUpdates('%s')",
-        //             $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES)
-        //                 . "&document_id=" . $this->documentId
-        //                 . "&status=" . $pendingStatuses[$this->status]
-        //         )
-        //     );
-        //     $this->tpl->setLeftContent($renderedWf . $this->getWebhookCallBox());
-        // } else {
-        //     $this->tpl->setLeftContent($renderedWf);
-        // }
     }
 
     /**
@@ -632,24 +653,6 @@ class ilNolejActivityManagementGUI
         }
 
         return implode(", ", $fails);
-    }
-
-    /**
-     * Get the obj_id from the document_id
-     * @param int $documentId
-     * @return int
-     */
-    public function getObjIdFromDocumentId($documentId)
-    {
-        $result = $this->db->queryF(
-            "SELECT id FROM " . ilNolejPlugin::TABLE_DATA . " WHERE document_id = %s",
-            ["integer"],
-            [$documentId]
-        );
-        if ($row = $this->db->fetchAssoc($result)) {
-            return (int) $row["id"];
-        }
-        return -1;
     }
 
     /**

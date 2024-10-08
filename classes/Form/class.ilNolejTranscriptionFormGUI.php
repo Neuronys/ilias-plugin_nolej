@@ -105,7 +105,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 
         $this->manager->updateDocumentStatus(ilNolejActivityManagementGUI::STATUS_ANALISYS_PENDING);
 
-        $ass = new NolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
+        $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
         $ass->withStatus("ok")
             ->withCode(0)
             ->withErrorMessage("")

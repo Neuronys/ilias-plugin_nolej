@@ -30,21 +30,52 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
     /** @var string reset mediapool filter */
     public const CMD_FILTER_RESET = "mediaSelectorResetFilter";
 
+    /** @var string */
     public const PROP_TITLE = "title";
+
+    /** @var string */
     public const PROP_MEDIA_SRC = "media_source";
+
+    /** @var string */
     public const PROP_WEB = "web";
+
+    /** @var string */
     public const PROP_WEB_SRC = "web_src";
+
+    /** @var string */
     public const PROP_URL = "url";
+
+    /** @var string */
     public const PROP_CONTENT = "content";
+
+    /** @var string */
     public const PROP_AUDIO = "audio";
+
+    /** @var string */
     public const PROP_VIDEO = "video";
+
+    /** @var string */
     public const PROP_MOB = "mob";
+
+    /** @var string */
     public const PROP_MOB_ID = "mob";
+
+    /** @var string */
     public const PROP_FILE = "file";
+
+    /** @var string */
     public const PROP_DOC = "document";
+
+    /** @var string */
     public const PROP_TEXT = "freetext";
+
+    /** @var string */
     public const PROP_TEXTAREA = "textarea";
+
+    /** @var string */
     public const PROP_INPUT_FILE = "input_file";
+
+    /** @var string */
     public const PROP_LANG = "language";
 
     /**

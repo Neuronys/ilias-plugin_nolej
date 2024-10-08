@@ -17,18 +17,37 @@ use ILIAS\GlobalScreen\Provider\PluginProviderCollection;
  */
 class ilNolejPlugin extends ilRepositoryObjectPlugin
 {
+    /** @var string */
     public const PLUGIN_ID = "xnlj";
+
+    /** @var string */
     public const PLUGIN_NAME = "Nolej";
+
+    /** @var string */
     public const PLUGIN_DIR = "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej";
+
+    /** @var string */
     public const PERMALINK = "xnlj_modules";
+
+    /** @var string */
     public const PREFIX = "rep_robj_xnlj";
 
+    /** @var string */
     public const TABLE_CONFIG = "rep_robj_xnlj_config";
+
+    /** @var string */
     public const TABLE_ACTIVITY = "rep_robj_xnlj_activity";
-    public const TABLE_TIC = "rep_robj_xnlj_tic";
+
+    /** @var string */
     public const TABLE_DOC = "rep_robj_xnlj_doc";
+
+    /** @var string */
     public const TABLE_DATA = "rep_robj_xnlj_data";
+
+    /** @var string */
     public const TABLE_H5P = "rep_robj_xnlj_hfp";
+
+    /** @var string */
     public const TABLE_LP = "rep_robj_xnlj_lp";
 
     /** @var self|null */
@@ -143,7 +162,6 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         $tables = [
             self::TABLE_CONFIG,
             self::TABLE_ACTIVITY,
-            self::TABLE_TIC,
             self::TABLE_DATA,
             self::TABLE_DOC,
             self::TABLE_H5P,

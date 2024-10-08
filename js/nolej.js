@@ -1,7 +1,11 @@
-function checkNolejUpdates(documentUrl) {
+/**
+ * Check for updates.
+ * @param {string} url
+ */
+function xnlj_check_updates(url) {
     setInterval(() => {
         il.Util.sendAjaxGetRequestToUrl(
-            documentUrl,
+            url,
             {},
             {},
             function (o) {

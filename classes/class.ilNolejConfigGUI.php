@@ -17,11 +17,16 @@
  */
 class ilNolejConfigGUI extends ilPluginConfigGUI
 {
+    /** @var string */
     public const SECRET = "**********";
 
+    /** @var string */
     public const CMD_CONFIGURE = "configure";
+
+    /** @var string */
     public const CMD_SAVE = "save";
 
+    /** @var string */
     public const TAB_CONFIGURE = "configuration";
 
     /** @var ilCtrl */

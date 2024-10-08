@@ -80,7 +80,7 @@ if(!$ilDB->tableExists("rep_robj_xnlj_activity")) {
     $ilDB->addPrimaryKey("rep_robj_xnlj_activity", ["document_id", "user_id", "action"]);
 }
 
-/* TicTac */
+/* Tic/Tac */
 $fields = [
     "exchange_id" => [
         "type" => "text",
@@ -137,15 +137,15 @@ $fields = [
         "notnull" => true
     ],
     "status" => [
-        /**
-         * 0 => idle,
-         * 1 => transcripting,
-         * 2 => transcription ready,
-         * 3 => analyzing,
-         * 4 => analysis ready,
-         * 5 => review,
-         * 6 => review ready,
-        */
+        // 0 => idle,
+        // 1 => transcription in progress,
+        // 2 => transcription ready,
+        // 3 => analysis in progress,
+        // 4 => analysis ready,
+        // 5 => review in progress,
+        // 6 => review complete,
+        // 7 => h5p generation in progress,
+        // 8 => h5p generation complete.
         "type" => "integer",
         "length" => 4,
         "notnull" => true
@@ -167,11 +167,7 @@ $fields = [
         "fixed" => false,
         "notnull" => true
     ],
-    "media_type" => [
-        /**
-         * Available: web, audio, video, document, freetext, youtube.
-         * Soon: slide.
-         */
+    "media_type" => [ // Available: web, audio, video, document, freetext, youtube.
         "type" => "text",
         "length" => 20,
         "fixed" => false,
@@ -290,6 +286,16 @@ $fields = [
 if(!$ilDB->tableExists("rep_robj_xnlj_hfp")) {
     $ilDB->createTable("rep_robj_xnlj_hfp", $fields);
     $ilDB->addPrimaryKey("rep_robj_xnlj_hfp", ["content_id"]);
+}
+
+?>
+
+<#3>
+<?php
+
+// Remove TIC/TAC.
+if($ilDB->tableExists("rep_robj_xnlj_tic")) {
+    $ilDB->dropTable("rep_robj_xnlj_tic");
 }
 
 ?>

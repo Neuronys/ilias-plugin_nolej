@@ -180,7 +180,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
             return;
         }
 
-        $ass = new NolejActivity($this->documentId, $DIC->user()->getId(), "activities");
+        $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "activities");
         $ass->withStatus("ok")
             ->withCode(0)
             ->withErrorMessage("")
