@@ -275,12 +275,13 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         $factory = $DIC->ui()->factory();
         $renderer = $DIC->ui()->renderer();
 
-        if (ilNolejH5PIntegrationGUI::isH5PInstalled()) {
+        try {
             $h5p = new ilNolejH5PIntegrationGUI();
             return $h5p->render((int) $contentId);
+        } catch (Exception $e) {
+            // Fallback.
+            return $renderer->render($factory->messageBox()->failure($e->getMessage()));
         }
-
-        return $renderer->render($factory->messageBox()->failure($nolej->txt("err_h5p_content")));
     }
 
     /**
