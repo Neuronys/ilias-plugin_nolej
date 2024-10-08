@@ -27,9 +27,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
      */
     public function showForm(): void
     {
-        $status = $this->status;
-
-        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
@@ -122,14 +120,12 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
      */
     protected function form(): ilPropertyFormGUI
     {
-        $status = $this->status;
-
         $form = new ilPropertyFormGUI();
 
         // Object title.
         $objTitle = $this->obj_gui->getObject()->getTitle();
 
-        if ($status != ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status != ilNolejManagerGUI::STATUS_ANALISYS) {
             $transcription = new ilFormSectionHeaderGUI();
             $transcription->setTitle($objTitle);
             $content = $this->manager->readDocumentFile("transcription.htm");
@@ -197,9 +193,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
      */
     protected function downloadTranscription()
     {
-        $status = $this->status;
-
-        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
             // Transctiption is not ready!
             $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_not_ready"));
             return false;

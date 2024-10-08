@@ -251,10 +251,10 @@ class ilNolejManagerGUI
      * @param int $status
      * @return bool
      */
-    protected function isStatusPending($status)
+    protected function isStatusPending()
     {
         return in_array(
-            $status,
+            $this->status,
             [
                 self::STATUS_CREATION_PENDING,
                 self::STATUS_ANALISYS_PENDING,
@@ -269,7 +269,7 @@ class ilNolejManagerGUI
      */
     protected function webhookCall(): void
     {
-        if (!$this->isStatusPending($this->status)) {
+        if (!$this->isStatusPending()) {
             $this->ctrl->redirectByClass($this->defaultClass, ilNolejFormGUI::CMD_SHOW);
             return;
         }
@@ -327,7 +327,7 @@ class ilNolejManagerGUI
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
         $this->tpl->addJavaScript(ilNolejPlugin::PLUGIN_DIR . "/js/nolej.js");
 
-        if ($this->isStatusPending($this->status)) {
+        if ($this->isStatusPending()) {
             $this->ctrl->setParameter($this, "document_id", $this->documentId);
             $this->ctrl->setParameter($this, "status", $this->status);
             $updateUrl = $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES);

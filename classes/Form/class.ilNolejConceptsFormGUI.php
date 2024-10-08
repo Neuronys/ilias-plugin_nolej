@@ -23,14 +23,12 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
      */
     public function showForm(): void
     {
-        $status = $this->status;
-
-        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
 
-        if ($status < ilNolejManagerGUI::STATUS_REVISION) {
+        if ($this->status < ilNolejManagerGUI::STATUS_REVISION) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
             return;
         }
@@ -49,9 +47,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
      */
     public function saveForm(): void
     {
-        $status = $this->status;
-
-        if ($status < ilNolejManagerGUI::STATUS_REVISION) {
+        if ($this->status < ilNolejManagerGUI::STATUS_REVISION) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
             return;
         }
