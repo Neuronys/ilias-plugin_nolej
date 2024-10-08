@@ -23,23 +23,21 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
      */
     public function showForm(): void
     {
-        $status = $this->status;
-
         $this->tpl->setRightContent(
             $this->renderer->render($this->manager->getWorkflow()->withActive(5))
         );
 
-        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
 
-        if ($status < ilNolejManagerGUI::STATUS_REVISION) {
+        if ($this->status < ilNolejManagerGUI::STATUS_REVISION) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
             return;
         }
 
-        if ($status == ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING) {
+        if ($this->status == ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("activities_generation_start")));
             return;
         }
@@ -188,7 +186,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
             ->store();
 
         $this->tpl->setOnScreenMessage("success", $this->plugin->txt("activities_generation_start"));
-        $this->tpl->setContent($form->getHTML());
+        $this->ctrl->redirect($this, self::CMD_SHOW);
     }
 
     /**
