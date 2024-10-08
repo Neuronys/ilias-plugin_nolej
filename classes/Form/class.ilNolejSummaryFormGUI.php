@@ -90,7 +90,7 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         // Keypoints.
         $length = $form->getInput("keypoints_count");
         for ($i = 0; $i < $length; $i++) {
-            $txt = $form->getInput(sprintf("keypoints_%d", $i));
+            $txt = $form->getInput("keypoints_{$i}");
             if (!empty($txt)) {
                 $summary["keypoints"][] = $txt;
             }
@@ -141,13 +141,13 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         for ($i = 0; $i < $length; $i++) {
             $title = new ilTextInputGUI(
                 $this->plugin->txt("prop_title"),
-                sprintf("summary_%d_title", $i)
+                "summary_{$i}_title"
             );
             $form->addItem($title);
 
             $txt = new ilTextAreaInputGUI(
                 $this->plugin->txt("prop_freetext"),
-                sprintf("summary_%d_text", $i)
+                "summary_{$i}_text"
             );
             $txt->usePurifier(false);
             $txt->setRows(6);
@@ -187,10 +187,7 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         $length_input->setValue($length);
         $form->addItem($length_input);
         for ($i = 0; $i < $length; $i++) {
-            $txt = new ilTextAreaInputGUI(
-                "",
-                sprintf("keypoints_%d", $i)
-            );
+            $txt = new ilTextAreaInputGUI("", "keypoints_{$i}");
             $txt->usePurifier(false);
             if ($usePost) {
                 $txt->setValueByArray($this->request->getParsedBody());

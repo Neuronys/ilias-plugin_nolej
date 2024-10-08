@@ -67,18 +67,18 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
 
         $length = $form->getInput("concepts_count");
         for ($i = 0; $i < $length; $i++) {
-            $id = $form->getInput(sprintf("concept_%d_id", $i));
-            $enable = (bool) $form->getInput(sprintf("concept_%d_enable", $i));
-            $useForCW = (bool) $form->getInput(sprintf("concept_%d_cw", $i)) ?? false;
-            $useForDTW = (bool) $form->getInput(sprintf("concept_%d_dtw", $i)) ?? false;
-            $useForFTW = (bool) $form->getInput(sprintf("concept_%d_ftw", $i)) ?? false;
-            $useForGaming = (bool) $form->getInput(sprintf("concept_%d_gaming", $i)) ?? false;
-            $useForPractice = (bool) $form->getInput(sprintf("concept_%d_practice", $i)) ?? false;
-            $useForAssessment = false; // (bool) $form->getInput(sprintf("concept_%d_assessment", $i)) ?? false;
-            $label = $form->getInput(sprintf("concept_%d_label", $i));
-            $language = $form->getInput(sprintf("concept_%d_language", $i));
-            $definition = $form->getInput(sprintf("concept_%d_definition", $i));
-            $games = json_decode($form->getInput(sprintf("concept_%d_games", $i)));
+            $id = $form->getInput("concept_{$i}_id");
+            $enable = (bool) $form->getInput("concept_{$i}_enable");
+            $useForCW = (bool) $form->getInput("concept_{$i}_cw") ?? false;
+            $useForDTW = (bool) $form->getInput("concept_{$i}_dtw") ?? false;
+            $useForFTW = (bool) $form->getInput("concept_{$i}_ftw") ?? false;
+            $useForGaming = (bool) $form->getInput("concept_{$i}_gaming") ?? false;
+            $useForPractice = (bool) $form->getInput("concept_{$i}_practice") ?? false;
+            $useForAssessment = false; // For legacy purpose.
+            $label = $form->getInput("concept_{$i}_label");
+            $language = $form->getInput("concept_{$i}_language");
+            $definition = $form->getInput("concept_{$i}_definition");
+            $games = json_decode($form->getInput("concept_{$i}_games"));
 
             if (!empty($id)) {
                 $concepts[] = [
@@ -148,26 +148,26 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
             $section->setTitle(sprintf($this->plugin->txt("concepts_n"), $i + 1));
             $form->addItem($section);
 
-            $id = new ilHiddenInputGUI(sprintf("concept_%d_id", $i));
+            $id = new ilHiddenInputGUI("concept_{$i}_id");
             $id->setValue($concepts[$i]->id);
             $form->addItem($id);
 
             $label = new ilNonEditableValueGUI(
                 $this->plugin->txt("concepts_label"),
-                sprintf("concept_%d_label", $i)
+                "concept_{$i}_label"
             );
             $label->setValue($concepts[$i]->concept->label);
             $form->addItem($label);
 
             $enable = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_enable"),
-                sprintf("concept_%d_enable", $i)
+                "concept_{$i}_enable"
             );
             $form->addItem($enable);
 
             $definition = new ilTextAreaInputGUI(
                 $this->plugin->txt("concepts_definition"),
-                sprintf("concept_%d_definition", $i)
+                "concept_{$i}_definition"
             );
             $definition->usePurifier(false);
             $definition->setRows(4);
@@ -176,22 +176,22 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
             $availableGames = $concepts[$i]->concept->available_games;
             $useForGaming = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_gaming"),
-                sprintf("concept_%d_gaming", $i)
+                "concept_{$i}_gaming"
             );
 
             $useForCW = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_cw"),
-                sprintf("concept_%d_cw", $i)
+                "concept_{$i}_cw"
             );
 
             $useForDTW = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_dtw"),
-                sprintf("concept_%d_dtw", $i)
+                "concept_{$i}_dtw"
             );
 
             $useForFTW = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_ftw"),
-                sprintf("concept_%d_ftw", $i)
+                "concept_{$i}_ftw"
             );
 
             if ($availableGames != null && is_array($availableGames) && count($availableGames) > 0) {
@@ -212,17 +212,15 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
 
             $useForPractice = new ilCheckboxInputGUI(
                 $this->plugin->txt("concepts_use_for_practice"),
-                sprintf("concept_%d_practice", $i)
+                "concept_{$i}_practice"
             );
             $enable->addSubItem($useForPractice);
 
-            $language = new ilHiddenInputGUI(sprintf("concept_%d_language", $i));
+            $language = new ilHiddenInputGUI("concept_{$i}_language");
             $language->setValue($concepts[$i]->concept->language);
             $enable->addSubItem($language);
 
-            $games = new ilHiddenInputGUI(
-                sprintf("concept_%d_games", $i)
-            );
+            $games = new ilHiddenInputGUI("concept_{$i}_games");
             $games->setValue(json_encode($concepts[$i]->concept->available_games));
             $enable->addSubItem($games);
 

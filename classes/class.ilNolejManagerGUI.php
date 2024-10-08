@@ -552,7 +552,7 @@ class ilNolejManagerGUI
         }
 
         $result = $api->get(
-            sprintf("/documents/%s/%s", $this->documentId, $pathname),
+            "/documents/{$this->documentId}/{$pathname}",
             $withData,
             $encode,
             false
@@ -581,7 +581,7 @@ class ilNolejManagerGUI
         $api = new ilNolejAPI();
 
         $result = $api->put(
-            sprintf("/documents/%s/%s", $this->documentId, $pathname),
+            "/documents/{$this->documentId}/{$pathname}",
             $content
         );
         return true;
@@ -634,11 +634,11 @@ class ilNolejManagerGUI
             return $this->plugin->txt("err_json_decode");
         }
         $activities = json_decode($json);
-        $fails = [];
+        $errorMessages = [];
 
         $now = strtotime("now");
         foreach ($activities->activities as $activity) {
-            $path = sprintf("%s/%s.h5p", $h5pDir, $activity->activity_name);
+            $path = "{$h5pDir}/{$activity->activity_name}.h5p";
 
             // Download activity.
             file_put_contents(
@@ -646,25 +646,25 @@ class ilNolejManagerGUI
                 file_get_contents($activity->url)
             );
 
-            $failReason = $this->importH5PContent($h5pDir, $activity->activity_name, $now);
-            if (!empty($failReason)) {
-                $fails[] = sprintf("%s (%s)", $activity->activity_name, $failReason);
+            $errorMessage = $this->importH5PContent($h5pDir, $activity->activity_name, $now);
+            if (!empty($errorMessage)) {
+                $errorMessages[] = "{$activity->activity_name} ({$errorMessage})";
             }
         }
 
-        return implode(", ", $fails);
+        return implode(", ", $errorMessages);
     }
 
     /**
      * @param string $h5pDir directory where are located h5p activities
      * @param string $type of h5p activity to import
      * @param int $time
-     * @return string fail reason. Empty string if succedeed.
+     * @return string error message. Empty string if succedeed.
      */
     public function importH5PContent($h5pDir, $type, $time)
     {
         global $DIC;
-        $filePath = sprintf("%s/%s.h5p", $h5pDir, $type);
+        $filePath = "{$h5pDir}/{$type}.h5p";
         $filePath = substr($filePath, 1);
         $absolutePath = ILIAS_ABSOLUTE_PATH . $filePath;
 
@@ -690,9 +690,6 @@ class ilNolejManagerGUI
 
         /** @var H5PStorage */
         $h5p_storage = $h5p_container->getKernelStorage();
-
-        /** @var IRepositoryFactory */
-        $repositories = $h5p_container->getRepositoryFactory();
 
         /** @var H5PValidator */
         $h5p_validator = $h5p_container->getKernelValidator();

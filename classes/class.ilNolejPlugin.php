@@ -342,10 +342,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
                     . $nolej->txt("content_loading")
                 );
 
-        return sprintf(
-            "<div style=\"margin-top: 25px;\">%s</div>",
-            $renderer->render($component)
-        );
+        return "<div style=\"margin-top: 25px;\">" . $renderer->render($component) . "</div>";
     }
 
     /**

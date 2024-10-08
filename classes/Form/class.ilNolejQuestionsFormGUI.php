@@ -78,33 +78,33 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
 
         $length = $form->getInput("questions_count");
         for ($i = 0; $i < $length; $i++) {
-            $id = $form->getInput(sprintf("question_%d_id", $i));
+            $id = $form->getInput("question_{$i}_id");
             if (empty($id)) {
                 continue;
             }
 
-            $questionType = $form->getInput(sprintf("question_%d_type", $i));
+            $questionType = $form->getInput("question_{$i}_type");
 
             if ($questionType == "open") {
-                $enable = (bool) $form->getInput(sprintf("question_%d_enable", $i));
+                $enable = (bool) $form->getInput("question_{$i}_enable");
                 $useForGrading = false;
             } else {
-                $useForGrading = (bool) $form->getInput(sprintf("question_%d_enable", $i));
+                $useForGrading = (bool) $form->getInput("question_{$i}_enable");
                 $enable = false;
             }
 
             $answer = $questionType == "hoq"
                 ? ""
-                : $form->getInput(sprintf("question_%d_answer", $i));
+                : $form->getInput("question_{$i}_answer");
 
             $question = $questionType == "tf"
                 ? ""
-                : $form->getInput(sprintf("question_%d_question", $i));
+                : $form->getInput("question_{$i}_question");
 
-            $distractorsLength = $form->getInput(sprintf("question_%d_distractors", $i));
+            $distractorsLength = $form->getInput("question_{$i}_distractors");
             $distractors = [];
             for ($j = 0; $j < $distractorsLength; $j++) {
-                $distractor = $form->getInput(sprintf("question_%d_distractor_%d", $i, $j));
+                $distractor = $form->getInput("question_{$i}_distractor_{$j}");
                 if (!empty($distractor)) {
                     $distractors[] = $distractor;
                 }
@@ -185,14 +185,14 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
             $section->setTitle(sprintf($this->plugin->txt("questions_n"), $i + 1));
             $form->addItem($section);
 
-            $id = new ilHiddenInputGUI(sprintf("question_%d_id", $i));
+            $id = new ilHiddenInputGUI("question_{$i}_id");
             $id->setValue($questions[$i]->id);
             $form->addItem($id);
 
             if ($questions[$i]->question_type != "tf") {
                 $question = new ilTextAreaInputGUI(
                     $this->plugin->txt("questions_question"),
-                    sprintf("question_%d_question", $i)
+                    "question_{$i}_question"
                 );
                 $question->usePurifier(false);
                 $question->setRows(3);
@@ -201,13 +201,13 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
                 $question = null;
             }
 
-            $questionType = new ilHiddenInputGUI(sprintf("question_%d_type", $i));
+            $questionType = new ilHiddenInputGUI("question_{$i}_type");
             $questionType->setValue($questions[$i]->question_type);
             $form->addItem($questionType);
 
             $questionTypeLabel = new ilNonEditableValueGUI(
                 $this->plugin->txt("questions_question_type"),
-                sprintf("question_%d_type_label", $i)
+                "question_{$i}_type_label"
             );
             $questionTypeLabel->setValue(
                 $this->plugin->txt("questions_type_" . $questions[$i]->question_type)
@@ -220,14 +220,14 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
                         ? "questions_enable"
                         : "questions_use_for_grading"
                 ),
-                sprintf("question_%d_enable", $i)
+                "question_{$i}_enable"
             );
             $form->addItem($enable);
 
             if ($questions[$i]->question_type != "hoq") {
                 $answer = new ilTextAreaInputGUI(
                     $this->plugin->txt("questions_answer"),
-                    sprintf("question_%d_answer", $i)
+                    "question_{$i}_answer"
                 );
                 $answer->usePurifier(false);
                 $answer->setRows(3);
@@ -241,13 +241,13 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
             }
 
             $distractorsLength = count($questions[$i]->distractors);
-            $distractors = new ilHiddenInputGUI(sprintf("question_%d_distractors", $i));
+            $distractors = new ilHiddenInputGUI("question_{$i}_distractors");
             $distractors->setValue($distractorsLength);
             $enable->addSubItem($distractors);
             for ($j = 0; $j < $distractorsLength; $j++) {
                 $distractor = new ilTextAreaInputGUI(
                     $j == 0 ? $this->plugin->txt("questions_distractors") : "",
-                    sprintf("question_%d_distractor_%d", $i, $j)
+                    "question_{$i}_distractor_{$j}"
                 );
                 $distractor->usePurifier(false);
                 $enable->addSubItem($distractor);
@@ -301,7 +301,7 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
             $steps[] = $this->factory->listing()->workflow()->step(
                 sprintf(
                     "%s (%d)",
-                    $this->plugin->txt("questions_type_" . $type),
+                    $this->plugin->txt("questions_type_{$type}"),
                     $count
                 ),
                 "",
