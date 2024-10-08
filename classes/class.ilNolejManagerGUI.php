@@ -126,7 +126,7 @@ class ilNolejManagerGUI
     {
         global $DIC;
 
-        $db = $DIC->databse();
+        $db = $DIC->database();
 
         $result = $db->queryF(
             "SELECT id FROM " . ilNolejPlugin::TABLE_DATA . " WHERE document_id = %s",
