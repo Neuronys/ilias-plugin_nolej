@@ -33,9 +33,7 @@ class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejActivity.php";
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejNotificationPrefRepository.php";
 
-        $noti_repo = new ilNolejNotificationPrefRepository($user);
-
-        // $lng->loadLanguageModule("badge");
+        $notificationRepository = new ilNolejNotificationPrefRepository($user);
 
         $factory = $this->notification_factory;
         $id = function (string $id): IdentificationInterface {
@@ -44,7 +42,7 @@ class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
 
         $new_activities = ilNolejActivity::getActivitiesForUser(
             $user->getId(),
-            $noti_repo->getLastCheckedTimestamp()
+            $notificationRepository->getLastCheckedTimestamp()
         );
 
         if (count($new_activities) == 0) {
@@ -52,8 +50,7 @@ class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
         }
 
         // Creating a Nolej Notification Item
-        $nolej_icon = $ui
-            ->factory()
+        $nolej_icon = $ui->factory()
             ->symbol()
             ->icon()
             ->custom(
@@ -61,51 +58,33 @@ class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
                 $plugin->txt("plugin_title")
             );
 
-        $group = $factory
-            ->standardGroup($id('nolej_bucket_group'))
-            ->withTitle($plugin->txt("plugin_title"))
-            ->withOpenedCallable(function () {
-                // Stuff we do, when the notification is opened
-            });
+        $group = $factory->standardGroup($id('nolej_bucket_group'))
+            ->withTitle($plugin->txt("plugin_title"));
 
         for ($i = 0, $len = count($new_activities); $i < $len; $i++) {
             $activity = $new_activities[$i];
 
-            switch ($activity->getAction()) {
-                case "tac":
-                case "tic":
-                    $title = $plugin->txt("action_" . ($activity->getAction() ?? ""));
-                    $description = "";
-                    break;
-
-                default:
-                    $documentTitle = $activity->lookupDocumentTitle()
-                        ?? "nf-" . $activity->getAction();
-                    $link = ILIAS_HTTP_PATH . "/goto.php?target=xnlj_" . $activity->lookupRefId();
-                    $title = $ui->factory()->link()->standard(
-                        $documentTitle,
-                        $link
-                    );
-                    $description = $plugin->txt("action_" . ($activity->getAction() ?? ""));
-            }
+            $action = $activity->getAction() ?? "";
+            $documentTitle = $activity->lookupDocumentTitle() ?? "nf-{$action}";
+            $link = ILIAS_HTTP_PATH . "/goto.php?target=xnlj_" . $activity->lookupRefId();
+            $title = $ui->factory()->link()->standard($documentTitle, $link);
+            $description = $plugin->txt("action_{$action}");
 
             // $title = $ui->renderer()->render($titleObj);
             $ts = new ilDateTime($activity->getTimestamp(), IL_CAL_UNIX);
 
-            $nolej_notification_item = $ui
-                ->factory()
+            $nolej_notification_item = $ui->factory()
                 ->item()
                 ->notification($title, $nolej_icon)
                 ->withDescription($description)
                 ->withProperties([$lng->txt("time") => ilDatePresentation::formatDate($ts)]);
 
             $group->addNotification(
-                $factory
-                    ->standard($id('nolej_bucket_' . $i))
+                $factory->standard($id('nolej_bucket_' . $i))
                     ->withNotificationItem($nolej_notification_item)
                     ->withClosedCallable(
                         function () use ($activity) {
-                            // Stuff we do, when the notification is closed
+                            // When the notification is closed.
                             $activity->delete();
                         }
                     )
