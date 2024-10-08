@@ -68,6 +68,8 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
      */
     public function init(): void
     {
+        require_once self::PLUGIN_DIR . "/classes/class.ilNolejH5PIntegrationGUI.php";
+
         $this->logger = ilLoggerFactory::getLogger(self::PREFIX);
 
         if (self::$instance == null) {
@@ -76,20 +78,24 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     }
 
     /**
-     * Used to initialize providers.
+     * Exchange renderer after plugin initialization.
      * @param \ILIAS\DI\Container $dic
      * @return Closure
      */
     public function exchangeUIRendererAfterInitialization(\ILIAS\DI\Container $dic): Closure
     {
-        // Add plugin providers.
-        global $DIC;
-
-        if (isset($DIC["global_screen"])) {
+        if ($dic->offsetExists("global_screen")) {
+            // Add plugin providers.
             self::$pluginProviderCollection = $this->getPluginProviderCollection(); // Fix overflow.
         }
 
-        // This returns the callable of $c["ui.renderer"] without executing it.
+        // Use H5P renderer exchange.
+        if (ilNolejH5PIntegrationGUI::isH5PInstalled()) {
+            $h5p = ilNolejH5PIntegrationGUI::getH5PPlugin();
+            return $h5p->exchangeUIRendererAfterInitialization($dic);
+        }
+
+        // Returns the default callable without executing it.
         return $dic->raw("ui.renderer");
     }
 
@@ -257,36 +263,6 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     }
 
     /**
-     * Include H5P plugin.
-     * @throws LogicException if H5P is not installed
-     * @return void
-     */
-    public static function includeH5P(): void
-    {
-        $h5pDirectory = "./Customizing/global/plugins/Services/Repository/RepositoryObject/H5P";
-        $h5pAutoloader = $h5pDirectory . "/vendor/autoload.php";
-        $h5pPlugin = $h5pDirectory . "/classes/class.ilH5PPlugin.php";
-
-        if (!file_exists($h5pAutoloader) || !file_exists($h5pPlugin)) {
-            throw new LogicException("You cannot use this plugin without installing the H5P plugin first.");
-        }
-
-        if (!self::isH5PPluginLoaded()) {
-            require_once $h5pAutoloader;
-            require_once $h5pPlugin;
-        }
-    }
-
-    /**
-     * Check that H5P plugin class is loaded.
-     * @return bool
-     */
-    public static function isH5PPluginLoaded(): bool
-    {
-        return class_exists("ilH5PPlugin");
-    }
-
-    /**
      * Get the HTML of an H5P activity.
      * @param int $contentId
      * @return string html
@@ -296,44 +272,15 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
         global $DIC;
 
         $nolej = self::getInstance();
-        $renderer = $DIC->ui()->renderer();
         $factory = $DIC->ui()->factory();
+        $renderer = $DIC->ui()->renderer();
 
-        if ($contentId == -1) {
-            return $renderer->render(
-                $factory
-                    ->messageBox()
-                    ->failure($nolej->txt("err_h5p_content"))
-            );
+        if (ilNolejH5PIntegrationGUI::isH5PInstalled()) {
+            $h5p = new ilNolejH5PIntegrationGUI();
+            return $h5p->render((int) $contentId);
         }
 
-        self::includeH5P();
-        $component_factory = $DIC["component.factory"];
-        $h5p_plugin = $component_factory->getPlugin(ilH5PPlugin::PLUGIN_ID);
-
-        /** @var IContainer */
-        $h5p_container = $h5p_plugin->getContainer();
-
-        /** @var IRepositoryFactory */
-        $repositories = $h5p_container->getRepositoryFactory();
-
-        $DIC->ui()->mainTemplate()->addCss(self::PLUGIN_DIR . "/css/nolej.css");
-
-        $content = $repositories->content()->getContent((int) $contentId);
-
-        $component = (null === $content)
-            ? $factory
-                ->messageBox()
-                ->failure($nolej->txt("err_h5p_content"))
-            : $h5p_container
-                ->getComponentFactory()
-                ->content($content)
-                ->withLoadingMessage(
-                    ilNolejManagerGUI::glyphicon("refresh gly-spin")
-                    . $nolej->txt("content_loading")
-                );
-
-        return "<div style=\"margin-top: 25px;\">" . $renderer->render($component) . "</div>";
+        return $renderer->render($factory->messageBox()->failure($nolej->txt("err_h5p_content")));
     }
 
     /**

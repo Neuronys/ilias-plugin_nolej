@@ -111,8 +111,6 @@ class ilNolejManagerGUI
         $this->dataDir = $this->obj_gui->getObject()->getDataDir();
         $this->statusCheck();
 
-        ilNolejPlugin::includeH5P();
-
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejAPI.php";
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejWebhook.php";
     }

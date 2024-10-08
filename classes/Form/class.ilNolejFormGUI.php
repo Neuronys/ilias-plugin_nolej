@@ -78,8 +78,6 @@ class ilNolejFormGUI
 
         $this->documentId = $this->manager->documentId;
         $this->status = $this->manager->status;
-
-        ilNolejPlugin::includeH5P();
     }
 
     /**
