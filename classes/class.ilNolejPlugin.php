@@ -185,15 +185,6 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     }
 
     /**
-     * @param mixed $code
-     */
-    public function setPermanentLink($code)
-    {
-        global $tpl;
-        $tpl->setPermanentLink(self::PLUGIN_ID, $code);
-    }
-
-    /**
      * Get the url to the plugin configuration GUI.
      * @return string
      */
