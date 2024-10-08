@@ -48,7 +48,7 @@ class ilNolejFormGUI
     /** @var ilObjNolejGUI */
     protected $obj_gui;
 
-    /** @var ilNolejActivityManagementGUI */
+    /** @var ilNolejManagerGUI */
     protected $manager;
 
     /** @var string */
@@ -59,7 +59,7 @@ class ilNolejFormGUI
 
     /**
      * @param ilObjNolejGUI $obj_gui
-     * @param ilNolejActivityManagementGUI $manager
+     * @param ilNolejManagerGUI $manager
      */
     public function __construct($obj_gui, $manager)
     {

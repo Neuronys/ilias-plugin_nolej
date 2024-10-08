@@ -27,7 +27,7 @@ class ilNolejWebhook
     public function __construct()
     {
         require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejActivity.php";
-        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejManagerGUI.php";
         $this->plugin = ilNolejPlugin::getInstance();
     }
 
@@ -156,7 +156,7 @@ class ilNolejWebhook
             . " ON a.document_id = d.document_id"
             . " WHERE d.document_id = %s AND d.status = %s;",
             ["text", "text", "text", "integer"],
-            [$documentId, $documentId, $documentId, ilNolejActivityManagementGUI::STATUS_CREATION_PENDING]
+            [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_CREATION_PENDING]
         );
         if ($db->numRows($result) != 1) {
             $this->exitWithMessage(404, "Document ID not found.");
@@ -177,7 +177,7 @@ class ilNolejWebhook
             $result = $db->manipulateF(
                 "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
                 ["integer", "integer", "text"],
-                [ilNolejActivityManagementGUI::STATUS_CREATION, $this->data["consumedCredit"], $documentId]
+                [ilNolejManagerGUI::STATUS_CREATION, $this->data["consumedCredit"], $documentId]
             );
             if (!$result) {
                 $this->exitWithMessage(404, "Document not found.");
@@ -204,7 +204,7 @@ class ilNolejWebhook
         $result = $db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
             ["integer", "integer", "text"],
-            [ilNolejActivityManagementGUI::STATUS_ANALISYS, $this->data["consumedCredit"], $documentId]
+            [ilNolejManagerGUI::STATUS_ANALISYS, $this->data["consumedCredit"], $documentId]
         );
         if (!$result) {
             $this->exitWithMessage(404, "Document not found.");
@@ -277,7 +277,7 @@ class ilNolejWebhook
             . " ON a.document_id = d.document_id"
             . " WHERE d.document_id = %s AND d.status = %s;",
             ["text", "text", "text", "integer"],
-            [$documentId, $documentId, $documentId, ilNolejActivityManagementGUI::STATUS_ANALISYS_PENDING]
+            [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ANALISYS_PENDING]
         );
         if ($db->numRows($result) != 1) {
             $this->exitWithMessage(404, "Document ID not found.");
@@ -298,7 +298,7 @@ class ilNolejWebhook
             $result = $db->manipulateF(
                 "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
                 ["integer", "integer", "text"],
-                [ilNolejActivityManagementGUI::STATUS_ANALISYS, $this->data["consumedCredit"], $documentId]
+                [ilNolejManagerGUI::STATUS_ANALISYS, $this->data["consumedCredit"], $documentId]
             );
             if (!$result) {
                 $this->exitWithMessage(404, "Document not found.");
@@ -331,7 +331,7 @@ class ilNolejWebhook
                 "text"
             ],
             [
-                ilNolejActivityManagementGUI::STATUS_REVISION,
+                ilNolejManagerGUI::STATUS_REVISION,
                 $this->data["consumedCredit"],
                 $documentId
             ]
@@ -407,7 +407,7 @@ class ilNolejWebhook
             . " ON a.document_id = d.document_id"
             . " WHERE d.document_id = %s AND d.status = %s;",
             ["text", "text", "text", "integer"],
-            [$documentId, $documentId, $documentId, ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING]
+            [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING]
         );
         if ($db->numRows($result) != 1) {
             $this->exitWithMessage(404, "Document ID not found.");
@@ -444,13 +444,13 @@ class ilNolejWebhook
         $result = $db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
             ["integer", "integer", "text"],
-            [ilNolejActivityManagementGUI::STATUS_COMPLETED, $this->data["consumedCredit"], $documentId]
+            [ilNolejManagerGUI::STATUS_COMPLETED, $this->data["consumedCredit"], $documentId]
         );
         if (!$result) {
             $this->exitWithMessage(404, "Document not found.");
         }
 
-        $manager = ilNolejActivityManagementGUI::getInstanceByDocumentId($documentId);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
         $fails = $manager->downloadActivities();
         if (!empty($fails)) {
             $this->plugin->log("Failed to download some activities: " . $fails . ".");

@@ -13,7 +13,7 @@
 /**
  * Activities settings Form GUI class.
  *
- * @ilCtrl_isCalledBy ilNolejActivitiesFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejActivitiesFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejManagerGUI
  */
 class ilNolejActivitiesFormGUI extends ilNolejFormGUI
 {
@@ -29,17 +29,17 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
             $this->renderer->render($this->manager->getWorkflow()->withActive(5))
         );
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_ANALISYS) {
+        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_REVISION) {
+        if ($status < ilNolejManagerGUI::STATUS_REVISION) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
             return;
         }
 
-        if ($status == ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING) {
+        if ($status == ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("activities_generation_start")));
             return;
         }
@@ -58,7 +58,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
 
         $form = $this->form(true);
 
-        if ($this->status == ilNolejActivityManagementGUI::STATUS_CREATION_PENDING) {
+        if ($this->status == ilNolejManagerGUI::STATUS_CREATION_PENDING) {
             $this->tpl->setOnScreenMessage("info", $this->plugin->txt("activities_generation_start"));
             $this->tpl->setContent($form->getHTML());
             return;
@@ -171,7 +171,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
             return;
         }
 
-        $this->manager->updateDocumentStatus(ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING);
+        $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING);
 
         $success = $this->manager->putNolejContent("settings", "settings.json");
         if (!$success) {

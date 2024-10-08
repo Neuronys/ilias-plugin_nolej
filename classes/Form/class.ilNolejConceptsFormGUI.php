@@ -13,7 +13,7 @@
 /**
  * Concepts Form GUI class.
  *
- * @ilCtrl_isCalledBy ilNolejConceptsFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejConceptsFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejManagerGUI
  */
 class ilNolejConceptsFormGUI extends ilNolejFormGUI
 {
@@ -25,12 +25,12 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
     {
         $status = $this->status;
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_ANALISYS) {
+        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_REVISION) {
+        if ($status < ilNolejManagerGUI::STATUS_REVISION) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
             return;
         }
@@ -51,7 +51,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
     {
         $status = $this->status;
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_REVISION) {
+        if ($status < ilNolejManagerGUI::STATUS_REVISION) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
             return;
         }

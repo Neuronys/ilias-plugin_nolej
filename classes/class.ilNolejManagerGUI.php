@@ -15,13 +15,13 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
 /**
  * GUI to manage every step of the Nolej module creation.
  *
- * @ilCtrl_isCalledBy ilNolejActivityManagementGUI: ilObjPluginDispatchGUI, ilObjNolejGUI
+ * @ilCtrl_isCalledBy ilNolejManagerGUI: ilObjPluginDispatchGUI, ilObjNolejGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejCreationFormGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejTranscriptionFormGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejConceptsFormGUI, ilNolejQuestionsFormGUI, ilNolejSummaryFormGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejActivitiesFormGUI
  */
-class ilNolejActivityManagementGUI
+class ilNolejManagerGUI
 {
     /** @var string */
     public const CMD_CHECK_UPDATES = "checkUpdates";

@@ -16,7 +16,7 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
 /**
  * @ilCtrl_isCalledBy ilObjNolejGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilCommonActionDispatcherGUI
- * @ilCtrl_Calls ilObjNolejGUI: ilNolejActivityManagementGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilNolejManagerGUI
  */
 class ilObjNolejGUI extends ilObjectPluginGUI
 {
@@ -101,10 +101,10 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     {
         $nextClass = $this->ctrl->getNextClass();
         switch ($nextClass) {
-            case strtolower(ilNolejActivityManagementGUI::class):
+            case strtolower(ilNolejManagerGUI::class):
                 $this->checkPermission("write");
                 $this->setContentSubTabs(self::TAB_ACTIVITY_MANAGEMENT);
-                $activityManagement = new ilNolejActivityManagementGUI($this);
+                $activityManagement = new ilNolejManagerGUI($this);
                 $this->ctrl->forwardCommand($activityManagement);
                 break;
 
@@ -232,7 +232,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         $this->tabs->addSubTab(
             self::TAB_ACTIVITY_MANAGEMENT,
             $this->txt("tab_" . self::TAB_ACTIVITY_MANAGEMENT),
-            $this->ctrl->getLinkTargetByClass(ilNolejActivityManagementGUI::class)
+            $this->ctrl->getLinkTargetByClass(ilNolejManagerGUI::class)
         );
 
         switch ($active_subtab) {
@@ -388,7 +388,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     {
         $this->setContentSubTabs();
 
-        if ($this->object->getDocumentStatus() != ilNolejActivityManagementGUI::STATUS_COMPLETED) {
+        if ($this->object->getDocumentStatus() != ilNolejManagerGUI::STATUS_COMPLETED) {
             $this->tpl->setOnScreenMessage("info", $this->plugin->txt("activities_not_yet_generated"));
             return;
         }
@@ -417,7 +417,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
      */
     public function editContent(): void
     {
-        $this->ctrl->redirectByClass(ilNolejActivityManagementGUI::class);
+        $this->ctrl->redirectByClass(ilNolejManagerGUI::class);
     }
 
     /**

@@ -338,7 +338,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
                 ->getComponentFactory()
                 ->content($content)
                 ->withLoadingMessage(
-                    ilNolejActivityManagementGUI::glyphicon("refresh gly-spin")
+                    ilNolejManagerGUI::glyphicon("refresh gly-spin")
                     . $nolej->txt("content_loading")
                 );
 

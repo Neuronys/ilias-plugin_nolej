@@ -14,7 +14,7 @@
  * Creation Form GUI class.
  *
  * @ilCtrl_Calls ilNolejCreationFormGUI: ilNolejTranscriptionFormGUI
- * @ilCtrl_isCalledBy ilNolejCreationFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejCreationFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejManagerGUI
  */
 class ilNolejCreationFormGUI extends ilNolejFormGUI
 {
@@ -286,7 +286,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             ["text", "integer", "integer", "text", "text", "text", "text", "text"],
             [
                 $this->obj_gui->getObject()->getTitle(),
-                ilNolejActivityManagementGUI::STATUS_CREATION_PENDING,
+                ilNolejManagerGUI::STATUS_CREATION_PENDING,
                 $decrementedCredit,
                 $apiUrl,
                 $apiFormat,
@@ -319,7 +319,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $form = new ilPropertyFormGUI();
         $form->setTitle($this->plugin->txt("tab_creation"));
 
-        if ($this->status != ilNolejActivityManagementGUI::STATUS_CREATION) {
+        if ($this->status != ilNolejManagerGUI::STATUS_CREATION) {
             // Show module information.
 
             $form->setOpenTag(false);

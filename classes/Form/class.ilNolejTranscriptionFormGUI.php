@@ -14,7 +14,7 @@
  * Transcription Form GUI class.
  *
  * @ilCtrl_Calls ilNolejTranscriptionFormGUI: ilNolejConceptsFormGUI, ilNolejQuestionsFormGUI, ilNolejSummaryFormGUI
- * @ilCtrl_isCalledBy ilNolejTranscriptionFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejActivityManagementGUI
+ * @ilCtrl_isCalledBy ilNolejTranscriptionFormGUI: ilObjPluginDispatchGUI, ilObjNolejGUI, ilNolejManagerGUI
  */
 class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 {
@@ -29,7 +29,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
     {
         $status = $this->status;
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_ANALISYS) {
+        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
@@ -103,7 +103,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             return;
         }
 
-        $this->manager->updateDocumentStatus(ilNolejActivityManagementGUI::STATUS_ANALISYS_PENDING);
+        $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ANALISYS_PENDING);
 
         $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
         $ass->withStatus("ok")
@@ -129,7 +129,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         // Object title.
         $objTitle = $this->obj_gui->getObject()->getTitle();
 
-        if ($status != ilNolejActivityManagementGUI::STATUS_ANALISYS) {
+        if ($status != ilNolejManagerGUI::STATUS_ANALISYS) {
             $transcription = new ilFormSectionHeaderGUI();
             $transcription->setTitle($objTitle);
             $content = $this->manager->readDocumentFile("transcription.htm");
@@ -199,7 +199,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
     {
         $status = $this->status;
 
-        if ($status < ilNolejActivityManagementGUI::STATUS_ANALISYS) {
+        if ($status < ilNolejManagerGUI::STATUS_ANALISYS) {
             // Transctiption is not ready!
             $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_not_ready"));
             return false;
