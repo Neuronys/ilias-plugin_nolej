@@ -148,6 +148,7 @@ prop_automatic_info#:#Si la case est cochée, NOLEJ passe directement à l'étap
 prop_content#:#Web page content
 prop_content_info#:#Analyser le contenu de la page web
 prop_description#:#Description
+prop_document#:#Document
 prop_file#:#Fichier
 prop_file_info#:#Charger un fichier (audio, vidéo ou document).
 prop_freetext#:#Texte

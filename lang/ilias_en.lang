@@ -148,6 +148,7 @@ prop_automatic_info#:#If checked, NOLEJ goes directly to the final step: the gen
 prop_content#:#Web page content
 prop_content_info#:#Analyze the web page content
 prop_description#:#Description
+prop_document#:#Document
 prop_file#:#File
 prop_file_info#:#Upload a file (audio, video, or a document).
 prop_freetext#:#Text

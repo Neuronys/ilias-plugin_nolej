@@ -148,6 +148,7 @@ prop_automatic_info#:#Wenn aktiviert, geht NOLEJ direkt zum letzten Schritt: der
 prop_content#:#Webseiteninhalt
 prop_content_info#:#Analysieren Sie den Inhalt der Webseite
 prop_description#:#Beschreibung
+prop_document#:#Dokument
 prop_file#:#Datei
 prop_file_info#:#Laden Sie eine Datei hoch (Audio, Video oder ein Dokument).
 prop_freetext#:#Text
