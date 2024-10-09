@@ -11,25 +11,12 @@
  */
 
 use ILIAS\UI\Component\Input\Container\Form\Form;
-use ILIAS\UI\Factory as ComponentFactory;
-use Psr\Http\Message\ServerRequestInterface;
-use srag\Plugins\H5P\ArrayBasedRequestWrapper;
-use srag\Plugins\H5P\Content\ContentEditorData;
 use srag\Plugins\H5P\Content\ContentEditorHelper;
-use srag\Plugins\H5P\Content\Form\ContentPostProcessor;
 use srag\Plugins\H5P\Content\Form\EditContentFormBuilder;
 use srag\Plugins\H5P\Content\Form\EditContentFormProcessor;
-use srag\Plugins\H5P\Content\Form\ImportContentFormBuilder;
-use srag\Plugins\H5P\Content\Form\ImportContentFormProcessor;
 use srag\Plugins\H5P\Content\Form\IPostProcessorAware;
 use srag\Plugins\H5P\Content\IContent;
-use srag\Plugins\H5P\Form\IFormBuilder;
-use srag\Plugins\H5P\IContainer;
-use srag\Plugins\H5P\IRepositoryFactory;
-use srag\Plugins\H5P\IRequestParameters;
 use srag\Plugins\H5P\ITranslator;
-use srag\Plugins\H5P\RequestHelper;
-use srag\Plugins\H5P\Settings\IGeneralSettings;
 use srag\Plugins\H5P\TemplateHelper;
 
 /**
@@ -40,6 +27,7 @@ class ilNolejH5PIntegrationGUI
 {
     use ContentEditorHelper;
     use TemplateHelper;
+    use ilH5PRequestObject;
 
     /** @var string */
     protected const H5P_PLUGIN_DIR = "./Customizing/global/plugins/Services/Repository/RepositoryObject/H5P";
@@ -54,10 +42,10 @@ class ilNolejH5PIntegrationGUI
     public const CMD_UPDATE = "update";
 
     /** @var ilCtrl */
-    protected ilCtrl $ctrl;
+    protected $ctrl;
 
     /** @var ilGlobalPageTemplate */
-    protected ilGlobalPageTemplate $tpl;
+    protected $tpl;
 
     /** @var \ILIAS\UI\Factory */
     protected \ILIAS\UI\Factory $factory;
@@ -119,14 +107,6 @@ class ilNolejH5PIntegrationGUI
 
         $this->obj_gui = $obj_gui;
         $this->plugin = ilNolejPlugin::getInstance();
-
-        // $this->post_request = new \srag\Plugins\H5P\ArrayBasedRequestWrapper(
-        //     $DIC->http()->request()->getParsedBody()
-        // );
-
-        // $this->get_request = new \srag\Plugins\H5P\ArrayBasedRequestWrapper(
-        //     $DIC->http()->request()->getQueryParams()
-        // );
     }
 
     /**
@@ -150,8 +130,6 @@ class ilNolejH5PIntegrationGUI
         switch ($cmd) {
             case self::CMD_EDIT:
             case self::CMD_UPDATE:
-                $this->setTabs();
-
                 $content = $this->getContentByRequest();
                 if (null === $content) {
                     $this->tpl->setContent(
@@ -159,8 +137,11 @@ class ilNolejH5PIntegrationGUI
                             $this->factory->messageBox()->failure($this->plugin->txt("err_h5p_content"))
                         )
                     );
-                    break;
+                    return;
                 }
+
+                // Needed for ajax loader.
+                $this->ctrl->setParameterByClass(ilH5PAjaxEndpointGUI::class, "ref_id", $_GET["ref_id"]);
 
                 $this->$cmd($content);
                 break;
@@ -288,7 +269,7 @@ class ilNolejH5PIntegrationGUI
             $this->ctrl->setParameter($this, "ref_id", $_GET["ref_id"]);
             $this->toolbar->addComponent(
                 $this->factory->button()->standard(
-                    $this->lng->txt("edit"),
+                    $this->lng->txt("edit_content"),
                     $this->ctrl->getLinkTarget($this, self::CMD_EDIT)
                 )
             );
@@ -347,7 +328,7 @@ class ilNolejH5PIntegrationGUI
      */
     public function edit($content): void
     {
-        // $this->addExportButton($content);
+        $this->setTabs();
         $this->render($this->getEditContentForm(self::CMD_UPDATE, $content));
     }
 
@@ -367,21 +348,6 @@ class ilNolejH5PIntegrationGUI
     }
 
     /**
-     * Export the h5p activity.
-     * @param IContent $content
-     * @return void
-     */
-    protected function addExportButton(IContent $content): void
-    {
-        // $this->toolbar->addComponent(
-        //     $this->factory->button()->standard(
-        //         $this->lng->txt("export"),
-        //         $this->ctrl->getLinkTarget($this, self::CMD_EXPORT)
-        //     )
-        // );
-    }
-
-    /**
      * Executes the given form processor and registers an additional post-processor,
      * which calles either $this->createElement() or $this->updateElement() depending
      * on the given content.
@@ -391,17 +357,6 @@ class ilNolejH5PIntegrationGUI
      */
     protected function runFormProcessor(IPostProcessorAware $form_processor, IContent $content = null): void
     {
-        // $post_processor = new ContentPostProcessor(
-        //     ilNolejPlugin::PLUGIN_ID,
-        //     function (array $content_data) use ($content): void {
-        //         $data["content_id"] = $content_data["id"] ?? null;
-
-        //         (null !== $content) ? $this->updateElement($data) : $this->createElement($data);
-        //     }
-        // );
-
-        // $form_processor = $form_processor->withPostProcessor($post_processor);
-
         if ($form_processor->processForm()) {
             $this->ctrl->redirectByClass(
                 [ilObjPluginDispatchGUI::class, ilObjNolejGUI::class],
@@ -415,10 +370,10 @@ class ilNolejH5PIntegrationGUI
     /**
      * Return the editor form.
      * @param string $command
-     * @param ?IContent $content
+     * @param IContent $content
      * @return Form
      */
-    protected function getEditContentForm(string $command, IContent $content = null): Form
+    protected function getEditContentForm(string $command, IContent $content): Form
     {
         $builder = new EditContentFormBuilder(
             $this->translator,
@@ -426,9 +381,7 @@ class ilNolejH5PIntegrationGUI
             $this->factory->input()->field(),
             $this->h5p_container->getComponentFactory(),
             $this->refinery,
-            (null !== $content) ? $this->getContentEditorData(
-                $content->getContentId()
-            ) : null
+            $this->getContentEditorData($content->getContentId())
         );
 
         return $builder->getForm(

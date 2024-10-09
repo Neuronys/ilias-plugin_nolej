@@ -414,7 +414,8 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         $contentId = $this->object->getContentIdOfType($this->selectedType);
 
         // Display activity.
-        $this->tpl->setContent(ilNolejPlugin::renderH5P($contentId, $this->selectedType, $this->checkPermissionBool("write")));
+        $editable = $this->checkPermissionBool("write");
+        $this->tpl->setContent(ilNolejPlugin::renderH5P($contentId, $this->selectedType, $editable));
     }
 
     /**
