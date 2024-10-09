@@ -205,12 +205,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
 
     /**
      * Returns the directory where all Nolej data is stored.
-     *
      * @return string
-     *
-     * @todo Replace use of this method with th filesystem service
-     * @see \ILIAS\DI\Container::filesystem()
-     * @see Filesystems::web()
      */
     public static function dataDir(): string
     {
@@ -258,10 +253,10 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     {
         $result = $this->db->queryF(
             "SELECT content_id FROM " . ilNolejPlugin::TABLE_H5P
-            . " WHERE document_id = %s"
-            . " AND type = %s"
-            . " ORDER BY `generated` DESC"
-            . " LIMIT 1",
+                . " WHERE document_id = %s"
+                . " AND type = %s"
+                . " ORDER BY `generated` DESC"
+                . " LIMIT 1",
             ["text", "text"],
             [$this->documentId, $type]
         );
