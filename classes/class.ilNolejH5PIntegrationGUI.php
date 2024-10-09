@@ -10,27 +10,27 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use srag\Plugins\H5P\Content\Form\ImportContentFormProcessor;
-use srag\Plugins\H5P\Content\Form\ImportContentFormBuilder;
-use srag\Plugins\H5P\Content\Form\EditContentFormBuilder;
-use srag\Plugins\H5P\Content\Form\EditContentFormProcessor;
-use srag\Plugins\H5P\Content\ContentEditorHelper;
-use srag\Plugins\H5P\Content\ContentEditorData;
-use srag\Plugins\H5P\Content\IContent;
-use srag\Plugins\H5P\Content\Form\ContentPostProcessor;
-use srag\Plugins\H5P\Content\Form\IPostProcessorAware;
-use srag\Plugins\H5P\Form\IFormBuilder;
-use srag\Plugins\H5P\ArrayBasedRequestWrapper;
-use srag\Plugins\H5P\IRepositoryFactory;
-use srag\Plugins\H5P\IRequestParameters;
-use srag\Plugins\H5P\TemplateHelper;
-use srag\Plugins\H5P\RequestHelper;
-use srag\Plugins\H5P\ITranslator;
-use srag\Plugins\H5P\IContainer;
-use Psr\Http\Message\ServerRequestInterface;
 use ILIAS\UI\Component\Input\Container\Form\Form;
 use ILIAS\UI\Factory as ComponentFactory;
+use Psr\Http\Message\ServerRequestInterface;
+use srag\Plugins\H5P\ArrayBasedRequestWrapper;
+use srag\Plugins\H5P\Content\ContentEditorData;
+use srag\Plugins\H5P\Content\ContentEditorHelper;
+use srag\Plugins\H5P\Content\Form\ContentPostProcessor;
+use srag\Plugins\H5P\Content\Form\EditContentFormBuilder;
+use srag\Plugins\H5P\Content\Form\EditContentFormProcessor;
+use srag\Plugins\H5P\Content\Form\ImportContentFormBuilder;
+use srag\Plugins\H5P\Content\Form\ImportContentFormProcessor;
+use srag\Plugins\H5P\Content\Form\IPostProcessorAware;
+use srag\Plugins\H5P\Content\IContent;
+use srag\Plugins\H5P\Form\IFormBuilder;
+use srag\Plugins\H5P\IContainer;
+use srag\Plugins\H5P\IRepositoryFactory;
+use srag\Plugins\H5P\IRequestParameters;
+use srag\Plugins\H5P\ITranslator;
+use srag\Plugins\H5P\RequestHelper;
 use srag\Plugins\H5P\Settings\IGeneralSettings;
+use srag\Plugins\H5P\TemplateHelper;
 
 /**
  * H5P integration class.
