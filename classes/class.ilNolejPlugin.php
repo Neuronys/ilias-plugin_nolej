@@ -271,10 +271,11 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     /**
      * Get the HTML of an H5P activity.
      * @param int $contentId
+     * @param string $type
      * @param bool $editable
      * @return string html
      */
-    public static function renderH5P($contentId, bool $editable = false): string
+    public static function renderH5P($contentId, string $type = "", bool $editable = false): string
     {
         global $DIC;
 
@@ -294,7 +295,7 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
                 $refId = reset(ilObject::_getAllReferences($objId));
                 $obj_gui = new ilObjNolejGUI($refId);
                 $h5p = new ilNolejH5PIntegrationGUI($obj_gui);
-                return $h5p->getHTML((int) $contentId, $editable);
+                return $h5p->getHTML((int) $contentId, $type, $editable);
             }
 
             throw new Exception("Activity not found.");

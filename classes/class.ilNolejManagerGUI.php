@@ -675,7 +675,7 @@ class ilNolejManagerGUI
         }
 
         $h5pIntegrationGui = new ilNolejH5PIntegrationGUI($this->obj_gui);
-        $contentId = $h5pIntegrationGui->importFromPath($filepath, $type, $this->obj_gui->getObject()->getId());
+        $contentId = $h5pIntegrationGui->importFromPath($filepath, $type);
 
         if ($contentId == -1) {
             $this->plugin->log("Import failed {$type} of document {$this->documentId}");

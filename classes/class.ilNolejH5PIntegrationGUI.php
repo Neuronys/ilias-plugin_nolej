@@ -178,6 +178,8 @@ class ilNolejH5PIntegrationGUI
     {
         global $DIC;
         $DIC->tabs()->clearTargets();
+
+        $this->ctrl->setParameter($this->obj_gui, "type", $_GET["type"]);
         $DIC->tabs()->setBackTarget(
             $this->lng->txt("back"),
             $this->ctrl->getLinkTarget($this->obj_gui, ilObjNolejGUI::CMD_CONTENT_SHOW)
@@ -251,10 +253,11 @@ class ilNolejH5PIntegrationGUI
     /**
      * Get the HTML of an H5P activity.
      * @param int $contentId
+     * @param string $type
      * @param bool $editable
      * @return string html
      */
-    public function getHTML(int $contentId, bool $editable = false): string
+    public function getHTML(int $contentId, string $type = "", bool $editable = false): string
     {
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
 
@@ -281,15 +284,12 @@ class ilNolejH5PIntegrationGUI
         }
 
         if ($editable) {
-            $this->ctrl->setParameter($this, "type", $content->getContentType());
+            $this->ctrl->setParameter($this, "type", $type);
             $this->ctrl->setParameter($this, "ref_id", $_GET["ref_id"]);
             $this->toolbar->addComponent(
                 $this->factory->button()->standard(
                     $this->lng->txt("edit"),
-                    $this->ctrl->getLinkTargetByClass(
-                        [ilObjNolejGUI::class, self::class],
-                        self::CMD_EDIT
-                    )
+                    $this->ctrl->getLinkTarget($this, self::CMD_EDIT)
                 )
             );
         }
@@ -307,10 +307,9 @@ class ilNolejH5PIntegrationGUI
      * Import H5P file.
      * @param string $filepath
      * @param string $type
-     * @param int $parent_obj_id
      * @return int content id
      */
-    public function importFromPath($filepath, $type, $parent_obj_id = -1)
+    public function importFromPath($filepath, $type)
     {
         $h5p_kernel = $this->getKernel();
 
@@ -329,7 +328,7 @@ class ilNolejH5PIntegrationGUI
         $metadata = (array) $h5p_kernel->mainJsonData;
         $metadata["title"] = $this->plugin->txt("activities_{$type}");
         $metadata["in_workspace"] = false;
-        $metadata["obj_id"] = $parent_obj_id;
+        $metadata["obj_id"] = $this->obj_gui->getObject()->getId();
         $metadata["parent_type"] = ilNolejPlugin::PLUGIN_ID;
 
         $h5p_storage->savePackage([
