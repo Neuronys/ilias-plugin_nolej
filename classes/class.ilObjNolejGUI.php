@@ -108,6 +108,12 @@ class ilObjNolejGUI extends ilObjectPluginGUI
                 $this->ctrl->forwardCommand($activityManagement);
                 break;
 
+            case strtolower(ilNolejH5PIntegrationGUI::class):
+                $this->checkPermission("write");
+                $h5pIntegrationGui = new ilNolejH5PIntegrationGUI($this);
+                $this->ctrl->forwardCommand($h5pIntegrationGui);
+                break;
+
             default:
                 switch ($cmd) {
                     case self::CMD_PROPERTIES_EDIT:
@@ -342,11 +348,11 @@ class ilObjNolejGUI extends ilObjectPluginGUI
 
         $result = $db->queryF(
             "SELECT * FROM " . ilNolejPlugin::TABLE_H5P
-            . " WHERE document_id = %s"
-            . " AND `generated` = ("
-            . " SELECT MAX(`generated`) FROM " . ilNolejPlugin::TABLE_H5P
-            . " WHERE document_id = %s"
-            . ") ORDER BY (type = 'ibook') DESC, type ASC;",
+                . " WHERE document_id = %s"
+                . " AND `generated` = ("
+                . " SELECT MAX(`generated`) FROM " . ilNolejPlugin::TABLE_H5P
+                . " WHERE document_id = %s"
+                . ") ORDER BY (type = 'ibook') DESC, type ASC;",
             ["text", "text"],
             [$this->object->getDocumentId(), $this->object->getDocumentId()]
         );
@@ -408,7 +414,7 @@ class ilObjNolejGUI extends ilObjectPluginGUI
         $contentId = $this->object->getContentIdOfType($this->selectedType);
 
         // Display activity.
-        $this->tpl->setContent(ilNolejPlugin::renderH5P($contentId));
+        $this->tpl->setContent(ilNolejPlugin::renderH5P($contentId, $this->checkPermissionBool("write")));
     }
 
     /**

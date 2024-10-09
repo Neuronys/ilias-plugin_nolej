@@ -271,19 +271,33 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
     /**
      * Get the HTML of an H5P activity.
      * @param int $contentId
+     * @param bool $editable
      * @return string html
      */
-    public static function renderH5P($contentId): string
+    public static function renderH5P($contentId, bool $editable = false): string
     {
         global $DIC;
 
-        $nolej = self::getInstance();
         $factory = $DIC->ui()->factory();
         $renderer = $DIC->ui()->renderer();
+        $db = $DIC->database();
 
         try {
-            $h5p = new ilNolejH5PIntegrationGUI();
-            return $h5p->render((int) $contentId);
+            $result = $db->queryF(
+                "SELECT id FROM " . self::TABLE_DATA
+                    . " WHERE document_id = (SELECT document_id FROM " . self::TABLE_H5P . " WHERE content_id = %s)",
+                ["integer"],
+                [$contentId]
+            );
+            if ($row = $db->fetchAssoc($result)) {
+                $objId = $row["id"];
+                $refId = reset(ilObject::_getAllReferences($objId));
+                $obj_gui = new ilObjNolejGUI($refId);
+                $h5p = new ilNolejH5PIntegrationGUI($obj_gui);
+                return $h5p->getHTML((int) $contentId, $editable);
+            }
+
+            throw new Exception("Activity not found.");
         } catch (Exception $e) {
             // Fallback.
             return $renderer->render($factory->messageBox()->failure($e->getMessage()));

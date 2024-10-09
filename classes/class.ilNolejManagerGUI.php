@@ -16,11 +16,11 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
  * GUI to manage every step of the Nolej module creation.
  *
  * @ilCtrl_isCalledBy ilNolejManagerGUI: ilObjPluginDispatchGUI, ilObjNolejGUI
- * @ilCtrl_Calls ilObjNolejGUI: ilNolejCreationFormGUI
- * @ilCtrl_Calls ilObjNolejGUI: ilNolejTranscriptionFormGUI
- * @ilCtrl_Calls ilObjNolejGUI: ilNolejConceptsFormGUI, ilNolejQuestionsFormGUI, ilNolejSummaryFormGUI
- * @ilCtrl_Calls ilObjNolejGUI: ilNolejActivitiesFormGUI
- * @ilCtrl_Calls ilObjNolejGUI: ilNolejH5PIntegrationGUI
+ * @ilCtrl_Calls ilNolejManagerGUI: ilNolejCreationFormGUI
+ * @ilCtrl_Calls ilNolejManagerGUI: ilNolejTranscriptionFormGUI
+ * @ilCtrl_Calls ilNolejManagerGUI: ilNolejConceptsFormGUI, ilNolejQuestionsFormGUI, ilNolejSummaryFormGUI
+ * @ilCtrl_Calls ilNolejManagerGUI: ilNolejActivitiesFormGUI
+ * @ilCtrl_Calls ilNolejManagerGUI: ilNolejH5PIntegrationGUI
  */
 class ilNolejManagerGUI
 {
@@ -609,6 +609,10 @@ class ilNolejManagerGUI
      */
     public function downloadActivities()
     {
+        if (!ilNolejH5PIntegrationGUI::isH5PInstalled()) {
+            return $this->plugin->txt("err_h5p_not_installed");
+        }
+
         $h5pDir = $this->dataDir . "/h5p";
         if (!is_dir($h5pDir)) {
             mkdir($h5pDir, 0775, true);
@@ -662,66 +666,24 @@ class ilNolejManagerGUI
      */
     public function importH5PContent($h5pDir, $type, $time)
     {
-        global $DIC;
-        $filePath = "{$h5pDir}/{$type}.h5p";
-        $filePath = substr($filePath, 1);
-        $absolutePath = ILIAS_ABSOLUTE_PATH . $filePath;
+        $this->plugin->log("Importing H5P activity {$type} of document {$this->documentId}");
 
-        $this->plugin->log("Importing H5P activity " . $type . " of document " . $this->documentId);
+        $filepath = substr("{$h5pDir}/{$type}.h5p", 1);
 
-        $component_factory = $DIC['component.factory'];
-        $h5p_plugin = $component_factory->getPlugin(ilH5PPlugin::PLUGIN_ID);
+        if (!ilNolejH5PIntegrationGUI::isH5PInstalled()) {
+            return $this->plugin->txt("err_h5p_not_installed");
+        }
 
-        /** @var IContainer */
-        $h5p_container = $h5p_plugin->getContainer();
+        $h5pIntegrationGui = new ilNolejH5PIntegrationGUI($this->obj_gui);
+        $contentId = $h5pIntegrationGui->importFromPath($filepath, $type, $this->obj_gui->getObject()->getId());
 
-        /** @var H5PCore */
-        $h5p_kernel = $h5p_container->getKernel();
-
-        $file = ilH5PEditorStorage::saveFileTemporarily(
-            $absolutePath,
-            true
-        );
-
-        /** @var FileUploadCommunicator */
-        $file_upload_communicator = $h5p_container->getFileUploadCommunicator();
-        $file_upload_communicator->setUploadPath($file->dir . "/" . $file->fileName);
-
-        /** @var H5PStorage */
-        $h5p_storage = $h5p_container->getKernelStorage();
-
-        /** @var H5PValidator */
-        $h5p_validator = $h5p_container->getKernelValidator();
-        if (!$h5p_validator->isValidPackage()) {
-            $this->plugin->log("Import validation failed " . $type . " of document " . $this->documentId);
+        if ($contentId == -1) {
+            $this->plugin->log("Import failed {$type} of document {$this->documentId}");
             return $this->plugin->txt("err_h5p_package");
         }
 
-        $h5p_storage->savePackage([
-            "metadata" => [
-                "authors" => $h5p_kernel->mainJsonData["authors"] ?? "-",
-                "authorComments" => $h5p_kernel->mainJsonData["authorComments"] ?? "",
-                "changes" => $h5p_kernel->mainJsonData["changes"] ?? "",
-                "defaultLanguage" => $h5p_kernel->mainJsonData["defaultLanguage"] ?? "",
-                "license" => $h5p_kernel->mainJsonData["license"] ?? "",
-                "licenseExtras" => $h5p_kernel->mainJsonData["licenseExtras"] ?? "",
-                "licenseVersion" => $h5p_kernel->mainJsonData["licenseVersion"] ?? "",
-                "source" => $h5p_kernel->mainJsonData["source"] ?? "",
-                "title" => $h5p_kernel->mainJsonData["title"] ?? $this->plugin->txt("activities_{$type}"),
-                "yearFrom" => $h5p_kernel->mainJsonData["yearFrom"] ?? "",
-                "yearTo" => $h5p_kernel->mainJsonData["yearTo"] ?? "",
-                "obj_id" => $this->getObjIdFromDocumentId($this->documentId),
-                // "parent_type" => "unknown", // instead of ilNolejPlugin::PLUGIN_ID, so that read permission is granted
-                "in_workspace" => false
-            ]
-        ]);
-
-        ilH5PEditorStorage::removeTemporarilySavedFiles($file_upload_communicator->getUploadPath());
-
-        $contentId = $h5p_storage->contentId;
-
-        if ($contentId == null || $contentId < 1) {
-            $this->plugin->log("Import failed " . $type . " of document " . $this->documentId);
+        if (null === $contentId) {
+            $this->plugin->log("Import failed {$type} of document {$this->documentId}");
             return $this->plugin->txt("err_content_id");
         }
 
@@ -733,7 +695,7 @@ class ilNolejManagerGUI
             [$this->documentId, $type, $time, $contentId]
         );
 
-        $this->plugin->log("Import completed " . $type . " of document " . $this->documentId);
+        $this->plugin->log("Import completed {$type} of document {$this->documentId}");
         return "";
     }
 }
