@@ -11,7 +11,7 @@
  */
 
 /**
- * Plugin main class
+ * H5P integration class.
  */
 class ilNolejH5PIntegrationGUI
 {
@@ -44,7 +44,7 @@ class ilNolejH5PIntegrationGUI
 
     /**
      * Constructor.
-     * @throws LogicException if there was no parent object id in the request.
+     * @throws LogicException if H5P is not installed.
      */
     public function __construct()
     {
@@ -100,10 +100,16 @@ class ilNolejH5PIntegrationGUI
         $h5p_container = $h5p_plugin->getContainer();
         $repositories = $h5p_container->getRepositoryFactory();
 
-        if (!$repositories->general()->isMainPluginInstalled()) {
-            return false;
-        }
+        return $repositories->general()->isMainPluginInstalled();
+    }
 
+    /**
+     * Check if H5P plugin is active.
+     * @return bool
+     */
+    public static function isH5PActive(): bool
+    {
+        $h5p_plugin = self::getH5PPlugin();
         return $h5p_plugin->isActive();
     }
 
@@ -117,11 +123,17 @@ class ilNolejH5PIntegrationGUI
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
         $nolej = ilNolejPlugin::getInstance();
 
+        // Check H5P plugin is active.
+        if (!self::isH5PActive()) {
+            return $this->renderer->render(
+                $this->factory->messageBox()->failure($nolej->txt("err_h5p_not_active"))
+            );
+        }
+
+        // Check H5P content ID.
         if ($contentId == -1) {
             return $this->renderer->render(
-                $this->factory
-                    ->messageBox()
-                    ->failure($nolej->txt("err_h5p_content"))
+                $this->factory->messageBox()->failure($nolej->txt("err_h5p_content"))
             );
         }
 
@@ -130,10 +142,10 @@ class ilNolejH5PIntegrationGUI
         $component = (null === $content)
             ? $this->factory->messageBox()->failure($nolej->txt("err_h5p_content"))
             : $this->h5p_container->getComponentFactory()
-                ->content($content)
-                ->withLoadingMessage(
-                    ilNolejManagerGUI::glyphicon("refresh gly-spin") . $nolej->txt("content_loading")
-                );
+            ->content($content)
+            ->withLoadingMessage(
+                ilNolejManagerGUI::glyphicon("refresh gly-spin") . $nolej->txt("content_loading")
+            );
 
         return "<div style=\"margin-top: 25px;\">" . $this->renderer->render($component) . "</div>";
     }

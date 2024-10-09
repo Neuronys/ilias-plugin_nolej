@@ -20,6 +20,7 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejTranscriptionFormGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejConceptsFormGUI, ilNolejQuestionsFormGUI, ilNolejSummaryFormGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejActivitiesFormGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilNolejH5PIntegrationGUI
  */
 class ilNolejManagerGUI
 {

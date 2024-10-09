@@ -89,8 +89,14 @@ class ilNolejPlugin extends ilRepositoryObjectPlugin
             self::$pluginProviderCollection = $this->getPluginProviderCollection(); // Fix overflow.
         }
 
-        // Use H5P renderer exchange.
-        if (ilNolejH5PIntegrationGUI::isH5PInstalled()) {
+        /**
+         * Exchanges the default renderer instead of h5p plugin, if it is available, installed but not active.
+         * This needs to be done because this plugins should still be usable even if the
+         * main plugin is inactive. Since renderers are only exchanged if a plugin is
+         * active, we need to exchange the renderer here to cover this scenario.
+         * @see ilH5PPageComponentPlugin::exchangeUIRendererAfterInitialization
+         */
+        if (ilNolejH5PIntegrationGUI::isH5PInstalled() && !ilNolejH5PIntegrationGUI::isH5PActive()) {
             $h5p = ilNolejH5PIntegrationGUI::getH5PPlugin();
             return $h5p->exchangeUIRendererAfterInitialization($dic);
         }
