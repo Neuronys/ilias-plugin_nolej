@@ -27,6 +27,10 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
      */
     public function showForm(): void
     {
+        $this->tpl->setRightContent(
+            $this->renderer->render($this->manager->getWorkflow()->withActive(1))
+        );
+
         if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
@@ -40,10 +44,6 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 
         $form = $this->form();
         $this->tpl->setContent($form->getHTML());
-
-        $this->tpl->setRightContent(
-            $this->renderer->render($this->manager->getWorkflow()->withActive(1))
-        );
     }
 
     /**
@@ -60,6 +60,9 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             // Input not ok.
             $form->setValuesByPost();
             $this->tpl->setContent($form->getHTML());
+            $this->tpl->setRightContent(
+                $this->renderer->render($this->manager->getWorkflow()->withActive(1))
+            );
             return;
         }
 

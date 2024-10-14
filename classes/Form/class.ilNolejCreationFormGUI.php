@@ -133,6 +133,9 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             // Input not ok.
             $form->setValuesByPost();
             $this->tpl->setContent($form->getHTML());
+            $this->tpl->setRightContent(
+                $this->renderer->render($this->manager->getWorkflow()->withActive(0))
+            );
             return;
         }
 

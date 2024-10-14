@@ -23,6 +23,10 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
      */
     public function showForm(): void
     {
+        $this->tpl->setRightContent(
+            $this->renderer->render($this->manager->getWorkflow()->withActive(2))
+        );
+
         if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
@@ -35,10 +39,6 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
 
         $form = $this->form();
         $this->tpl->setContent($form->getHTML());
-
-        $this->tpl->setRightContent(
-            $this->renderer->render($this->manager->getWorkflow()->withActive(2))
-        );
     }
 
     /**
@@ -47,15 +47,13 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
      */
     public function saveForm(): void
     {
-        if ($this->status < ilNolejManagerGUI::STATUS_REVISION) {
-            $this->tpl->setContent($this->infoBox($this->plugin->txt("err_analysis_not_ready")));
-            return;
-        }
-
         $form = $this->form(true);
         if (!$form->checkInput()) {
             // Input not ok.
             $this->tpl->setContent($form->getHTML());
+            $this->tpl->setRightContent(
+                $this->renderer->render($this->manager->getWorkflow()->withActive(2))
+            );
             return;
         }
 
