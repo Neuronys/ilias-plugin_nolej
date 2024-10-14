@@ -98,6 +98,7 @@ err_content_id#:#Inhalts-ID kann nicht ermittelt werden
 err_credentials#:#Ungültige/Falsche Anmeldeinformationen.
 err_doc_response#:#Bei der Erstellung des NOLEJ-Moduls ist ein Fehler aufgetreten:<br>%s<br>Bitte versuchen Sie es erneut oder wenden Sie sich an einen Administrator, wenn dieser Fehler weiterhin besteht.
 err_file_upload#:#Fehler beim Hochladen der Datei. Bitte wenden Sie sich an einen Administrator.
+err_ftb_missing_blank#:#Missing 4 underscores for Fill the blanks activity.
 err_h5p_content#:#Leider kann diese Aktivität nicht geladen werden. Bitte wenden Sie sich an einen Administrator.
 err_h5p_package#:#kein gültiges H5P-Paket
 err_h5p_plugin#:#Leider wird Ihre Version des H5P-Plugins nicht unterstützt. Bitte aktualisieren Sie es oder wenden Sie sich an einen Administrator.
@@ -178,6 +179,9 @@ prop_web#:#Web-URL
 prop_web_info#:#Analysieren Sie eine Ressource aus dem Web.
 prop_web_src#:#Wählen Sie aus dieser URL aus, was analysiert werden soll
 questions_answer#:#Antwort
+questions_answer_distractor#:#Statement to display
+questions_answer_false#:#False statement
+questions_answer_true#:#Correct statement
 questions_distractors#:#Distraktoren
 questions_enable#:#Frage aktiviert
 questions_explanation#:#Erläuterung

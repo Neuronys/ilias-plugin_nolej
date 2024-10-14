@@ -214,11 +214,11 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
 
             $language = new ilHiddenInputGUI("concept_{$i}_language");
             $language->setValue($concepts[$i]->concept->language);
-            $enable->addSubItem($language);
+            $form->addItem($language);
 
             $games = new ilHiddenInputGUI("concept_{$i}_games");
             $games->setValue(json_encode($concepts[$i]->concept->available_games));
-            $enable->addSubItem($games);
+            $form->addItem($games);
 
             if ($usePost) {
                 $enable->setValueByArray($this->request->getParsedBody());

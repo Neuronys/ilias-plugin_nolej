@@ -78,6 +78,8 @@ class ilNolejFormGUI
 
         $this->documentId = $this->manager->documentId;
         $this->status = $this->manager->status;
+
+        include_once ilNolejPlugin::PLUGIN_DIR . "/classes/Form/Input/class.ilTextAreaInputGUI.php";
     }
 
     /**

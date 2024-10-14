@@ -98,6 +98,7 @@ err_content_id#:#cannot determine content id
 err_credentials#:#Invalid/Wrong credentials.
 err_doc_response#:#An error accurred during the creation of NOLEJ module:<br>%s<br>Please try again or contact an administrator if this error persists.
 err_file_upload#:#Failed to upload file. Please contact an administrator.
+err_ftb_missing_blank#:#Missing 4 underscores for Fill the blanks activity.
 err_h5p_content#:#Sorry, this activity cannot be loaded. Please contact an administrator.
 err_h5p_package#:#not a valid H5P package
 err_h5p_plugin#:#Sorry, your version of H5P plugin is not supported. Please update it or contact an administrator.
@@ -178,6 +179,9 @@ prop_web#:#Web URL
 prop_web_info#:#Analyze a resource from the Web.
 prop_web_src#:#Choose what to analyze from that URL
 questions_answer#:#Answer
+questions_answer_distractor#:#Statement to display
+questions_answer_false#:#False statement
+questions_answer_true#:#Correct statement
 questions_distractors#:#Distractors
 questions_enable#:#Question enabled
 questions_explanation#:#Explanation

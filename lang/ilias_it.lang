@@ -98,6 +98,7 @@ err_content_id#:#impossibile determinare l'id del contenuto
 err_credentials#:#Le credenziali non sono valide.
 err_doc_response#:#C'è stato un errore durante la creazione del modulo NOLEJ:<br>%s<br>Per favore riprova, oppure contatta un amministratore se l'errore persiste.
 err_file_upload#:#Errore nel caricamento del file. Contattare un amministratore.
+err_ftb_missing_blank#:#Non sono presenti i 4 trattini bassi per l'attività Riempi gli spazi.
 err_h5p_content#:#Non è stato possibile caricare l'attività. Per favore, contatta un amministratore.
 err_h5p_package#:#non è un valido pacchetto H5P
 err_h5p_plugin#:#La versione del plugin H5P installata non è supportata. Per favore, aggiorna il plugin o contatta un amministratore.
@@ -178,6 +179,9 @@ prop_web#:#URL web
 prop_web_info#:#Analizza una risorsa da Internet.
 prop_web_src#:#Scegli cosa NOLEJ dovrà analizzare da questo URL.
 questions_answer#:#Risposta
+questions_answer_distractor#:#Affermazione da visualizzare
+questions_answer_false#:#Affermazione falsa
+questions_answer_true#:#Affermazione corretta
 questions_distractors#:#Distrattori
 questions_enable#:#Domanda abilitata
 questions_explanation#:#Spiegazione

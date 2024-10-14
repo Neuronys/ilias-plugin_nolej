@@ -98,6 +98,7 @@ err_content_id#:#ne peut pas déterminer l'identifiant du contenu
 err_credentials#:#Informations d'identification invalides ou erronées.
 err_doc_response#:#Une erreur s'est produite lors de la création du module NOLEJ:<br>%s<br>Veuillez réessayer ou contacter un administrateur si cette erreur persiste.
 err_file_upload#:#Échec de chargement du fichier. Veuillez contacter un administrateur.
+err_ftb_missing_blank#:#Missing 4 underscores for Fill the blanks activity.
 err_h5p_content#:#Désolé, cette activité ne peut pas être chargée. Veuillez contacter un administrateur.
 err_h5p_package#:#paquet H5P invalide
 err_h5p_plugin#:#Désolé, votre version du plugin H5P n'est pas prise en charge. Veuillez la mettre à jour ou contacter un administrateur.
@@ -178,6 +179,9 @@ prop_web#:#URL web
 prop_web_info#:#Analyser une ressource du Web.
 prop_web_src#:#Choisissez ce que vous voulez analyser à partir de cette URL
 questions_answer#:#Réponse
+questions_answer_distractor#:#Statement to display
+questions_answer_false#:#False statement
+questions_answer_true#:#Correct statement
 questions_distractors#:#Distracteurs
 questions_enable#:#Question activée
 questions_explanation#:#Explication
