@@ -105,13 +105,19 @@ class ilNolejFormGUI
      * Show form.
      * @return void
      */
-    public function showForm(): void {}
+    public function showForm(): void
+    {
+        // Implement in child classes.
+    }
 
     /**
      * Save form.
      * @return void
      */
-    public function saveForm(): void {}
+    public function saveForm(): void
+    {
+        // Implement in child classes.
+    }
 
     /**
      * Init form.
@@ -119,11 +125,14 @@ class ilNolejFormGUI
      */
     protected function form(): ilPropertyFormGUI
     {
+        // Implement in child classes.
         return new ilPropertyFormGUI();
     }
 
     /**
      * Render an information box.
+     * @param string $message to display
+     * @return string html
      */
     protected function infoBox(string $message): string
     {

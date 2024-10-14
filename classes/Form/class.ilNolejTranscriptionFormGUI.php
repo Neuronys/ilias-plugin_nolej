@@ -226,7 +226,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
                 true,
                 true
             );
-        } else if (empty($transcription) || empty($title)) {
+        } elseif (empty($transcription) || empty($title)) {
             // Error: transcription and title cannot be empty.
             return $this->plugin->txt("err_transcription_missing");
         } else {
