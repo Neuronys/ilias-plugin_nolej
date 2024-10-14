@@ -38,6 +38,9 @@ class ilNolejAPI
         ...self::TYPE_TEXT
     ];
 
+    /** @var string[] Supported languages */
+    public const LANG_SUPPORTED = ["en", "fr", "it", "de", "pt", "es", "nl"];
+
     /** @var int Max bytes for uploaded files (500 MB) */
     public const MAX_SIZE = 524288000;
 

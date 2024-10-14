@@ -143,18 +143,18 @@ class ilNolejWebhook
 
         $result = $db->queryF(
             "SELECT a.user_id, d.title"
-            . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
-            . " INNER JOIN ("
-            . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "   WHERE document_id = %s"
-            . "   AND tstamp = ("
-            . "     SELECT MAX(tstamp)"
-            . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "     WHERE document_id = %s"
-            . "   )"
-            . " ) a"
-            . " ON a.document_id = d.document_id"
-            . " WHERE d.document_id = %s AND d.status = %s;",
+                . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
+                . " INNER JOIN ("
+                . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "   WHERE document_id = %s"
+                . "   AND tstamp = ("
+                . "     SELECT MAX(tstamp)"
+                . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "     WHERE document_id = %s"
+                . "   )"
+                . " ) a"
+                . " ON a.document_id = d.document_id"
+                . " WHERE d.document_id = %s AND d.status = %s;",
             ["text", "text", "text", "integer"],
             [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_CREATION_PENDING]
         );
@@ -208,6 +208,45 @@ class ilNolejWebhook
         );
         if (!$result) {
             $this->exitWithMessage(404, "Document not found.");
+        }
+
+        // Start analysis if the source is not audio or video.
+        if (!in_array($document["media_type"], [ilNolejCreationFormGUI::PROP_AUDIO, ilNolejCreationFormGUI::PROP_VIDEO])) {
+            $this->plugin->log("Starting analysis automatically for document: {$documentId}");
+
+            $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
+            $transcriptionGui = new ilNolejTranscriptionFormGUI($manager);
+            $transcriptionGui->downloadTranscription();
+            $errorMessage = $transcriptionGui->runAnalysis($document->title, null);
+            if (null !== $errorMessage) {
+                // An error occurred.
+                $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
+
+                $ass = new ilNolejActivity($documentId, (int) $document["user_id"], "analysis");
+                $ass->withStatus("ko")
+                    ->withCode(0)
+                    ->withErrorMessage($errorMessage)
+                    ->withConsumedCredit(0)
+                    ->store();
+            }
+
+            $this->sendNotification(
+                $documentId,
+                (int) $document["user_id"],
+                "transcription_ko",
+                $this->data["status"],
+                400,
+                $errorMessage,
+                $this->data["consumedCredit"],
+                "action_transcription_ko_desc",
+                [
+                    $document["title"],
+                    ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
+                    $errorMessage
+                ]
+            );
+
+            return;
         }
 
         $this->sendNotification(
@@ -264,18 +303,18 @@ class ilNolejWebhook
 
         $result = $db->queryF(
             "SELECT a.user_id, d.title"
-            . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
-            . " INNER JOIN ("
-            . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "   WHERE document_id = %s"
-            . "   AND tstamp = ("
-            . "     SELECT MAX(tstamp)"
-            . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "     WHERE document_id = %s"
-            . "   )"
-            . " ) a"
-            . " ON a.document_id = d.document_id"
-            . " WHERE d.document_id = %s AND d.status = %s;",
+                . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
+                . " INNER JOIN ("
+                . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "   WHERE document_id = %s"
+                . "   AND tstamp = ("
+                . "     SELECT MAX(tstamp)"
+                . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "     WHERE document_id = %s"
+                . "   )"
+                . " ) a"
+                . " ON a.document_id = d.document_id"
+                . " WHERE d.document_id = %s AND d.status = %s;",
             ["text", "text", "text", "integer"],
             [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ANALISYS_PENDING]
         );
@@ -324,7 +363,7 @@ class ilNolejWebhook
 
         $result = $db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC
-            . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
+                . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
             [
                 "integer",
                 "integer",
@@ -394,18 +433,18 @@ class ilNolejWebhook
 
         $result = $db->queryF(
             "SELECT a.user_id, d.title"
-            . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
-            . " INNER JOIN ("
-            . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "   WHERE document_id = %s"
-            . "   AND tstamp = ("
-            . "     SELECT MAX(tstamp)"
-            . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "     WHERE document_id = %s"
-            . "   )"
-            . " ) a"
-            . " ON a.document_id = d.document_id"
-            . " WHERE d.document_id = %s AND d.status = %s;",
+                . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
+                . " INNER JOIN ("
+                . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "   WHERE document_id = %s"
+                . "   AND tstamp = ("
+                . "     SELECT MAX(tstamp)"
+                . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "     WHERE document_id = %s"
+                . "   )"
+                . " ) a"
+                . " ON a.document_id = d.document_id"
+                . " WHERE d.document_id = %s AND d.status = %s;",
             ["text", "text", "text", "integer"],
             [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING]
         );

@@ -61,7 +61,7 @@ class ilNolejFormGUI
      * @param ilObjNolejGUI $obj_gui
      * @param ilNolejManagerGUI $manager
      */
-    public function __construct($obj_gui, $manager)
+    public function __construct($manager)
     {
         global $DIC;
         $this->ctrl = $DIC->ctrl();
@@ -72,7 +72,7 @@ class ilNolejFormGUI
         $this->factory = $DIC->ui()->factory();
         $this->renderer = $DIC->ui()->renderer();
 
-        $this->obj_gui = $obj_gui;
+        $this->obj_gui = $manager->getObjectGUI();
         $this->manager = $manager;
         $this->plugin = ilNolejPlugin::getInstance();
 
@@ -105,17 +105,13 @@ class ilNolejFormGUI
      * Show form.
      * @return void
      */
-    public function showForm(): void
-    {
-    }
+    public function showForm(): void {}
 
     /**
      * Save form.
      * @return void
      */
-    public function saveForm(): void
-    {
-    }
+    public function saveForm(): void {}
 
     /**
      * Init form.

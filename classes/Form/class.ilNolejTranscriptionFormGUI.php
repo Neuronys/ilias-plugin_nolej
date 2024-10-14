@@ -32,11 +32,10 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             return;
         }
 
-        if (!file_exists($this->manager->dataDir . "/transcription.htm")) {
-            $downloadSuccess = $this->downloadTranscription();
-            if (!$downloadSuccess) {
-                return;
-            }
+        $errorMessage = $this->downloadTranscription();
+        if (null !== $errorMessage) {
+            $this->tpl->setOnScreenMessage("failure", $errorMessage);
+            return;
         }
 
         $form = $this->form();
@@ -74,41 +73,23 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 
         // Update transcription.
         $transcription = $form->getInput(self::PROP_TRANSCRIPTION);
-        $this->manager->writeDocumentFile("transcription.htm", $transcription);
 
-        $api = new ilNolejAPI();
-        $url = ILIAS_HTTP_PATH . substr(ilWACSignedPath::signFile($this->manager->dataDir . "/transcription.htm"), 1);
-        $result = $api->put(
-            "/documents/{$this->documentId}/transcription",
-            [
-                "s3URL" => $url,
-                "automaticMode" => false,
-            ],
-            true,
-            true
-        );
+        // Start analysis.
+        $errorMessage = $this->runAnalysis($title, $transcription, false);
+        if (null != $errorMessage) {
+            // An error occurred.
+            $this->tpl->setOnScreenMessage("failure", $errorMessage);
+            $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
 
-        if (
-            !is_object($result) ||
-            !property_exists($result, "result") ||
-            !is_string($result->result) ||
-            !(
-                $result->result == "\"ok\"" ||
-                $result->result == "ok"
-            )
-        ) {
-            $this->tpl->setOnScreenMessage("failure", "An error occurred: " . print_r($result, true));
+            $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
+            $ass->withStatus("ko")
+                ->withCode(0)
+                ->withErrorMessage($errorMessage)
+                ->withConsumedCredit(0)
+                ->store();
+
             return;
         }
-
-        $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ANALISYS_PENDING);
-
-        $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
-        $ass->withStatus("ok")
-            ->withCode(0)
-            ->withErrorMessage("")
-            ->withConsumedCredit(0)
-            ->store();
 
         $this->tpl->setOnScreenMessage("success", $this->plugin->txt("action_analysis"), true);
         $this->ctrl->redirectByClass(ilNolejConceptsFormGUI::class, ilNolejConceptsFormGUI::CMD_SHOW);
@@ -125,10 +106,12 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         // Object title.
         $objTitle = $this->obj_gui->getObject()->getTitle();
 
+        // Module transcription.
+        $content = $this->manager->readDocumentFile("transcription.htm");
+
         if ($this->status != ilNolejManagerGUI::STATUS_ANALISYS) {
             $transcription = new ilFormSectionHeaderGUI();
             $transcription->setTitle($objTitle);
-            $content = $this->manager->readDocumentFile("transcription.htm");
             $transcription->setInfo($content == false ? "--" : $content);
             $form->addItem($transcription);
             return $form;
@@ -164,21 +147,9 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             $txt->setUseRte(true);
             $txt->setRteTags(["h1", "h2", "h3", "p", "ul", "ol", "li", "br", "strong", "u", "i"]);
             $txt->setRTERootBlockElement("");
-            $txt->disableButtons([
-                "charmap",
-                "justifyright",
-                "justifyleft",
-                "justifycenter",
-                "justifyfull",
-                "alignleft",
-                "aligncenter",
-                "alignright",
-                "alignjustify",
-                "anchor",
-                "pasteword"
-            ]);
+            $txt->disableButtons(["charmap", "anchor"]);
         }
-        $txt->setValue($this->manager->readDocumentFile("transcription.htm"));
+        $txt->setValue($content);
         $form->addItem($txt);
 
         $form->addCommandButton(self::CMD_SAVE, $this->lng->txt("save"));
@@ -189,14 +160,18 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 
     /**
      * Download the transctiption of the analyzed media.
-     * @return bool success
+     * @return ?string error message
      */
-    protected function downloadTranscription()
+    public function downloadTranscription()
     {
         if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
-            // Transctiption is not ready!
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_not_ready"));
-            return false;
+            // Transcription is not ready!
+            return $this->plugin->txt("err_transcription_not_ready");
+        }
+
+        if ($this->manager->hasDocumentFile("transcription.htm")) {
+            // Transcription already downloaded.
+            return;
         }
 
         $api = new ilNolejAPI();
@@ -209,8 +184,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             !property_exists($result, "result") ||
             !is_string($result->result)
         ) {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_get") . print_r($result));
-            return false;
+            return $this->plugin->txt("err_transcription_get") . print_r($result);
         }
 
         $title = $result->title;
@@ -225,10 +199,78 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             file_get_contents($result->result)
         );
         if (!$success) {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_transcription_download") . print_r($result, true));
-            return false;
+            return $this->plugin->txt("err_transcription_download") . print_r($result, true);
+        }
+    }
+
+    /**
+     * Call Nolej API to start the analysis.
+     * @param string $title
+     * @param ?string $transcription null to start analysis with no transcription changes.
+     * @param bool $automaticMode
+     * @return ?string $errorMessage null on success
+     */
+    public function runAnalysis($title, $transcription = null, $automaticMode = false): ?string
+    {
+        global $DIC;
+
+        $api = new ilNolejAPI();
+
+        // Check transcription.
+        if ($transcription == null) {
+            // Start analysis with no changes in the transcription.
+            $this->plugin->log("Requesting analysis with unmodified transcription for document: {$this->documentId}");
+            $result = $api->put(
+                "/documents/{$this->documentId}/transcription",
+                [],
+                true,
+                true
+            );
+        } else if (empty($transcription) || empty($title)) {
+            // Error: transcription and title cannot be empty.
+            return $this->plugin->txt("err_transcription_missing");
+        } else {
+            // Update transcription file.
+            $this->manager->writeDocumentFile("transcription.htm", $transcription);
+
+            // Generate transcription url webhook.
+            $url = ILIAS_HTTP_PATH . substr(ilWACSignedPath::signFile($this->manager->dataDir . "/transcription.htm"), 1);
+
+            $this->plugin->log("Requesting analysis for document: {$this->documentId}");
+
+            // Call Nolej analysis API.
+            $result = $api->put(
+                "/documents/{$this->documentId}/transcription",
+                [
+                    "s3URL" => $url,
+                    "automaticMode" => $automaticMode,
+                ],
+                true,
+                true
+            );
         }
 
-        return true;
+        if (
+            !is_object($result) ||
+            !property_exists($result, "result") ||
+            !is_string($result->result) ||
+            !(
+                $result->result == "\"ok\"" ||
+                $result->result == "ok"
+            )
+        ) {
+            return "An error occurred: " . print_r($result, true);
+        }
+
+        $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ANALISYS_PENDING);
+
+        $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
+        $ass->withStatus("ok")
+            ->withCode(0)
+            ->withErrorMessage("")
+            ->withConsumedCredit(0)
+            ->store();
+
+        return null;
     }
 }

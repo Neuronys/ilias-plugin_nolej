@@ -127,42 +127,35 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
      */
     public function saveForm(): void
     {
-        global $DIC;
-
         $form = $this->form();
 
         if (!$form->checkInput()) {
-            // input not ok, then
+            // Input not ok.
             $form->setValuesByPost();
             $this->tpl->setContent($form->getHTML());
             return;
         }
 
-        $apiTitle = $form->getInput(self::PROP_TITLE);
+        $title = $form->getInput(self::PROP_TITLE);
         $decrementedCredit = 1;
 
-        /**
-         * Set $apiUrl (signed)
-         * Set $apiFormat
-         * Set $decrementedCredit (all to 1)
-         */
+        // Set url (signed) and format based on source type.
         $mediaSrc = $form->getInput(self::PROP_MEDIA_SRC);
+
         switch ($mediaSrc) {
             case self::PROP_WEB:
-                /**
-                 * No need to sign the url, just check the
-                 * source type (content, or audio/video streaming)
-                 */
-                $apiUrl = $form->getInput(self::PROP_URL);
-                $format = $form->getInput(self::PROP_WEB_SRC);
-                switch ($format) {
+                // No need to sign the url, just check the source type
+                // (content, or audio/video streaming).
+                $url = $form->getInput(self::PROP_URL);
+                $formatInput = $form->getInput(self::PROP_WEB_SRC);
+                switch ($formatInput) {
                     case self::PROP_CONTENT:
-                        $apiFormat = self::PROP_WEB;
+                        $format = self::PROP_WEB;
                         break;
 
                     case self::PROP_AUDIO:
                     case self::PROP_VIDEO:
-                        $apiFormat = $format;
+                        $format = $formatInput;
                         break;
                 }
                 break;
@@ -171,8 +164,8 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                 // Use selected mob.
                 $mobId = (int) $form->getInput(self::PROP_MOB_ID);
                 if ($this->isValidMobId($mobId)) {
-                    $apiFormat = $this->getMobFormat($mobId);
-                    $apiUrl = $this->getSignedUrl($mobId, ilWACSignedPath::MAX_LIFETIME);
+                    $format = $this->getMobFormat($mobId);
+                    $url = $this->getSignedUrl($mobId, ilWACSignedPath::MAX_LIFETIME);
                 }
                 break;
 
@@ -180,7 +173,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                 // Save uploaded file as a media object.
                 if (!isset($_FILES[self::PROP_INPUT_FILE], $_FILES[self::PROP_INPUT_FILE]["tmp_name"])) {
                     // File not set.
-                    $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"), true);
+                    $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"));
                     $form->setValuesByPost();
                     $this->tpl->setContent($form->getHTML());
                     return;
@@ -188,121 +181,51 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
 
                 $mob = $this->saveMob();
                 if ($mob == null) {
-                    $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"), true);
+                    $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_file_upload"));
                     $form->setValuesByPost();
                     $this->tpl->setContent($form->getHTML());
                     return;
                 }
 
-                $apiFormat = $this->getMobFormat($mob->getId());
-                $apiUrl = $this->getSignedUrl($mob->getId(), ilWACSignedPath::MAX_LIFETIME);
+                $format = $this->getMobFormat($mob->getId());
+                $url = $this->getSignedUrl($mob->getId(), ilWACSignedPath::MAX_LIFETIME);
                 break;
 
             case self::PROP_TEXT:
                 // Save text as media object.
                 $content = $form->getInput(self::PROP_TEXTAREA);
                 $mob = $this->saveMob($content);
-                $apiFormat = "freetext";
-                $apiUrl = $this->getSignedUrl($mob->getId(), ilWACSignedPath::MAX_LIFETIME);
+                $format = "freetext";
+                $url = $this->getSignedUrl($mob->getId(), ilWACSignedPath::MAX_LIFETIME);
                 break;
         }
 
-        // Check url.
-        if (!$apiUrl || $apiUrl == "") {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_media_url_empty"), true);
-            $form->setValuesByPost();
-            $this->tpl->setContent($form->getHTML());
-            return;
-        }
-
-        // Check format.
-        if (!$apiFormat || $apiFormat == "") {
-            $this->tpl->setOnScreenMessage("failure", $this->plugin->txt("err_media_format_unknown"), true);
-            $form->setValuesByPost();
-            $this->tpl->setContent($form->getHTML());
-            return;
-        }
-
-        $apiLanguage = $form->getInput(self::PROP_LANG);
-        $apiAutomaticMode = false;
+        $language = $form->getInput(self::PROP_LANG);
 
         // Update object title if it differs from the current one.
-        if ($apiTitle != "" && $apiTitle != $this->obj_gui->getObject()->getTitle()) {
-            $this->obj_gui->getObject()->setTitle($apiTitle);
+        if (!empty($title) && $title != $this->obj_gui->getObject()->getTitle()) {
+            $this->obj_gui->getObject()->setTitle($title);
             $this->obj_gui->getObject()->update();
         }
 
-        $api = new ilNolejAPI();
-        $webhookUrl = ILIAS_HTTP_PATH . "/goto.php?target=xnlj_webhook";
-
-        $result = $api->post(
-            "/documents",
-            [
-                "userID" => $DIC->user()->getId(),
-                "organisationID" => ($DIC->settings()->get("short_inst_name") ?? "ILIAS") . " [ILIAS Plugin]",
-                "title" => $apiTitle,
-                "decrementedCredit" => $decrementedCredit,
-                "docURL" => $apiUrl,
-                "webhookURL" => $webhookUrl,
-                "mediaType" => $apiFormat,
-                "automaticMode" => $apiAutomaticMode,
-                "language" => $apiLanguage
-            ],
-            true
+        // Call Nolej creation API.
+        $errorMessage = $this->runCreation(
+            $title,
+            $language,
+            $url ?? "",
+            $format ?? "",
+            $decrementedCredit,
+            false
         );
-
-        if (!is_object($result) || !property_exists($result, "id") || !is_string($result->id)) {
-            $message = print_r($result, true);
-            if (property_exists($result, "errorMessage")) {
-                $message = sprintf(
-                    "<details><summary style='display: list-item;'>%s</summary><br><pre>%s</pre></details>",
-                    $result->errorMessage,
-                    print_r($result, true)
-                );
-            }
-            $this->tpl->setOnScreenMessage(
-                "failure",
-                sprintf(
-                    $this->plugin->txt("err_doc_response"),
-                    $message
-                )
-            );
+        if (null != $errorMessage) {
+            // Creation failed.
+            $this->tpl->setOnScreenMessage("failure", $errorMessage);
             $form->setValuesByPost();
             $this->tpl->setContent($form->getHTML());
             return;
         }
 
-        $this->db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DATA . " SET"
-                . " document_id = %s WHERE id = %s;",
-            ["text", "integer"],
-            [$result->id, $this->obj_gui->getObject()->getId()]
-        );
-
-        $this->db->manipulateF(
-            "INSERT INTO " . ilNolejPlugin::TABLE_DOC
-                . " (title, status, consumed_credit, doc_url, media_type, automatic_mode, language, document_id)"
-                . "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
-            ["text", "integer", "integer", "text", "text", "text", "text", "text"],
-            [
-                $this->obj_gui->getObject()->getTitle(),
-                ilNolejManagerGUI::STATUS_CREATION_PENDING,
-                $decrementedCredit,
-                $apiUrl,
-                $apiFormat,
-                ilUtil::tf2yn($apiAutomaticMode),
-                $apiLanguage,
-                $result->id
-            ]
-        );
-
-        $ass = new ilNolejActivity($result->id, $DIC->user()->getId(), "transcription");
-        $ass->withStatus("ok")
-            ->withCode(0)
-            ->withErrorMessage("")
-            ->withConsumedCredit($decrementedCredit)
-            ->store();
-
+        // Creation succedeed.
         $this->tpl->setOnScreenMessage("success", $this->plugin->txt("action_transcription"), true);
         $this->ctrl->redirectByClass(ilNolejTranscriptionFormGUI::class, ilNolejTranscriptionFormGUI::CMD_SHOW);
     }
@@ -320,8 +243,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $form->setTitle($this->plugin->txt("tab_creation"));
 
         if ($this->status != ilNolejManagerGUI::STATUS_CREATION) {
-            // Show module information.
-
+            // Show module information, no form tags.
             $form->setOpenTag(false);
             $form->setCloseTag(false);
 
@@ -341,71 +263,80 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             return $form;
         }
 
-        /**
-         * Module title
-         * By default is the Object title, it can be changed here.
-         */
+        // Module title. Defaults to Object title, it can be changed.
         $title = new ilTextInputGUI($this->plugin->txt("prop_" . self::PROP_TITLE), self::PROP_TITLE);
         $title->setInfo($this->plugin->txt("prop_" . self::PROP_TITLE . "_info"));
         $title->setValue($this->obj_gui->getObject()->getTitle());
         $title->setMaxLength(250);
         $form->addItem($title);
 
+        // Source language.
+        $language = new ilSelectInputGUI($this->plugin->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
+        $language->setInfo($this->plugin->txt("prop_" . self::PROP_LANG . "_info"));
+        $language->setOptions(array_map(fn($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED));
+        $language->setRequired(true);
+        $form->addItem($language);
+
         // Content limits.
         $limits = new ilNonEditableValueGUI();
         $limits->setInfo($this->contentLimitsInfo());
         $form->addItem($limits);
 
-        /**
-         * Choose a source to analyze.
-         * - Web (url):
-         *   - Web page content;
-         *   - Audio streaming;
-         *   - Video streaming.
-         * - MediaPool (mob_id)
-         * - Document (file upload)
-         * - Text (textarea)
-         */
+        // Source to analyze.
         $mediaSource = new ilRadioGroupInputGUI($this->plugin->txt("prop_" . self::PROP_MEDIA_SRC), self::PROP_MEDIA_SRC);
         $mediaSource->setRequired(true);
         $form->addItem($mediaSource);
+        $this->setSources($mediaSource);
 
-        /* Source: WEB or Streaming Audio/Video */
+        $form->setFormAction($this->ctrl->getFormAction($this));
+        $form->addCommandButton(self::CMD_SAVE, $this->plugin->txt("cmd_create"));
+
+        return $form;
+    }
+
+    /**
+     * Set possible sources to analyze.
+     * @param ilRadioGroupInputGUI $mediaSource
+     * @return null
+     */
+    protected function setSources($mediaSource): void
+    {
+        // Source: web (content or streaming audio/video.
         $mediaWeb = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_WEB), self::PROP_WEB);
         $mediaWeb->setInfo($this->plugin->txt("prop_" . self::PROP_WEB . "_info"));
         $mediaSource->addOption($mediaWeb);
 
-        /* Source URL */
+        // Source web URL.
         $url = new ilUriInputGUI($this->plugin->txt("prop_" . self::PROP_URL), self::PROP_URL);
         $url->setRequired(true);
         $mediaWeb->addSubItem($url);
 
-        /* Web Source Type */
+        // Source web type.
         $mediaSourceType = new ilRadioGroupInputGUI($this->plugin->txt("prop_" . self::PROP_WEB_SRC), self::PROP_WEB_SRC);
         $mediaSourceType->setRequired(true);
         $mediaWeb->addSubItem($mediaSourceType);
 
-        /* Source Web page content */
+        // Source web page content.
         $srcContent = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_CONTENT), self::PROP_CONTENT);
         $srcContent->setInfo($this->plugin->txt("prop_" . self::PROP_CONTENT . "_info"));
         $mediaSourceType->addOption($srcContent);
 
-        /* Source Audio */
+        // Source web audio.
         $srcAudio = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_AUDIO), self::PROP_AUDIO);
         $srcAudio->setInfo($this->plugin->txt("prop_" . self::PROP_AUDIO . "_info"));
         $mediaSourceType->addOption($srcAudio);
 
-        /* Source Video: YouTube, Vimeo, Wistia */
+        // Source web video.
         $srcVideo = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_VIDEO), self::PROP_VIDEO);
         $srcVideo->setInfo($this->plugin->txt("prop_" . self::PROP_VIDEO . "_info"));
         $mediaSourceType->addOption($srcVideo);
 
-        /* Source: Media from MediaPool */
+        // Source: Media Object from MediaPool.
         $mediaMob = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_MOB), self::PROP_MOB);
         $mediaMob->setInfo($this->plugin->txt("prop_" . self::PROP_MOB . "_info"));
         $mediaSource->addOption($mediaMob);
 
-        /* Mob ID */
+        // Source Media Object ID.
         $mob = new ilFormSectionHeaderGUI();
         $mobIdInput = new ilHiddenInputGUI(self::PROP_MOB_ID);
         $tree = $this->getPoolSelectorGUI();
@@ -451,91 +382,37 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $mediaMob->addSubItem($mob);
         $mediaMob->addSubItem($mobIdInput);
 
-        /**
-         * Source: File upload
-         * Upload audio/video/documents/text files in the plugin data directory.
-         * The media type is taken from the file extension.
-         */
+        // Source: file upload.
         $mediaFile = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_FILE), self::PROP_FILE);
         $mediaFile->setInfo($this->plugin->txt("prop_" . self::PROP_FILE . "_info"));
         $mediaSource->addOption($mediaFile);
 
-        /* File upload */
+        // Source file upload input.
         $file = new ilFileInputGUI("", self::PROP_INPUT_FILE);
         $file->setRequired(true);
         $file->setSuffixes(ilNolejAPI::TYPE_SUPPORTED);
         $mediaFile->addSubItem($file);
 
-        /**
-         * Source: Text
-         * Write an html text that need to be saved just like uploaded files
-         * (with .html extension).
-         */
+        // Source: text.
         $mediaText = new ilRadioOption($this->plugin->txt("prop_" . self::PROP_TEXT), self::PROP_TEXT);
         $mediaText->setInfo($this->plugin->txt("prop_" . self::PROP_TEXT . "_info"));
         $mediaSource->addOption($mediaText);
 
-        /* Text area */
+        // Source text content.
         $txt = new ilTextAreaInputGUI("", self::PROP_TEXTAREA);
         $txt->setRows(50);
         $txt->setMinNumOfChars(500);
         $txt->setMaxNumOfChars(50000);
         $txt->usePurifier(false);
         if (ilObjAdvancedEditing::_getRichTextEditor() === "tinymce") {
+            // Use TinyMCE text editor.
             $txt->setUseRte(true);
-            $txt->setRteTags([
-                "h1",
-                "h2",
-                "h3",
-                "p",
-                "ul",
-                "ol",
-                "li",
-                "br",
-                "strong",
-                "u",
-                "i",
-            ]);
+            $txt->setRteTags(["h1", "h2", "h3", "p", "ul", "ol", "li", "br", "strong", "u", "i"]);
             $txt->setRTERootBlockElement("");
-            $txt->disableButtons([
-                "charmap",
-                "justifyright",
-                "justifyleft",
-                "justifycenter",
-                "justifyfull",
-                "alignleft",
-                "aligncenter",
-                "alignright",
-                "alignjustify",
-                "anchor",
-                "pasteword"
-            ]);
-            // $txt->setPurifier(\ilHtmlPurifierFactory::_getInstanceByType('frm_post'));
+            $txt->disableButtons(["charmap", "anchor"]);
         }
         $txt->setRequired(true);
         $mediaText->addSubItem($txt);
-
-        /**
-         * Source language
-         */
-        $language = new ilSelectInputGUI($this->plugin->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
-        $language->setInfo($this->plugin->txt("prop_" . self::PROP_LANG . "_info"));
-        $language->setOptions([
-            "en" => $this->lng->txt("meta_l_en"),
-            "fr" => $this->lng->txt("meta_l_fr"),
-            "it" => $this->lng->txt("meta_l_it"),
-            "de" => $this->lng->txt("meta_l_de"),
-            "pt" => $this->lng->txt("meta_l_pt"),
-            "es" => $this->lng->txt("meta_l_es"),
-            "nl" => $this->lng->txt("meta_l_nl")
-        ]);
-        $language->setRequired(true);
-        $form->addItem($language);
-
-        $form->setFormAction($this->ctrl->getFormAction($this));
-        $form->addCommandButton(self::CMD_SAVE, $this->plugin->txt("cmd_create"));
-
-        return $form;
     }
 
     /**
@@ -614,6 +491,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
     /**
      * Show video selector modal.
      * @param string $filter
+     * @return void
      */
     public function showMediaSelector($filter = "")
     {
@@ -865,5 +743,100 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             return self::PROP_DOC;
         }
         return "";
+    }
+
+    /**
+     * Call Nolej API to create the module.
+     * @param string $title
+     * @param string $language
+     * @param string $url
+     * @param string $format
+     * @param int $decrementedCredit
+     * @param bool $automaticMode
+     * @return ?string error message, null on success.
+     */
+    public function runCreation(
+        $title,
+        $language,
+        $url,
+        $format,
+        $decrementedCredit = 1,
+        $automaticMode = false
+    ): ?string {
+        global $DIC;
+
+        // Check url.
+        if (empty($url)) {
+            return $this->plugin->txt("err_media_url_empty");
+        }
+
+        // Check format.
+        if (empty($format)) {
+            return $this->plugin->txt("err_media_format_unknown");
+        }
+
+        $api = new ilNolejAPI();
+        $webhookUrl = ILIAS_HTTP_PATH . "/goto.php?target=xnlj_webhook";
+        $orgName = $DIC->settings()->get("short_inst_name") ?? "ILIAS";
+
+        $result = $api->post(
+            "/documents",
+            [
+                "userID" => $DIC->user()->getId(),
+                "organisationID" => "{$orgName} [ILIAS Plugin]",
+                "title" => $title,
+                "decrementedCredit" => $decrementedCredit,
+                "docURL" => $url,
+                "webhookURL" => $webhookUrl,
+                "mediaType" => $format,
+                "automaticMode" => $automaticMode,
+                "language" => $language
+            ],
+            true
+        );
+
+        // Check for creation errors.
+        if (!is_object($result) || !property_exists($result, "id") || !is_string($result->id)) {
+            // An error occurred.
+            $message = print_r($result, true);
+            if (property_exists($result, "errorMessage")) {
+                $summary = $result->errorMessage;
+                $content = print_r($result, true);
+                $message = "<details><summary style='display:list-item;'>{$summary}</summary><br><pre>{$content}</pre></details>";
+            }
+            return sprintf($this->plugin->txt("err_doc_response"), $message);
+        }
+
+        $this->db->manipulateF(
+            "UPDATE " . ilNolejPlugin::TABLE_DATA . " SET document_id = %s WHERE id = %s;",
+            ["text", "integer"],
+            [$result->id, $this->obj_gui->getObject()->getId()]
+        );
+
+        $this->db->manipulateF(
+            "INSERT INTO " . ilNolejPlugin::TABLE_DOC
+                . " (title, status, consumed_credit, doc_url, media_type, automatic_mode, language, document_id)"
+                . "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+            ["text", "integer", "integer", "text", "text", "text", "text", "text"],
+            [
+                $this->obj_gui->getObject()->getTitle(),
+                ilNolejManagerGUI::STATUS_CREATION_PENDING,
+                $decrementedCredit,
+                $url,
+                $format,
+                ilUtil::tf2yn($automaticMode),
+                $language,
+                $result->id
+            ]
+        );
+
+        $ass = new ilNolejActivity($result->id, $DIC->user()->getId(), "transcription");
+        $ass->withStatus("ok")
+            ->withCode(0)
+            ->withErrorMessage("")
+            ->withConsumedCredit($decrementedCredit)
+            ->store();
+
+        return null;
     }
 }

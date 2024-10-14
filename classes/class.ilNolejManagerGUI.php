@@ -57,6 +57,9 @@ class ilNolejManagerGUI
     /** @var int */
     public const STATUS_COMPLETED = 8;
 
+    /** @var int */
+    public const STATUS_FAILED = 8;
+
     /** @var ilCtrl */
     protected ilCtrl $ctrl;
 
@@ -170,32 +173,32 @@ class ilNolejManagerGUI
 
         switch ($next_class) {
             case strtolower(ilNolejCreationFormGUI::class):
-                $formGui = new ilNolejCreationFormGUI($this->obj_gui, $this);
+                $formGui = new ilNolejCreationFormGUI($this);
                 $this->ctrl->forwardCommand($formGui);
                 break;
 
             case strtolower(ilNolejTranscriptionFormGUI::class):
-                $formGui = new ilNolejTranscriptionFormGUI($this->obj_gui, $this);
+                $formGui = new ilNolejTranscriptionFormGUI($this);
                 $this->ctrl->forwardCommand($formGui);
                 break;
 
             case strtolower(ilNolejConceptsFormGUI::class):
-                $formGui = new ilNolejConceptsFormGUI($this->obj_gui, $this);
+                $formGui = new ilNolejConceptsFormGUI($this);
                 $this->ctrl->forwardCommand($formGui);
                 break;
 
             case strtolower(ilNolejQuestionsFormGUI::class):
-                $formGui = new ilNolejQuestionsFormGUI($this->obj_gui, $this);
+                $formGui = new ilNolejQuestionsFormGUI($this);
                 $this->ctrl->forwardCommand($formGui);
                 break;
 
             case strtolower(ilNolejSummaryFormGUI::class):
-                $formGui = new ilNolejSummaryFormGUI($this->obj_gui, $this);
+                $formGui = new ilNolejSummaryFormGUI($this);
                 $this->ctrl->forwardCommand($formGui);
                 break;
 
             case strtolower(ilNolejActivitiesFormGUI::class):
-                $formGui = new ilNolejActivitiesFormGUI($this->obj_gui, $this);
+                $formGui = new ilNolejActivitiesFormGUI($this);
                 $this->ctrl->forwardCommand($formGui);
                 break;
 
@@ -243,6 +246,15 @@ class ilNolejManagerGUI
                 $this->defaultClass = ilNolejActivitiesFormGUI::class;
                 break;
         }
+    }
+
+    /**
+     * Get the current ObjectGUI.
+     * @return ilObjNolejGUI
+     */
+    public function getObjectGUI()
+    {
+        return $this->obj_gui;
     }
 
     /**
