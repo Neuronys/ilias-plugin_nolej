@@ -61,7 +61,7 @@ class ilTextAreaInputGUI extends \ilTextAreaInputGUI
 
         $value = $this->getInput();
 
-        foreach ($this->regex as $regex){
+        foreach ($this->regex as $regex) {
             if (!preg_match($regex["pattern"], $value)) {
                 $this->setAlert($regex["alert"]);
                 return false;
