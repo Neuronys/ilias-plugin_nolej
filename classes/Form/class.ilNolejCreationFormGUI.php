@@ -276,7 +276,12 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         // Source language.
         $language = new ilSelectInputGUI($this->plugin->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
         $language->setInfo($this->plugin->txt("prop_" . self::PROP_LANG . "_info"));
-        $language->setOptions(array_map(fn ($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED));
+        $language->setOptions(
+            array_combine(
+                ilNolejAPI::LANG_SUPPORTED,
+                array_map(fn ($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED)
+            )
+        );
         $language->setRequired(true);
         $form->addItem($language);
 
