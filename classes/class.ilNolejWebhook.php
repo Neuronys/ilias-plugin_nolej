@@ -22,7 +22,7 @@ class ilNolejWebhook
     protected $data;
 
     /** @var bool */
-    protected $shouldDie = false;
+    protected $shouldExit = false;
 
     public function __construct()
     {
@@ -41,7 +41,7 @@ class ilNolejWebhook
         if ($data == null) {
             header("Content-type: application/json; charset=UTF-8");
             $data = json_decode(file_get_contents("php://input"), true);
-            $this->shouldDie = true;
+            $this->shouldExit = true;
         }
 
         if (
@@ -95,12 +95,12 @@ class ilNolejWebhook
     ) {
         if (!empty($message)) {
             $this->plugin->log("Replied to Nolej with message: " . $message);
-            if ($this->shouldDie) {
+            if ($this->shouldExit) {
                 echo json_encode(["message" => $message]);
             }
         }
 
-        if (!$this->shouldDie) {
+        if (!$this->shouldExit) {
             return false;
         }
 
@@ -167,6 +167,7 @@ class ilNolejWebhook
 
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
 
         if (
             $this->data["status"] != "\"ok\"" &&
@@ -175,13 +176,16 @@ class ilNolejWebhook
             $this->plugin->log("Result: ko");
 
             $result = $db->manipulateF(
-                "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
-                ["integer", "integer", "text"],
-                [ilNolejManagerGUI::STATUS_CREATION, $this->data["consumedCredit"], $documentId]
+                "UPDATE " . ilNolejPlugin::TABLE_DOC . " consumed_credit = %s WHERE document_id = %s;",
+                ["integer", "text"],
+                [$this->data["consumedCredit"], $documentId]
             );
             if (!$result) {
                 $this->exitWithMessage(404, "Document not found.");
             }
+
+            // Back to creation state.
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_CREATION);
 
             $this->sendNotification(
                 $documentId,
@@ -214,7 +218,6 @@ class ilNolejWebhook
         if (!in_array($document["media_type"], [ilNolejCreationFormGUI::PROP_AUDIO, ilNolejCreationFormGUI::PROP_VIDEO])) {
             $this->plugin->log("Starting analysis automatically for document: {$documentId}");
 
-            $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
             $transcriptionGui = new ilNolejTranscriptionFormGUI($manager);
             $transcriptionGui->downloadTranscription();
             $errorMessage = $transcriptionGui->runAnalysis($document->title, null);
@@ -327,6 +330,7 @@ class ilNolejWebhook
 
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
 
         if (
             $this->data["status"] != "\"ok\"" &&
@@ -342,6 +346,8 @@ class ilNolejWebhook
             if (!$result) {
                 $this->exitWithMessage(404, "Document not found.");
             }
+
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
 
             $this->sendNotification(
                 $documentId,
@@ -362,22 +368,15 @@ class ilNolejWebhook
         }
 
         $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DOC
-                . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
-            [
-                "integer",
-                "integer",
-                "text"
-            ],
-            [
-                ilNolejManagerGUI::STATUS_REVISION,
-                $this->data["consumedCredit"],
-                $documentId
-            ]
+            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
+            ["integer", "text"],
+            [$this->data["consumedCredit"], $documentId]
         );
         if (!$result) {
             $this->exitWithMessage(404, "Document not found.");
         }
+
+        $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_REVISION);
 
         $this->sendNotification(
             $documentId,
@@ -453,9 +452,19 @@ class ilNolejWebhook
             return;
         }
 
+        $result = $db->manipulateF(
+            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
+            ["integer", "text"],
+            [$this->data["consumedCredit"], $documentId]
+        );
+        if (!$result) {
+            $this->exitWithMessage(404, "Document not found.");
+        }
+
         $document = $db->fetchAssoc($result);
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
 
         if (
             $this->data["status"] != "\"ok\"" &&
@@ -477,19 +486,11 @@ class ilNolejWebhook
                     $this->data["error_message"]
                 ]
             );
+
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ACTIVITIES);
             return;
         }
 
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
-            ["integer", "integer", "text"],
-            [ilNolejManagerGUI::STATUS_COMPLETED, $this->data["consumedCredit"], $documentId]
-        );
-        if (!$result) {
-            $this->exitWithMessage(404, "Document not found.");
-        }
-
-        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
         $fails = $manager->downloadActivities();
         if (!empty($fails)) {
             $this->plugin->log("Failed to download some activities: " . $fails . ".");
@@ -505,9 +506,12 @@ class ilNolejWebhook
                 [$fails]
             );
 
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_COMPLETED);
             $this->exitWithMessage(200, "Activities received, but something went wrong while retrieving them.");
             return;
         }
+
+        $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_COMPLETED);
 
         $this->sendNotification(
             $documentId,
