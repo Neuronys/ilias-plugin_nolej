@@ -27,7 +27,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
             $this->renderer->render($this->manager->getWorkflow()->withActive(5))
         );
 
-        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALYSIS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }

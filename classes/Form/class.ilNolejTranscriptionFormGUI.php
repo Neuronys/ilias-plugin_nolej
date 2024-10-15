@@ -31,7 +31,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             $this->renderer->render($this->manager->getWorkflow()->withActive(1))
         );
 
-        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALYSIS) {
             $this->tpl->setContent($this->infoBox($this->plugin->txt("err_transcription_not_ready")));
             return;
         }
@@ -112,7 +112,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         // Module transcription.
         $content = $this->manager->readDocumentFile("transcription.htm");
 
-        if ($this->status != ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status != ilNolejManagerGUI::STATUS_ANALYSIS) {
             $form->setTitle($objTitle);
             $form->setDescription($content ? $content : "---");
             return $form;
@@ -166,7 +166,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
      */
     public function downloadTranscription()
     {
-        if ($this->status < ilNolejManagerGUI::STATUS_ANALISYS) {
+        if ($this->status < ilNolejManagerGUI::STATUS_ANALYSIS) {
             // Transcription is not ready!
             return $this->plugin->txt("err_transcription_not_ready");
         }
@@ -264,7 +264,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             return "An error occurred: " . print_r($result, true);
         }
 
-        $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ANALISYS_PENDING);
+        $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ANALYSIS_PENDING);
 
         $ass = new ilNolejActivity($this->documentId, $DIC->user()->getId(), "analysis");
         $ass->withStatus("ok")

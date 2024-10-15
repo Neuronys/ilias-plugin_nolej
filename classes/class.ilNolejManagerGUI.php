@@ -37,10 +37,10 @@ class ilNolejManagerGUI
     public const STATUS_CREATION_PENDING = 1;
 
     /** @var int */
-    public const STATUS_ANALISYS = 2;
+    public const STATUS_ANALYSIS = 2;
 
     /** @var int */
-    public const STATUS_ANALISYS_PENDING = 3;
+    public const STATUS_ANALYSIS_PENDING = 3;
 
     /** @var int */
     public const STATUS_REVISION = 4;
@@ -230,8 +230,8 @@ class ilNolejManagerGUI
                 $this->defaultClass = ilNolejCreationFormGUI::class;
                 break;
 
-            case self::STATUS_ANALISYS:
-            case self::STATUS_ANALISYS_PENDING:
+            case self::STATUS_ANALYSIS:
+            case self::STATUS_ANALYSIS_PENDING:
                 $this->defaultClass = ilNolejTranscriptionFormGUI::class;
                 break;
 
@@ -268,7 +268,7 @@ class ilNolejManagerGUI
             $this->status,
             [
                 self::STATUS_CREATION_PENDING,
-                self::STATUS_ANALISYS_PENDING,
+                self::STATUS_ANALYSIS_PENDING,
                 self::STATUS_ACTIVITIES_PENDING,
             ]
         );
@@ -367,20 +367,20 @@ class ilNolejManagerGUI
                 ),
             $workflow->step(
                 $this->plugin->txt("tab_analysis"),
-                $this->status == self::STATUS_ANALISYS_PENDING
+                $this->status == self::STATUS_ANALYSIS_PENDING
                     ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_analysis")
                     : "",
                 $this->ctrl->getLinkTargetByClass([self::class, ilNolejTranscriptionFormGUI::class], ilNolejTranscriptionFormGUI::CMD_SHOW)
             )
                 ->withAvailability(
-                    $this->status < self::STATUS_ANALISYS
+                    $this->status < self::STATUS_ANALYSIS
                         ? Step::NOT_AVAILABLE
                         : Step::AVAILABLE
                 )
                 ->withStatus(
-                    $this->status <= self::STATUS_ANALISYS
+                    $this->status <= self::STATUS_ANALYSIS
                         ? Step::NOT_STARTED
-                        : ($this->status == self::STATUS_ANALISYS_PENDING ? Step::IN_PROGRESS : Step::SUCCESSFULLY)
+                        : ($this->status == self::STATUS_ANALYSIS_PENDING ? Step::IN_PROGRESS : Step::SUCCESSFULLY)
                 ),
             $workflow->step(
                 $this->plugin->txt("review_concepts"),

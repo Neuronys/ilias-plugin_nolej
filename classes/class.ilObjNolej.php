@@ -168,6 +168,41 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
+     * Get document status text.
+     * @return string
+     */
+    public function getDocumentStatusInfo(): string
+    {
+        $status = $this->getDocumentStatus();
+        switch ($status) {
+            case ilNolejManagerGUI::STATUS_CREATION:
+                return $this->plugin->txt("tab_creation");
+
+            case ilNolejManagerGUI::STATUS_CREATION_PENDING:
+                return $this->plugin->txt("action_transcription");
+
+            case ilNolejManagerGUI::STATUS_ANALYSIS:
+                return $this->plugin->txt("action_transcription_ok");
+
+            case ilNolejManagerGUI::STATUS_ANALYSIS_PENDING:
+                return $this->plugin->txt("action_analysis");
+
+            case ilNolejManagerGUI::STATUS_REVISION:
+            case ilNolejManagerGUI::STATUS_ACTIVITIES:
+                return $this->plugin->txt("action_analysis_ok");
+
+            case ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING:
+                return $this->plugin->txt("action_activities");
+
+            case ilNolejManagerGUI::STATUS_COMPLETED:
+                return $this->plugin->txt("action_activities_ok");
+
+            case ilNolejManagerGUI::STATUS_FAILED:
+                return "";
+        }
+    }
+
+    /**
      * Get document source.
      * @return string
      */

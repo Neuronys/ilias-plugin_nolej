@@ -86,7 +86,16 @@ class ilObjNolejListGUI extends ilObjectPluginListGUI
             $props[] = [
                 "alert" => true,
                 "property" => $this->txt("prop_status"),
-                "value" => $this->txt("prop_offline")
+                "value" => $this->txt("prop_offline"),
+            ];
+        }
+
+        if ($this->checkCommandAccess("write", "", $this->ref_id, $this->type)) {
+            $object = new ilObjNolej($this->ref_id);
+            $props[] = [
+                "alert" => false,
+                "property" => $this->plugin->txt("plugin_title"),
+                "value" => $object->getDocumentStatusInfo(),
             ];
         }
 
