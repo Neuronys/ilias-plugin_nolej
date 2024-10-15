@@ -82,7 +82,8 @@ concepts_use_for_dtw#:#Utilizza per Trascina la parola
 concepts_use_for_ftw#:#Utilizza per Trova la parola
 concepts_use_for_gaming#:#Utilizza per i giochi
 concepts_use_for_practice#:#Utilizza per le Carte concettuali
-configuration_title#:#Configura
+config_interval#:#Intervallo di aggiornamento
+config_interval_info#:#Specifica ogni quanto Nolej deve verificare aggiornamenti sulle attività (in secondi, minimo 1).
 content_loading#:#Caricamento del contenuto...
 crs_create_xnlj#:#Crea oggetto NOLEJ
 document_id#:#Document ID
@@ -227,4 +228,3 @@ xnlj_new#:#Aggiungi un oggetto NOLEJ
 xnlj_read#:#Lettura: l'utente può accedere agli oggetti NOLEJ
 xnlj_visible#:#Visibilità: gli oggetti NOLEJ sono visibili all'utente
 xnlj_write#:#Modifica impostazioni: l'utente può modificare le impostazioni degli oggetti NOLEJ
-

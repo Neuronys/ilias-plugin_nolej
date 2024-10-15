@@ -16,36 +16,36 @@ action_transcription_ko#:#Transkription fehlgeschlagen
 action_transcription_ko_desc#:#Leider ist die Transkription des Dokuments „%s“ am %s fehlgeschlagen. Fehlermeldungen
 action_transcription_ok#:#Die Transkription ist fertig
 action_transcription_ok_desc#:#Die Transkription des Dokuments „%s“ wurde am %s abgeschlossen. Sie können es jetzt überprüfen und mit der Analyse beginnen.
-Activities_crossword#:#Kreuzworträtsel
-Activities_cw_words#:#Definiert, wie viele Wörter in der Kreuzworträtselaktivität verwendet werden sollen
-Activities_dragtheword#:#Ziehen Sie das Wort
-Activities_dtw_words#:#Definiert, wie viele Wörter in der Ziehen Sie das Wort-Aktivität verwendet werden sollen
-Activities_findtheword#:#Finde das Wort
-Activities_flashcards_flashcards#:#Definiert, wie viele Karten in der konzeptionellen Bewertungsaktivität erscheinen sollen
-Activities_ftw_words#:#Definiert, wie viele Wörter in der Aktivität „Wortsuche“ verwendet werden sollen
-Activities_generation_start#:#Ausgewählte Aktivitäten werden generiert; Sie erhalten eine Benachrichtigung, wenn sie fertig sind. Es kann bis zu 1 Minute dauern.
-Activities_glossary#:#Glossar
-Activities_grade#:#Konzeptionelle Bewertung
-Activities_grade_questions#:#Definiert, wie viele Fragen in der konzeptionellen Bewertungsaktivität erscheinen sollen
-Activities_gradeq#:#Kontextbezogene Bewertung
-Activities_gradeq_questions#:#Definiert, wie viele Fragen in der kontextbezogenen Bewertungsaktivität angezeigt werden sollen
-Activities_hoquestions#:#Fragen höherer Ordnung
-Activities_ibook#:#Interaktives Buch
-Activities_ivideo#:#Interaktives Video
-Activities_ivideo_questions#:#Definiert, wie viele Fragen in der interaktiven Videoaktivität vorgeschlagen werden sollen. Es gibt zwei Sets: eines in der Mitte des Videos, eines am Ende
-Activities_ivideo_summary#:#Definiert, ob die Zusammenfassung am Ende der interaktiven Videoaktivität hinzugefügt wird
-Activities_ko#:#Aktivitätsgenerierung fehlgeschlagen: %s
-Activities_not_downloaded#:#Aktivitätsdatei kann nicht auf der Festplatte gefunden werden.
-Activities_not_yet_generated#:#Aktivitäten für dieses Dokument wurden noch nicht generiert.
-Activities_practice#:#Konzeptionelle Karten
-Activities_practice_flashcards#:#Definiert, wie viele Fragen in der konzeptionellen Lernkartenaktivität erscheinen sollen
-Activities_practiceq#:#Kontextbezogene Lernkarten
-Activities_practiceq_flashcards#:#Definiert, wie viele Fragen in der kontextbezogenen Lernkartenaktivität erscheinen sollen
-Activities_select#:#Wählen Sie eine Aktivität aus
-Activities_selected#:#NOLEJ-Aktivität: %s aus dem Modul „%s“.
-Activities_settings#:#Verfeinern Sie die Details, bevor Sie die Aktivitäten generieren
-Activities_summary#:#Zusammenfassung
-Activities_use_in_ibook#:#Diese Aktivität im Modul-Inhalt anzeigen
+activities_crossword#:#Kreuzworträtsel
+activities_cw_words#:#Definiert, wie viele Wörter in der Kreuzworträtselaktivität verwendet werden sollen
+activities_dragtheword#:#Ziehen Sie das Wort
+activities_dtw_words#:#Definiert, wie viele Wörter in der Ziehen Sie das Wort-Aktivität verwendet werden sollen
+activities_findtheword#:#Finde das Wort
+activities_flashcards_flashcards#:#Definiert, wie viele Karten in der konzeptionellen Bewertungsaktivität erscheinen sollen
+activities_ftw_words#:#Definiert, wie viele Wörter in der Aktivität „Wortsuche“ verwendet werden sollen
+activities_generation_start#:#Ausgewählte Aktivitäten werden generiert; Sie erhalten eine Benachrichtigung, wenn sie fertig sind. Es kann bis zu 1 Minute dauern.
+activities_glossary#:#Glossar
+activities_grade#:#Konzeptionelle Bewertung
+activities_grade_questions#:#Definiert, wie viele Fragen in der konzeptionellen Bewertungsaktivität erscheinen sollen
+activities_gradeq#:#Kontextbezogene Bewertung
+activities_gradeq_questions#:#Definiert, wie viele Fragen in der kontextbezogenen Bewertungsaktivität angezeigt werden sollen
+activities_hoquestions#:#Fragen höherer Ordnung
+activities_ibook#:#Interaktives Buch
+activities_ivideo#:#Interaktives Video
+activities_ivideo_questions#:#Definiert, wie viele Fragen in der interaktiven Videoaktivität vorgeschlagen werden sollen. Es gibt zwei Sets: eines in der Mitte des Videos, eines am Ende
+activities_ivideo_summary#:#Definiert, ob die Zusammenfassung am Ende der interaktiven Videoaktivität hinzugefügt wird
+activities_ko#:#Aktivitätsgenerierung fehlgeschlagen: %s
+activities_not_downloaded#:#Aktivitätsdatei kann nicht auf der Festplatte gefunden werden.
+activities_not_yet_generated#:#Aktivitäten für dieses Dokument wurden noch nicht generiert.
+activities_practice#:#Konzeptionelle Karten
+activities_practice_flashcards#:#Definiert, wie viele Fragen in der konzeptionellen Lernkartenaktivität erscheinen sollen
+activities_practiceq#:#Kontextbezogene Lernkarten
+activities_practiceq_flashcards#:#Definiert, wie viele Fragen in der kontextbezogenen Lernkartenaktivität erscheinen sollen
+activities_select#:#Wählen Sie eine Aktivität aus
+activities_selected#:#NOLEJ-Aktivität: %s aus dem Modul „%s“.
+activities_settings#:#Verfeinern Sie die Details, bevor Sie die Aktivitäten generieren
+activities_summary#:#Zusammenfassung
+activities_use_in_ibook#:#Diese Aktivität im Modul-Inhalt anzeigen
 api_key#:#API-Schlüssel
 api_key_info#:#Ihr NOLEJ-API-Schlüssel.
 cat_create_xnlj#:#NOLEJ-Objekt erstellen
@@ -67,22 +67,23 @@ cmd_select#:#Medien aus dem Medienpool auswählen
 cmd_update#:#Aktualisieren
 cmd_webhook_call#:#Überprüfen Sie den aktuellen Status
 cmd_webhook_call_info#:#Wenn Sie lange auf das Ergebnis der Operation gewartet haben, können Sie versuchen, den Status mit dem NOLEJ-Server zu synchronisieren. Tatsächlich ist es möglich, wenn auch selten, dass die Antwort unterwegs verloren ging ...
-Concepts_definition#:#Definition
-Konzepte_enable#:#Konzept aktiviert
-Concepts_game_cw#:#Kreuzworträtsel
-Concepts_game_dtw#:#Ziehen Sie das Wort
-Concepts_game_ftw#:#Finde das Wort
-Concepts_games#:#Verfügbare Spiele
-Concepts_label#:#Etikette
-Concepts_Sprache#:#Sprache
-Concepts_saved#:#Konzepte wurden aktualisiert.
-Concepts_use_for_assessment#:#Zur Bewertung verwenden
-Concepts_use_for_cw#:#Für Kreuzworträtsel verwenden
-Concepts_use_for_dtw#:#Zu Ziehen des Wortes verwenden
-Concepts_use_for_ftw#:#Verwenden Sie diese Option, um das Wort zu finden
-Concepts_use_for_gaming#:#Für Spiele verwenden
-Concepts_use_for_practice#:#Für Konzeptkarten verwenden
-configuration_title#:#Konfigurieren
+concepts_definition#:#Definition
+concepts_enable#:#Konzept aktiviert
+concepts_game_cw#:#Kreuzworträtsel
+concepts_game_dtw#:#Ziehen Sie das Wort
+concepts_game_ftw#:#Finde das Wort
+concepts_games#:#Verfügbare Spiele
+concepts_label#:#Etikette
+concepts_Sprache#:#Sprache
+concepts_saved#:#Konzepte wurden aktualisiert.
+concepts_use_for_assessment#:#Zur Bewertung verwenden
+concepts_use_for_cw#:#Für Kreuzworträtsel verwenden
+concepts_use_for_dtw#:#Zu Ziehen des Wortes verwenden
+concepts_use_for_ftw#:#Verwenden Sie diese Option, um das Wort zu finden
+concepts_use_for_gaming#:#Für Spiele verwenden
+concepts_use_for_practice#:#Für Konzeptkarten verwenden
+config_interval#:#Update interval
+config_interval_info#:#Specifies how often Nolej should check for activity updates (in seconds, minimum 1).
 content_loading#:#Inhalt wird geladen...
 crs_create_xnlj#:#NOLEJ-Objekt erstellen
 document_id#:#Document ID

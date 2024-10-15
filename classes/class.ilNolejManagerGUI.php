@@ -217,7 +217,7 @@ class ilNolejManagerGUI
     }
 
     /**
-     * Get status and set default cmd
+     * Get status and set default cmd.
      * @return void
      */
     protected function statusCheck()
@@ -336,13 +336,19 @@ class ilNolejManagerGUI
 
         ilYuiUtil::initConnection($this->tpl);
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
-        $this->tpl->addJavaScript(ilNolejPlugin::PLUGIN_DIR . "/js/nolej.js");
 
         if ($this->isStatusPending()) {
+            $this->tpl->addJavaScript(ilNolejPlugin::PLUGIN_DIR . "/js/updates.js");
+            $interval = (int) $this->plugin->getConfig("interval", "1");
+
+            $this->ctrl->setParameter($this->obj_gui, "ref_id", $this->obj_gui->getObject()->getRefId());
+            $redirectToUrl = $this->ctrl->getLinkTarget($this->status == self::STATUS_ACTIVITIES_PENDING ? $this->obj_gui : $this);
+
             $this->ctrl->setParameter($this, "document_id", $this->documentId);
             $this->ctrl->setParameter($this, "status", $this->status);
             $updateUrl = $this->ctrl->getLinkTarget($this, self::CMD_CHECK_UPDATES);
-            $this->tpl->addOnLoadCode("xnlj_check_updates('{$updateUrl}')");
+
+            $this->tpl->addOnLoadCode("xnlj_check_updates('{$updateUrl}', '{$redirectToUrl}', {$interval});");
         }
 
         $steps = [
@@ -444,11 +450,13 @@ class ilNolejManagerGUI
     }
 
     /**
+     * Return a glyphicon html.
      * @param string $id
+     * @return string
      */
     public static function glyphicon($id)
     {
-        return "<span class=\"glyphicon glyphicon-" . $id . "\" aria-hidden=\"true\"></span> ";
+        return "<span class=\"glyphicon glyphicon-{$id}\" aria-hidden=\"true\"></span> ";
     }
 
     /**
@@ -459,29 +467,30 @@ class ilNolejManagerGUI
      */
     protected function checkUpdates(): void
     {
-        global $DIC;
-
+        // Required params.
         if (!isset($_GET["document_id"], $_GET["status"])) {
             exit(0);
         }
 
+        $documentId = $_GET["document_id"];
+        $currentStatus = $_GET["status"];
+
+        // Fetch document data.
         $set = $this->db->queryF(
-            "SELECT `action` FROM " . ilNolejPlugin::TABLE_ACTIVITY
-                . " WHERE document_id = %s AND user_id = %s"
-                . " ORDER BY tstamp DESC LIMIT 1",
-            ["text", "integer"],
-            [$_GET["document_id"], $DIC->user()->getId()]
+            "SELECT `status` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s;",
+            ["text"],
+            [$documentId]
         );
+
         $row = $this->db->fetchAssoc($set);
         if (!$row) {
+            // Document not found.
             exit(0);
         }
 
-        if (
-            $row["action"] == ($_GET["status"] . "_ok") ||
-            $row["action"] == ($_GET["status"] . "_ko")
-        ) {
-            echo "reload";
+        if ($row["status"] != $currentStatus) {
+            // Document updated.
+            echo "update";
         }
 
         exit(0);

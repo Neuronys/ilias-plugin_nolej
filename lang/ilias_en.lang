@@ -82,7 +82,8 @@ concepts_use_for_dtw#:#Use for Drag the word
 concepts_use_for_ftw#:#Use for Find the word
 concepts_use_for_gaming#:#Use for gaming
 concepts_use_for_practice#:#Use for Concept cards
-configuration_title#:#Configure
+config_interval#:#Update interval
+config_interval_info#:#Specifies how often Nolej should check for activity updates (in seconds, minimum 1).
 content_loading#:#Content is loading...
 crs_create_xnlj#:#Create NOLEJ object
 document_id#:#Document ID
@@ -227,4 +228,3 @@ xnlj_new#:#Add a NOLEJ object
 xnlj_read#:#Read: User has read access to NOLEJ objects
 xnlj_visible#:#Visible: NOLEJ object is visible
 xnlj_write#:#Edit Settings: User can edit settings of NOLEJ objects
-

@@ -108,16 +108,17 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
      * Init configuration form.
      * @return ilPropertyFormGUI form object
      */
-    public function initConfigureForm()
+    public function initConfigurationForm()
     {
         $this->initTabs(self::TAB_CONFIGURE);
 
         $form = new ilPropertyFormGUI();
 
         $section = new ilFormSectionHeaderGUI();
-        $section->setTitle($this->plugin->txt("configuration_title"));
+        $section->setTitle($this->lng->txt("settings"));
         $form->addItem($section);
 
+        // API Key.
         $api_key = new ilPasswordInputGUI($this->plugin->txt("api_key"), "api_key");
         $api_key->setMaxLength(100);
         $api_key->setRetype(false);
@@ -126,6 +127,13 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
         $api_key->setInfo($this->plugin->txt("api_key_info"));
         $api_key->setValue(ilNolejAPI::hasKey() ? self::SECRET : ""); // Hide key for security.
         $form->addItem($api_key);
+
+        // Updates interval.
+        $interval = new ilNumberInputGUI($this->plugin->txt("config_interval"), "interval");
+        $interval->setRequired(true);
+        $interval->setInfo($this->plugin->txt("config_interval_info"));
+        $interval->setValue($this->plugin->getConfig("interval", "1"));
+        $form->addItem($interval);
 
         $form->addCommandButton(self::CMD_SAVE, $this->plugin->txt("cmd_save"));
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -140,7 +148,7 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        $form = $this->initConfigureForm();
+        $form = $this->initConfigurationForm();
 
         // Check form input.
         if (!$form->checkInput()) {
@@ -156,6 +164,9 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
             $this->plugin->saveConfig("api_key", $api_key);
         }
 
+        // Save interval.
+        $this->plugin->saveConfig("interval", $form->getInput("interval"));
+
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
     }
 
@@ -167,7 +178,7 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        $form = $this->initConfigureForm();
+        $form = $this->initConfigurationForm();
         $DIC->ui()->mainTemplate()->setContent($form->getHTML());
     }
 }
