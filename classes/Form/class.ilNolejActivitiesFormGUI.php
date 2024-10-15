@@ -198,6 +198,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
     {
         $form = new ilPropertyFormGUI();
         $form->setTitle($this->plugin->txt("activities_settings"));
+        $form->setShowTopButtons(false);
 
         $this->manager->getNolejContent("settings", "settings.json", !$usePost);
         $json = $this->manager->readDocumentFile("settings.json");
