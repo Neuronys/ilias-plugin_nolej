@@ -121,6 +121,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         }
 
         $form->setTitle($this->plugin->txt("tab_analysis"));
+        $form->setShowTopButtons(false);
 
         // Document title.
         $title = $this->obj_gui->getObject()->getDocumentTitle();

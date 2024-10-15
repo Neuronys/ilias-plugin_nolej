@@ -244,6 +244,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
 
         $form = new ilPropertyFormGUI();
         $form->setTitle($this->plugin->txt("tab_creation"));
+        $form->setShowTopButtons(false);
 
         if ($this->status != ilNolejManagerGUI::STATUS_CREATION) {
             // Show module information, no form tags.
