@@ -81,7 +81,7 @@ concepts_use_for_ftw#:#Utilizza per Trova la parola
 concepts_use_for_gaming#:#Utilizza per i giochi
 concepts_use_for_practice#:#Utilizza per le Carte concettuali
 config_interval#:#Intervallo di aggiornamento
-config_interval_info#:#Specifica ogni quanto Nolej deve verificare aggiornamenti sulle attività (in secondi, minimo 1).
+config_interval_info#:#Specifica ogni quanto Nolej deve verificare aggiornamenti sulle attività (in secondi).
 content_loading#:#Caricamento del contenuto...
 crs_create_xnlj#:#Crea oggetto NOLEJ
 document_id#:#Document ID

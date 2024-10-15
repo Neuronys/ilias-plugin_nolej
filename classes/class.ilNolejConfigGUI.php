@@ -133,6 +133,8 @@ class ilNolejConfigGUI extends ilPluginConfigGUI
         $interval->setRequired(true);
         $interval->setInfo($this->plugin->txt("config_interval_info"));
         $interval->setValue($this->plugin->getConfig("interval", "1"));
+        $interval->allowDecimals(false);
+        $interval->setMinValue(1, true);
         $form->addItem($interval);
 
         $form->addCommandButton(self::CMD_SAVE, $this->plugin->txt("cmd_save"));
