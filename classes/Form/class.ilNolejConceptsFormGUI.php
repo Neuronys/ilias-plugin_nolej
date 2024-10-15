@@ -139,14 +139,14 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
         $form->addItem($length_input);
         for ($i = 0; $i < $length; $i++) {
             $section = new ilFormSectionHeaderGUI();
-            $section->setTitle(sprintf($this->plugin->txt("concepts_n"), $i + 1));
+            $section->setTitle($concepts[$i]->concept->label);
             $form->addItem($section);
 
             $id = new ilHiddenInputGUI("concept_{$i}_id");
             $id->setValue($concepts[$i]->id);
             $form->addItem($id);
 
-            $label = new ilNonEditableValueGUI(
+            $label = new ilTextInputGUI(
                 $this->plugin->txt("concepts_label"),
                 "concept_{$i}_label"
             );
@@ -165,7 +165,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
             );
             $definition->usePurifier(false);
             $definition->setRows(4);
-            $enable->addSubItem($definition);
+            $form->addItem($definition);
 
             $availableGames = $concepts[$i]->concept->available_games;
             $useForGaming = new ilCheckboxInputGUI(
@@ -189,7 +189,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
             );
 
             if ($availableGames != null && is_array($availableGames) && count($availableGames) > 0) {
-                $enable->addSubItem($useForGaming);
+                $form->addItem($useForGaming);
 
                 if (in_array("cw", $concepts[$i]->concept->available_games)) {
                     $useForGaming->addSubItem($useForCW);
@@ -208,7 +208,7 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
                 $this->plugin->txt("concepts_use_for_practice"),
                 "concept_{$i}_practice"
             );
-            $enable->addSubItem($useForPractice);
+            $form->addItem($useForPractice);
 
             $language = new ilHiddenInputGUI("concept_{$i}_language");
             $language->setValue($concepts[$i]->concept->language);
