@@ -313,43 +313,27 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
             }
         }
 
-        $steps = [
-            $this->factory->listing()->workflow()->step(
-                sprintf(
-                    "%s (%d)",
-                    $this->plugin->txt("questions_type_all"),
-                    $length
-                ),
-                "",
-                $this->ctrl->getLinkTarget($this, self::CMD_SHOW)
-            )
-                ->withAvailability(Step::AVAILABLE)
-                ->withStatus(Step::IN_PROGRESS)
+        // Use view control to filter questions.
+        $target = $this->ctrl->getLinkTarget($this, self::CMD_SHOW);
+        $all = sprintf("%s (%d)", $this->plugin->txt("questions_type_all"), $length);
+        $actions = [
+            $all => $target,
         ];
 
-        $selectedIndex = 0;
-        $i = 1;
+        $selectedAction = $all;
         foreach ($questionTypes as $type => $count) {
-            $this->ctrl->setParameter($this, "filter_type", $type);
             $title = $this->plugin->txt("questions_type_{$type}");
-            $steps[] = $this->factory->listing()->workflow()->step(
-                "{$title} ({$count})",
-                "",
-                $this->ctrl->getLinkTarget($this, self::CMD_SHOW)
-            )
-                ->withAvailability(Step::AVAILABLE)
-                ->withStatus(Step::IN_PROGRESS);
+            $key = "{$title} ({$count})";
+            $actions[$key] = "{$target}&filter_type={$type}";
             if ($type == $questionTypeFilter) {
-                $selectedIndex = $i;
+                $selectedAction = $key;
             }
-            $i++;
         }
-        $wf = $this->factory->listing()->workflow()->linear($this->plugin->txt("questions_question_type"), $steps);
+        $viewControl = $this->factory->viewControl()
+            ->mode($actions, $this->plugin->txt("questions_question_type"))
+            ->withActive($selectedAction);
 
-        // TODO: Use toolbar selector.
-        $this->tpl->setLeftContent(
-            $this->renderer->render($wf->withActive($selectedIndex))
-        );
+        $form->setDescription($this->renderer->render([$this->factory->divider()->horizontal(), $viewControl]));
 
         $this->ctrl->setParameter($this, "filter_type", $questionTypeFilter);
         $form->addCommandButton(self::CMD_SAVE, $this->lng->txt("save"));
