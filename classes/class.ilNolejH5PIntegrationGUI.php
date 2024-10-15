@@ -269,7 +269,7 @@ class ilNolejH5PIntegrationGUI
             $this->ctrl->setParameter($this, "ref_id", $_GET["ref_id"]);
             $this->toolbar->addComponent(
                 $this->factory->button()->standard(
-                    $this->lng->txt("edit_content"),
+                    $this->plugin->txt("edit_h5p"),
                     $this->ctrl->getLinkTarget($this, self::CMD_EDIT)
                 )
             );

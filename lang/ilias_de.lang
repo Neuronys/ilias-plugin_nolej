@@ -60,8 +60,6 @@ cmd_details#:#Details
 cmd_edit#:#Bearbeiten
 cmd_generate#:#Aktivitäten generieren
 cmd_insert#:#Einfügen
-cmd_review#:#Bewertung bestätigen
-cmd_review_info#:#Sobald Sie die Zusammenfassung sowie jede Frage und jedes Konzept überprüft haben, können Sie mit der Erstellung von H5P-Aktivitäten fortfahren.
 cmd_save#:#Speichern
 cmd_select#:#Medien aus dem Medienpool auswählen
 cmd_update#:#Aktualisieren
@@ -87,6 +85,7 @@ config_interval_info#:#Specifies how often Nolej should check for activity updat
 content_loading#:#Inhalt wird geladen...
 crs_create_xnlj#:#NOLEJ-Objekt erstellen
 document_id#:#Document ID
+edit_h5p#:#Edit H5P
 err_access_denied#:#Sie können nicht auf diesen Kurs zugreifen.
 err_activities_get#:#Einige der generierten Aktivitäten können nicht abgerufen werden: %s. Bitte versuchen Sie erneut, die Aktivitäten zu generieren.
 err_analysis_not_ready#:#Die Analyse ist noch nicht fertig, bitte warten Sie und überprüfen Sie es erneut.

@@ -60,8 +60,6 @@ cmd_details#:#Dettagli
 cmd_edit#:#Modifica
 cmd_generate#:#Genera attività
 cmd_insert#:#Inserisci
-cmd_review#:#Conferma revisione
-cmd_review_info#:#Se hai revisionato il sommario, tutte le domande e i concetti, puoi procedere con la creazione degli oggetti H5P.
 cmd_save#:#Salva
 cmd_select#:#Seleziona un oggetto dal mediapool
 cmd_update#:#Aggiorna
@@ -87,6 +85,7 @@ config_interval_info#:#Specifica ogni quanto Nolej deve verificare aggiornamenti
 content_loading#:#Caricamento del contenuto...
 crs_create_xnlj#:#Crea oggetto NOLEJ
 document_id#:#Document ID
+edit_h5p#:#Modifica H5P
 err_access_denied#:#Non puoi accedere a questo corso.
 err_activities_get#:#Impossibile ottenere alcune delle attività generate: %s. Riprova a generare nuovamente le attività.
 err_analysis_not_ready#:#L'analisi non è ancora completa, attendi ancora un po' di tempo e torna qui per verificare.
