@@ -113,10 +113,8 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
         $content = $this->manager->readDocumentFile("transcription.htm");
 
         if ($this->status != ilNolejManagerGUI::STATUS_ANALISYS) {
-            $transcription = new ilFormSectionHeaderGUI();
-            $transcription->setTitle($objTitle);
-            $transcription->setInfo($content == false ? "--" : $content);
-            $form->addItem($transcription);
+            $form->setTitle($objTitle);
+            $form->setDescription($content ? $content : "---");
             return $form;
         }
 
