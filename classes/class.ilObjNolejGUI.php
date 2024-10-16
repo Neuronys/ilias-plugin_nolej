@@ -15,6 +15,7 @@ use ILIAS\UI\Component\Listing\Workflow\Step;
 
 /**
  * @ilCtrl_isCalledBy ilObjNolejGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
+ * @ilCtrl_Calls ilObjNolejGUI: ilLearningProgressGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilCommonActionDispatcherGUI
  * @ilCtrl_Calls ilObjNolejGUI: ilNolejManagerGUI
  */
