@@ -211,6 +211,13 @@ class ilObjNolejGUI extends ilObjectPluginGUI
                 $this->txt("tab_" . self::TAB_PROPERTIES),
                 $this->ctrl->getLinkTarget($this, self::CMD_PROPERTIES_EDIT)
             );
+
+            // LP tab.
+            // $this->tabs->addTab(
+            //     "learning_progress",
+            //     $this->lng->txt("learning_progress"),
+            //     $this->ctrl->getLinkTargetByClass(ilLearningProgressGUI::class)
+            // );
         }
 
         // Standard permission tab.

@@ -398,22 +398,4 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     {
         return false;
     }
-
-    /**
-     * Return the view mode for this object LP.
-     * @return int
-     */
-    public function getViewMode()
-    {
-        return ilContainer::VIEW_SIMPLE;
-    }
-
-    /**
-     * Get the course participant object.
-     * @return ilCourseParticipant
-     */
-    public function getMemberObject(): ilCourseParticipant
-    {
-        return ilCourseParticipant::_getInstanceByObjId($this->getId(), $this->user->getId());
-    }
 }
