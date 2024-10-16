@@ -262,10 +262,10 @@ class ilNolejManagerGUI
      * @param int $status
      * @return bool
      */
-    protected function isStatusPending()
+    public static function isStatusPending($status)
     {
         return in_array(
-            $this->status,
+            $status,
             [
                 self::STATUS_CREATION_PENDING,
                 self::STATUS_ANALYSIS_PENDING,
@@ -280,7 +280,7 @@ class ilNolejManagerGUI
      */
     protected function webhookCall(): void
     {
-        if (!$this->isStatusPending()) {
+        if (!$this->isStatusPending($this->status)) {
             $this->ctrl->redirectByClass($this->defaultClass, ilNolejFormGUI::CMD_SHOW);
             return;
         }
@@ -301,30 +301,6 @@ class ilNolejManagerGUI
     }
 
     /**
-     * Print a caller to the last webhook.
-     * @return string
-     */
-    public function getWebhookCallBox(): string
-    {
-        global $DIC;
-        $factory = $DIC->ui()->factory();
-        $renderer = $DIC->ui()->renderer();
-
-        $buttons = [
-            $factory->button()->standard(
-                $this->plugin->txt("cmd_webhook_call"),
-                $this->ctrl->getLinkTarget($this, self::CMD_WEBHOOK_CALL)
-            )
-        ];
-
-        return $renderer->render(
-            $factory->messageBox()
-                ->confirmation($this->plugin->txt("cmd_webhook_call_info"))
-                ->withButtons($buttons)
-        );
-    }
-
-    /**
      * Get the activity management workflow, follows current status.
      * @return \ILIAS\UI\Component\Listing\Workflow\Linear
      */
@@ -337,7 +313,7 @@ class ilNolejManagerGUI
         ilYuiUtil::initConnection($this->tpl);
         $this->tpl->addCss(ilNolejPlugin::PLUGIN_DIR . "/css/nolej.css");
 
-        if ($this->isStatusPending()) {
+        if ($this->isStatusPending($this->status)) {
             $this->tpl->addJavaScript(ilNolejPlugin::PLUGIN_DIR . "/js/updates.js");
             $interval = (int) $this->plugin->getConfig("interval", "1");
 

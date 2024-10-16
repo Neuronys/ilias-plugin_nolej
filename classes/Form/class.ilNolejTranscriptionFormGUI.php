@@ -79,7 +79,7 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
 
         // Start analysis.
         $errorMessage = $this->runAnalysis($title, $transcription, false);
-        if (null != $errorMessage) {
+        if (!empty($errorMessage)) {
             // An error occurred.
             $this->tpl->setOnScreenMessage("failure", $errorMessage);
             $this->manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
@@ -210,9 +210,9 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
      * @param string $title
      * @param ?string $transcription null to start analysis with no transcription changes.
      * @param bool $automaticMode
-     * @return ?string $errorMessage null on success
+     * @return string $errorMessage empty on success
      */
-    public function runAnalysis($title, $transcription = null, $automaticMode = false): ?string
+    public function runAnalysis($title, $transcription = null, $automaticMode = false): string
     {
         global $DIC;
 
@@ -273,6 +273,6 @@ class ilNolejTranscriptionFormGUI extends ilNolejFormGUI
             ->withConsumedCredit(0)
             ->store();
 
-        return null;
+        return "";
     }
 }

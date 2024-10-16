@@ -259,10 +259,52 @@ class ilObjNolejGUI extends ilObjectPluginGUI
     public function addInfoItems(ilInfoScreenGUI $info): void
     {
         $info->addSection($this->plugin->txt("plugin_title"));
+
+        // Document ID.
         $info->addProperty(
             $this->plugin->txt("document_id"),
             $this->object->getDocumentId()
         );
+
+        // Status.
+        $info->addProperty(
+            $this->lng->txt("status"),
+            $this->object->getDocumentStatusInfo() . $this->lastWebhookCallModal()
+        );
+    }
+
+    /**
+     * Get the last webhook call modal button.
+     * @return string
+     */
+    protected function lastWebhookCallModal()
+    {
+        global $DIC;
+
+        if (!ilNolejManagerGUI::isStatusPending($this->object->getDocumentStatus())) {
+            return "";
+        }
+
+        $factory = $DIC->ui()->factory();
+        $renderer = $DIC->ui()->renderer();
+
+        $webhookCallUrl = $this->ctrl->getLinkTargetByClass(ilNolejManagerGUI::class, ilNolejManagerGUI::CMD_WEBHOOK_CALL);
+
+        $modal = $factory->modal()->roundtrip(
+            $this->plugin->txt("cmd_webhook_call"),
+            $factory->messageBox()->confirmation($this->plugin->txt("cmd_webhook_call_info"))
+        )->withActionButtons([
+            $factory->button()->primary($this->plugin->txt("cmd_webhook_call"), $webhookCallUrl),
+        ]);
+
+        $button = $factory->button()->standard($this->plugin->txt("cmd_webhook_call"), "#")
+            ->withOnClick($modal->getShowSignal());
+
+        return $renderer->render([
+            $factory->divider()->horizontal(),
+            $modal,
+            $button
+        ]);
     }
 
     /**

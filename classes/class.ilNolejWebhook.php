@@ -175,14 +175,11 @@ class ilNolejWebhook
         ) {
             $this->plugin->log("Result: ko");
 
-            $result = $db->manipulateF(
+            $db->manipulateF(
                 "UPDATE " . ilNolejPlugin::TABLE_DOC . " consumed_credit = %s WHERE document_id = %s;",
                 ["integer", "text"],
                 [$this->data["consumedCredit"], $documentId]
             );
-            if (!$result) {
-                $this->exitWithMessage(404, "Document not found.");
-            }
 
             // Back to creation state.
             $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_CREATION);
@@ -205,14 +202,11 @@ class ilNolejWebhook
             return;
         }
 
-        $result = $db->manipulateF(
+        $db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
             ["integer", "integer", "text"],
             [ilNolejManagerGUI::STATUS_ANALYSIS, $this->data["consumedCredit"], $documentId]
         );
-        if (!$result) {
-            $this->exitWithMessage(404, "Document not found.");
-        }
 
         // Start analysis if the source is not audio or video.
         if (!in_array($document["media_type"], [ilNolejCreationFormGUI::PROP_AUDIO, ilNolejCreationFormGUI::PROP_VIDEO])) {
@@ -221,7 +215,7 @@ class ilNolejWebhook
             $transcriptionGui = new ilNolejTranscriptionFormGUI($manager);
             $transcriptionGui->downloadTranscription();
             $errorMessage = $transcriptionGui->runAnalysis($document->title, null);
-            if (null !== $errorMessage) {
+            if (!empty($errorMessage)) {
                 // An error occurred.
                 $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
 
@@ -338,14 +332,11 @@ class ilNolejWebhook
         ) {
             $this->plugin->log("Result: ko");
 
-            $result = $db->manipulateF(
+            $db->manipulateF(
                 "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
                 ["integer", "integer", "text"],
                 [ilNolejManagerGUI::STATUS_ANALYSIS, $this->data["consumedCredit"], $documentId]
             );
-            if (!$result) {
-                $this->exitWithMessage(404, "Document not found.");
-            }
 
             $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
 
@@ -367,14 +358,11 @@ class ilNolejWebhook
             return;
         }
 
-        $result = $db->manipulateF(
+        $db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
             ["integer", "text"],
             [$this->data["consumedCredit"], $documentId]
         );
-        if (!$result) {
-            $this->exitWithMessage(404, "Document not found.");
-        }
 
         $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_REVISION);
 
@@ -452,19 +440,16 @@ class ilNolejWebhook
             return;
         }
 
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
-            ["integer", "text"],
-            [$this->data["consumedCredit"], $documentId]
-        );
-        if (!$result) {
-            $this->exitWithMessage(404, "Document not found.");
-        }
-
         $document = $db->fetchAssoc($result);
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
         $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
+
+        $db->manipulateF(
+            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
+            ["integer", "text"],
+            [$this->data["consumedCredit"], $documentId]
+        );
 
         if (
             $this->data["status"] != "\"ok\"" &&

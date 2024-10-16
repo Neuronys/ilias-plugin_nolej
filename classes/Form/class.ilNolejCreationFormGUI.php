@@ -220,7 +220,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             $decrementedCredit,
             false
         );
-        if (null != $errorMessage) {
+        if (!empty($errorMessage)) {
             // Creation failed.
             $this->tpl->setOnScreenMessage("failure", $errorMessage);
             $form->setValuesByPost();
@@ -762,7 +762,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
      * @param string $format
      * @param int $decrementedCredit
      * @param bool $automaticMode
-     * @return ?string error message, null on success.
+     * @return string error message, empty on success.
      */
     public function runCreation(
         $title,
@@ -771,7 +771,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $format,
         $decrementedCredit = 1,
         $automaticMode = false
-    ): ?string {
+    ): string {
         global $DIC;
 
         // Check url.
@@ -846,6 +846,6 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             ->withConsumedCredit($decrementedCredit)
             ->store();
 
-        return null;
+        return "";
     }
 }
