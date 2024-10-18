@@ -299,3 +299,23 @@ if($ilDB->tableExists("rep_robj_xnlj_tic")) {
 }
 
 ?>
+
+<#4>
+<?php
+
+// Fix H5P `authors` and `changes` column.
+if ($ilDB->tableExists("rep_robj_xhfp_cont")) {
+    $ilDB->manipulateF(
+        "UPDATE rep_robj_xhfp_cont SET `authors` = %s WHERE `authors` = %s",
+        ["text", "text"],
+        ["[]", "[\"-\"]"]
+    );
+
+    $ilDB->manipulateF(
+        "UPDATE rep_robj_xhfp_cont SET `changes` = %s WHERE `changes` = %s",
+        ["text", "text"],
+        ["[]", "[\"-\"]"]
+    );
+}
+
+?>
