@@ -158,7 +158,7 @@ class ilNolejWebhook
             ["text", "text", "text", "integer"],
             [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_CREATION_PENDING]
         );
-        if ($db->numRows($result) != 1) {
+        if ($db->numRows($result) == 0) {
             $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
@@ -315,7 +315,7 @@ class ilNolejWebhook
             ["text", "text", "text", "integer"],
             [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ANALYSIS_PENDING]
         );
-        if ($db->numRows($result) != 1) {
+        if ($db->numRows($result) == 0) {
             $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
@@ -435,7 +435,7 @@ class ilNolejWebhook
             ["text", "text", "text", "integer"],
             [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING]
         );
-        if ($db->numRows($result) != 1) {
+        if ($db->numRows($result) == 0) {
             $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
