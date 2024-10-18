@@ -314,7 +314,7 @@ if ($ilDB->tableExists("rep_robj_xhfp_cont")) {
     $ilDB->manipulateF(
         "UPDATE rep_robj_xhfp_cont SET `changes` = %s WHERE `changes` = %s",
         ["text", "text"],
-        ["[]", "[\"-\"]"]
+        ["[]", "[\"\"]"]
     );
 }
 
