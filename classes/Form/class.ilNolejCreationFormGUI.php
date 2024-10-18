@@ -274,6 +274,17 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $title->setMaxLength(250);
         $form->addItem($title);
 
+        // Content limits.
+        $limits = new ilNonEditableValueGUI();
+        $limits->setInfo($this->contentLimitsInfo());
+        $form->addItem($limits);
+
+        // Source to analyze.
+        $mediaSource = new ilRadioGroupInputGUI($this->plugin->txt("prop_" . self::PROP_MEDIA_SRC), self::PROP_MEDIA_SRC);
+        $mediaSource->setRequired(true);
+        $form->addItem($mediaSource);
+        $this->setSources($mediaSource);
+
         // Source language.
         $language = new ilSelectInputGUI($this->plugin->txt("prop_" . self::PROP_LANG), self::PROP_LANG);
         $language->setInfo($this->plugin->txt("prop_" . self::PROP_LANG . "_info"));
@@ -285,17 +296,6 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         );
         $language->setRequired(true);
         $form->addItem($language);
-
-        // Content limits.
-        $limits = new ilNonEditableValueGUI();
-        $limits->setInfo($this->contentLimitsInfo());
-        $form->addItem($limits);
-
-        // Source to analyze.
-        $mediaSource = new ilRadioGroupInputGUI($this->plugin->txt("prop_" . self::PROP_MEDIA_SRC), self::PROP_MEDIA_SRC);
-        $mediaSource->setRequired(true);
-        $form->addItem($mediaSource);
-        $this->setSources($mediaSource);
 
         $form->setFormAction($this->ctrl->getFormAction($this));
         $form->addCommandButton(self::CMD_SAVE, $this->plugin->txt("cmd_create"));
