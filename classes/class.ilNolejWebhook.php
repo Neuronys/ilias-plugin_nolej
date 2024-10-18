@@ -142,7 +142,7 @@ class ilNolejWebhook
         $documentId = $this->data["documentID"];
 
         $result = $db->queryF(
-            "SELECT a.user_id, d.title"
+            "SELECT a.user_id, d.title, d.media_type"
                 . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
                 . " INNER JOIN ("
                 . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
