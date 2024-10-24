@@ -46,8 +46,8 @@ This plugin currently supports the following languages:
 Note: this branch is for ILIAS 8. If you have ILIAS 6 or 7,
 see [branch release_7](https://github.com/Neuronys/ilias-robj_nolej/tree/release_7).
 
-* ILIAS 8.x
-* [H5P Repository plugin](https://github.com/srsolutionsag/H5P) installed and updated (tested wih version `5.0.11`).
+* ILIAS 8.x - 9.x
+* [H5P Repository plugin](https://github.com/srsolutionsag/H5P) installed and updated (tested wih version `5.x` and `6.x`)
 
 ## Installation
 
