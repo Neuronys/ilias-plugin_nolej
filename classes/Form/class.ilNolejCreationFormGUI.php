@@ -807,12 +807,9 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         // Check for creation errors.
         if (!is_object($result) || !property_exists($result, "id") || !is_string($result->id)) {
             // An error occurred.
-            $message = print_r($result, true);
-            if (property_exists($result, "Error")) {
-                $summary = $result->Error;
-                $content = print_r($result, true);
-                $message = "<details><summary style='display:list-item;'>{$summary}</summary><br><pre>{$content}</pre></details>";
-            }
+            $message = property_exists($result, "Error")
+                ? $result->Error
+                : "<pre>" . print_r($result, true) . "</pre>";
             return sprintf($this->plugin->txt("err_doc_response"), $message);
         }
 
