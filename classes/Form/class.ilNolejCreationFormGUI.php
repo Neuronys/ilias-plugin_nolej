@@ -291,7 +291,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $language->setOptions(
             array_combine(
                 ilNolejAPI::LANG_SUPPORTED,
-                array_map(fn($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED)
+                array_map(fn ($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED)
             )
         );
         $language->setRequired(true);
