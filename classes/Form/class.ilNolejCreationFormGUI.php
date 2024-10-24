@@ -291,7 +291,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $language->setOptions(
             array_combine(
                 ilNolejAPI::LANG_SUPPORTED,
-                array_map(fn ($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED)
+                array_map(fn($lang) => $this->lng->txt("meta_l_{$lang}"), ilNolejAPI::LANG_SUPPORTED)
             )
         );
         $language->setRequired(true);
@@ -799,7 +799,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                 "webhookURL" => $webhookUrl,
                 "mediaType" => $format,
                 "automaticMode" => $automaticMode,
-                "language" => $language
+                "language" => $language,
             ],
             true
         );
@@ -835,7 +835,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
                 $format,
                 ilUtil::tf2yn($automaticMode),
                 $language,
-                $result->id
+                $result->id,
             ]
         );
 

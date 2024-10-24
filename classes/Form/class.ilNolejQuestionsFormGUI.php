@@ -127,7 +127,7 @@ class ilNolejQuestionsFormGUI extends ilNolejFormGUI
                 "question" => $question,
                 "question_type" => $questionType,
                 "distractors" => $distractors,
-                "selected_distractor" => $selectedDistractor
+                "selected_distractor" => $selectedDistractor,
             ];
         }
 

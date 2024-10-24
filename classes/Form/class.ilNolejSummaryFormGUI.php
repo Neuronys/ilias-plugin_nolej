@@ -68,7 +68,7 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
         $summary = [
             "summary" => [],
             "abstract" => "",
-            "keypoints" => []
+            "keypoints" => [],
         ];
 
         // Summary.
@@ -79,7 +79,7 @@ class ilNolejSummaryFormGUI extends ilNolejFormGUI
             if (!empty($title) && !empty($txt)) {
                 $summary["summary"][] = [
                     "title" => $title,
-                    "text" => $txt
+                    "text" => $txt,
                 ];
             }
         }

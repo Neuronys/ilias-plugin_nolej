@@ -196,7 +196,7 @@ class ilNolejWebhook
                 [
                     $document["title"],
                     ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $this->data["error_message"]
+                    $this->data["error_message"],
                 ]
             );
             return;
@@ -225,23 +225,23 @@ class ilNolejWebhook
                     ->withErrorMessage($errorMessage)
                     ->withConsumedCredit(0)
                     ->store();
-            }
 
-            $this->sendNotification(
-                $documentId,
-                (int) $document["user_id"],
-                "transcription_ko",
-                $this->data["status"],
-                400,
-                $errorMessage,
-                $this->data["consumedCredit"],
-                "action_transcription_ko_desc",
-                [
-                    $document["title"],
-                    ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $errorMessage
-                ]
-            );
+                $this->sendNotification(
+                    $documentId,
+                    (int) $document["user_id"],
+                    "transcription_ko",
+                    $this->data["status"],
+                    400,
+                    $errorMessage,
+                    $this->data["consumedCredit"],
+                    "action_transcription_ko_desc",
+                    [
+                        $document["title"],
+                        ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
+                        $errorMessage,
+                    ]
+                );
+            }
 
             return;
         }
@@ -258,7 +258,7 @@ class ilNolejWebhook
             [
                 $document["title"],
                 ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                $this->data["error_message"]
+                $this->data["error_message"],
             ]
         );
 
@@ -352,7 +352,7 @@ class ilNolejWebhook
                 [
                     $document["title"],
                     ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $this->data["error_message"]
+                    $this->data["error_message"],
                 ]
             );
             return;
@@ -378,7 +378,7 @@ class ilNolejWebhook
             [
                 $document["title"],
                 ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                $this->data["error_message"]
+                $this->data["error_message"],
             ]
         );
 
@@ -468,7 +468,7 @@ class ilNolejWebhook
                 [
                     $document["title"],
                     ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $this->data["error_message"]
+                    $this->data["error_message"],
                 ]
             );
 
@@ -508,7 +508,7 @@ class ilNolejWebhook
             "action_activities_ok_desc",
             [
                 $document["title"],
-                ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX))
+                ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
             ]
         );
         $this->exitWithMessage(200, "Activities received!");

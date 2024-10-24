@@ -80,7 +80,7 @@ class ilNolejActivitiesFormGUI extends ilNolejFormGUI
         $settingsToSave = [
             "settings" => $settings["settings"],
             "avaible_packages" => $availableActivities,
-            "desired_packages" => []
+            "desired_packages" => [],
         ];
 
         for ($i = 0, $len = count($availableActivities); $i < $len; $i++) {

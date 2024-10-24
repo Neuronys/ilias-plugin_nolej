@@ -88,8 +88,8 @@ class ilNolejConceptsFormGUI extends ilNolejFormGUI
                         "label" => $label,
                         "language" => $language,
                         "definition" => $definition,
-                        "available_games" => $games
-                    ]
+                        "available_games" => $games,
+                    ],
                 ];
             }
         }
