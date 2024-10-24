@@ -214,7 +214,7 @@ class ilNolejWebhook
 
             $transcriptionGui = new ilNolejTranscriptionFormGUI($manager);
             $transcriptionGui->downloadTranscription();
-            $errorMessage = $transcriptionGui->runAnalysis($document->title, null);
+            $errorMessage = $transcriptionGui->runAnalysis($document["title"], null);
             if (!empty($errorMessage)) {
                 // An error occurred.
                 $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
