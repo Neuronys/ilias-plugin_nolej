@@ -476,6 +476,8 @@ class ilNolejWebhook
             return;
         }
 
+        $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_COMPLETED);
+
         $fails = $manager->downloadActivities();
         if (!empty($fails)) {
             $this->plugin->log("Failed to download some activities: " . $fails . ".");
@@ -491,12 +493,9 @@ class ilNolejWebhook
                 [$fails]
             );
 
-            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_COMPLETED);
             $this->exitWithMessage(200, "Activities received, but something went wrong while retrieving them.");
             return;
         }
-
-        $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_COMPLETED);
 
         $this->sendNotification(
             $documentId,
