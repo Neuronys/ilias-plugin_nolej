@@ -808,8 +808,8 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         if (!is_object($result) || !property_exists($result, "id") || !is_string($result->id)) {
             // An error occurred.
             $message = print_r($result, true);
-            if (property_exists($result, "errorMessage")) {
-                $summary = $result->errorMessage;
+            if (property_exists($result, "Error")) {
+                $summary = $result->Error;
                 $content = print_r($result, true);
                 $message = "<details><summary style='display:list-item;'>{$summary}</summary><br><pre>{$content}</pre></details>";
             }
