@@ -20,7 +20,7 @@
 class ilObjNolejListGUI extends ilObjectPluginListGUI
 {
     /**
-     * Init type
+     * Init type.
      */
     public function initType(): void
     {
@@ -31,7 +31,7 @@ class ilObjNolejListGUI extends ilObjectPluginListGUI
      * Get name of gui class handling the commands
      * @return string
      */
-    function getGuiClass(): string
+    public function getGuiClass(): string
     {
         return "ilObjNolejGUI";
     }
@@ -40,7 +40,7 @@ class ilObjNolejListGUI extends ilObjectPluginListGUI
      * Get commands
      * @return array
      */
-    function initCommands(): array
+    public function initCommands(): array
     {
         $this->commands_enabled = true;
         $this->copy_enabled = false;
@@ -61,33 +61,42 @@ class ilObjNolejListGUI extends ilObjectPluginListGUI
         $this->tags_enabled = false;
         $this->timings_enabled = false;
 
-        return array(
-            array(
+        return [
+            [
                 "permission" => "read",
                 "cmd" => ilObjNolejGUI::CMD_CONTENT_SHOW,
                 "default" => true
-            )
-        );
+            ]
+        ];
     }
 
     /**
      * Get item properties
      *
-     * @return array array of property arrays:
-     * "alert" (boolean) => display as an alert property (usually in red)
-     * "property" (string) => property name
-     * "value" (string) => property value
+     * @return array of array properties:
+     * - "alert" (boolean) => display as an alert property (usually in red)
+     * - "property" (string) => property name
+     * - "value" (string) => property value
      */
-    function getProperties(): array
+    public function getProperties(): array
     {
-        $props = array();
+        $props = [];
 
         if (ilObjNolejAccess::_isOffline($this->obj_id)) {
-            $props[] = array(
+            $props[] = [
                 "alert" => true,
                 "property" => $this->txt("prop_status"),
-                "value" => $this->txt("prop_offline")
-            );
+                "value" => $this->txt("prop_offline"),
+            ];
+        }
+
+        if ($this->checkCommandAccess("write", "", $this->ref_id, $this->type)) {
+            $object = new ilObjNolej($this->ref_id);
+            $props[] = [
+                "alert" => false,
+                "property" => $this->plugin->txt("plugin_title"),
+                "value" => $object->getDocumentStatusInfo(),
+            ];
         }
 
         return $props;

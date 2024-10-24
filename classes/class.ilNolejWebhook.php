@@ -10,47 +10,38 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/NolejActivity.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejActivityManagementGUI.php";
-
 /**
  * This class takes care of the calls to the webhook.
  */
 class ilNolejWebhook
 {
-    /** @var ilNolejConfig */
-    protected $config;
+    /** @var ilNolejPlugin */
+    protected $plugin;
 
     /** @var array */
     protected $data;
 
     /** @var bool */
-    protected $shouldDie = false;
+    protected $shouldExit = false;
 
     public function __construct()
     {
-        $this->config = new ilNolejConfig();
-    }
-
-    /**
-     * @param string $msg
-     */
-    public function log($msg)
-    {
-        $this->config->logger->log($msg);
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/Notification/class.ilNolejActivity.php";
+        require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejManagerGUI.php";
+        $this->plugin = ilNolejPlugin::getInstance();
     }
 
     /**
      * Parse the request from POST content if
      * @param mixed $data is not null
+     * @return void
      */
     public function parse($data = null)
     {
         if ($data == null) {
             header("Content-type: application/json; charset=UTF-8");
             $data = json_decode(file_get_contents("php://input"), true);
-            $this->shouldDie = true;
+            $this->shouldExit = true;
         }
 
         if (
@@ -58,42 +49,38 @@ class ilNolejWebhook
             !isset($data["action"]) ||
             !is_string($data["action"])
         ) {
-            $this->die_message(400, "Request not valid.");
-            $this->log("Received invalid request: " . var_export($data, true));
+            $this->exitWithMessage(400, "Request not valid.");
+            $this->plugin->log("Received invalid request: " . var_export($data, true));
         }
 
         $this->data = $data;
         switch ($data["action"]) {
-            case "tac":
-                $this->checkTac();
-                break;
-
             case "transcription":
-                $this->log("Received transcription request: " . var_export($data, true));
+                $this->plugin->log("Received transcription request: " . var_export($data, true));
                 $this->checkTranscription();
                 break;
 
             case "analysis":
-                $this->log("Received analysis request: " . var_export($data, true));
+                $this->plugin->log("Received analysis request: " . var_export($data, true));
                 $this->checkAnalysis();
                 break;
 
             case "activities":
-                $this->log("Received activities request: " . var_export($data, true));
+                $this->plugin->log("Received activities request: " . var_export($data, true));
                 $this->checkActivities();
                 break;
 
             case "work in progress":
-                $this->log("Received work in progress.");
+                $this->plugin->log("Received work in progress.");
                 global $DIC, $tpl;
                 if (!$DIC->user()->isAnonymous()) {
-                    $tpl->setOnScreenMessage("info", ilNolejConfig::txt("work_in_progress"));
+                    $tpl->setOnScreenMessage("info", $this->plugin->txt("work_in_progress"));
                     return;
                 }
                 break;
 
             default:
-                $this->log("Received invalid action: " . var_export($data, true));
+                $this->plugin->log("Received invalid action: " . var_export($data, true));
         }
     }
 
@@ -102,18 +89,18 @@ class ilNolejWebhook
      * @param int $code
      * @param string $message
      */
-    protected function die_message(
+    protected function exitWithMessage(
         $code = 400,
         $message = ""
     ) {
         if (!empty($message)) {
-            $this->log("Replied to Nolej with message: " . $message);
-            if ($this->shouldDie) {
+            $this->plugin->log("Replied to Nolej with message: " . $message);
+            if ($this->shouldExit) {
                 echo json_encode(["message" => $message]);
             }
         }
 
-        if (!$this->shouldDie) {
+        if (!$this->shouldExit) {
             return false;
         }
 
@@ -121,67 +108,10 @@ class ilNolejWebhook
         exit;
     }
 
-    public function checkTac()
-    {
-        global $DIC;
-
-        if (
-            !isset($this->data["exchangeId"], $this->data["message"], $this->data["s3URL"]) ||
-            !is_string($this->data["exchangeId"]) ||
-            !is_string($this->data["message"]) ||
-            !is_string($this->data["s3URL"])
-        ) {
-            $this->die_message(400, "Request not valid.");
-            return;
-        }
-
-        $db = $DIC->database();
-        $exchangeId = $this->data["exchangeId"];
-
-        $result = $db->queryF(
-            "SELECT * FROM " . ilNolejPlugin::TABLE_TIC
-            . " WHERE exchange_id = %s AND response_on IS NULL;",
-            ["text"],
-            [$exchangeId]
-        );
-        if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Exchange not found.");
-            return;
-        }
-
-        $exchange = $db->fetchAssoc($result);
-
-        $now = strtotime("now");
-        $this->setUserLang($exchange["user_id"]);
-
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_TIC
-            . " SET response_on = %s, response_url = %s WHERE exchange_id = %s;",
-            ["integer", "text", "text"],
-            [$now, $this->data["s3URL"], $exchangeId]
-        );
-        if (!$result) {
-            $this->die_message(404, "Exchange not found.");
-        }
-
-        $this->sendNotification(
-            $exchangeId,
-            (int) $exchange["user_id"],
-            "tac",
-            "ok",
-            0,
-            $this->data["message"],
-            0,
-            "tac_received_info",
-            [
-                $exchangeId,
-                ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX))
-            ]
-        );
-
-        $this->die_message(200, "TAC received!");
-    }
-
+    /**
+     * Check transcription action.
+     * @return void
+     */
     public function checkTranscription()
     {
         global $DIC;
@@ -192,19 +122,19 @@ class ilNolejWebhook
 
         if (
             !isset(
-            $this->data["documentID"],
-            $this->data["status"],
-            $this->data["code"],
-            $this->data["error_message"],
-            $this->data["consumedCredit"]
-        ) ||
+                $this->data["documentID"],
+                $this->data["status"],
+                $this->data["code"],
+                $this->data["error_message"],
+                $this->data["consumedCredit"]
+            ) ||
             !is_string($this->data["documentID"]) ||
             !is_string($this->data["status"]) ||
             !is_string($this->data["error_message"]) ||
             !is_integer($this->data["code"]) ||
             !is_integer($this->data["consumedCredit"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             return;
         }
 
@@ -212,34 +142,24 @@ class ilNolejWebhook
         $documentId = $this->data["documentID"];
 
         $result = $db->queryF(
-            "SELECT a.user_id, d.title"
-            . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
-            . " INNER JOIN ("
-            . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "   WHERE document_id = %s"
-            . "   AND tstamp = ("
-            . "     SELECT MAX(tstamp)"
-            . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "     WHERE document_id = %s"
-            . "   )"
-            . " ) a"
-            . " ON a.document_id = d.document_id"
-            . " WHERE d.document_id = %s AND d.status = %s;",
-            [
-                "text",
-                "text",
-                "text",
-                "integer"
-            ],
-            [
-                $documentId,
-                $documentId,
-                $documentId,
-                ilNolejActivityManagementGUI::STATUS_CREATION_PENDING
-            ]
+            "SELECT a.user_id, d.title, d.media_type"
+                . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
+                . " INNER JOIN ("
+                . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "   WHERE document_id = %s"
+                . "   AND tstamp = ("
+                . "     SELECT MAX(tstamp)"
+                . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "     WHERE document_id = %s"
+                . "   )"
+                . " ) a"
+                . " ON a.document_id = d.document_id"
+                . " WHERE d.document_id = %s AND d.status = %s;",
+            ["text", "text", "text", "integer"],
+            [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_CREATION_PENDING]
         );
-        if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Document ID not found.");
+        if ($db->numRows($result) == 0) {
+            $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
 
@@ -247,31 +167,22 @@ class ilNolejWebhook
 
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
 
         if (
             $this->data["status"] != "\"ok\"" &&
             $this->data["status"] != "ok"
         ) {
-            $this->log("Result: ko");
+            $this->plugin->log("Result: ko");
 
-            $result = $db->manipulateF(
-                "UPDATE " . ilNolejPlugin::TABLE_DOC
-                . " SET status = %s, consumed_credit = %s"
-                . " WHERE document_id = %s;",
-                [
-                    "integer",
-                    "integer",
-                    "text"
-                ],
-                [
-                    ilNolejActivityManagementGUI::STATUS_CREATION,
-                    $this->data["consumedCredit"],
-                    $documentId
-                ]
+            $db->manipulateF(
+                "UPDATE " . ilNolejPlugin::TABLE_DOC . " consumed_credit = %s WHERE document_id = %s;",
+                ["integer", "text"],
+                [$this->data["consumedCredit"], $documentId]
             );
-            if (!$result) {
-                $this->die_message(404, "Document not found.");
-            }
+
+            // Back to creation state.
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_CREATION);
 
             $this->sendNotification(
                 $documentId,
@@ -285,28 +196,54 @@ class ilNolejWebhook
                 [
                     $document["title"],
                     ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $this->data["error_message"]
+                    $this->data["error_message"],
                 ]
             );
             return;
         }
 
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DOC
-            . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
-            [
-                "integer",
-                "integer",
-                "text"
-            ],
-            [
-                ilNolejActivityManagementGUI::STATUS_ANALISYS,
-                $this->data["consumedCredit"],
-                $documentId
-            ]
+        $db->manipulateF(
+            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
+            ["integer", "integer", "text"],
+            [ilNolejManagerGUI::STATUS_ANALYSIS, $this->data["consumedCredit"], $documentId]
         );
-        if (!$result) {
-            $this->die_message(404, "Document not found.");
+
+        // Start analysis if the source is not audio or video.
+        if (!in_array($document["media_type"], [ilNolejCreationFormGUI::PROP_AUDIO, ilNolejCreationFormGUI::PROP_VIDEO])) {
+            $this->plugin->log("Starting analysis automatically for document: {$documentId}");
+
+            $transcriptionGui = new ilNolejTranscriptionFormGUI($manager);
+            $transcriptionGui->downloadTranscription();
+            $errorMessage = $transcriptionGui->runAnalysis($document["title"], null);
+            if (!empty($errorMessage)) {
+                // An error occurred.
+                $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
+
+                $ass = new ilNolejActivity($documentId, (int) $document["user_id"], "analysis");
+                $ass->withStatus("ko")
+                    ->withCode(0)
+                    ->withErrorMessage($errorMessage)
+                    ->withConsumedCredit(0)
+                    ->store();
+
+                $this->sendNotification(
+                    $documentId,
+                    (int) $document["user_id"],
+                    "transcription_ko",
+                    $this->data["status"],
+                    400,
+                    $errorMessage,
+                    $this->data["consumedCredit"],
+                    "action_transcription_ko_desc",
+                    [
+                        $document["title"],
+                        ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
+                        $errorMessage,
+                    ]
+                );
+            }
+
+            return;
         }
 
         $this->sendNotification(
@@ -321,13 +258,17 @@ class ilNolejWebhook
             [
                 $document["title"],
                 ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                $this->data["error_message"]
+                $this->data["error_message"],
             ]
         );
 
-        $this->die_message(200, "Transcription received!");
+        $this->exitWithMessage(200, "Transcription received!");
     }
 
+    /**
+     * Check analysis action.
+     * @return void
+     */
     public function checkAnalysis()
     {
         global $DIC;
@@ -338,19 +279,19 @@ class ilNolejWebhook
 
         if (
             !isset(
-            $this->data["documentID"],
-            $this->data["status"],
-            $this->data["code"],
-            $this->data["error_message"],
-            $this->data["consumedCredit"]
-        ) ||
+                $this->data["documentID"],
+                $this->data["status"],
+                $this->data["code"],
+                $this->data["error_message"],
+                $this->data["consumedCredit"]
+            ) ||
             !is_string($this->data["documentID"]) ||
             !is_string($this->data["status"]) ||
             !is_string($this->data["error_message"]) ||
             !is_integer($this->data["code"]) ||
             !is_integer($this->data["consumedCredit"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             return;
         }
 
@@ -359,33 +300,23 @@ class ilNolejWebhook
 
         $result = $db->queryF(
             "SELECT a.user_id, d.title"
-            . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
-            . " INNER JOIN ("
-            . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "   WHERE document_id = %s"
-            . "   AND tstamp = ("
-            . "     SELECT MAX(tstamp)"
-            . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "     WHERE document_id = %s"
-            . "   )"
-            . " ) a"
-            . " ON a.document_id = d.document_id"
-            . " WHERE d.document_id = %s AND d.status = %s;",
-            [
-                "text",
-                "text",
-                "text",
-                "integer"
-            ],
-            [
-                $documentId,
-                $documentId,
-                $documentId,
-                ilNolejActivityManagementGUI::STATUS_ANALISYS_PENDING
-            ]
+                . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
+                . " INNER JOIN ("
+                . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "   WHERE document_id = %s"
+                . "   AND tstamp = ("
+                . "     SELECT MAX(tstamp)"
+                . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "     WHERE document_id = %s"
+                . "   )"
+                . " ) a"
+                . " ON a.document_id = d.document_id"
+                . " WHERE d.document_id = %s AND d.status = %s;",
+            ["text", "text", "text", "integer"],
+            [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ANALYSIS_PENDING]
         );
-        if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Document ID not found.");
+        if ($db->numRows($result) == 0) {
+            $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
 
@@ -393,31 +324,21 @@ class ilNolejWebhook
 
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
 
         if (
             $this->data["status"] != "\"ok\"" &&
             $this->data["status"] != "ok"
         ) {
-            $this->log("Result: ko");
+            $this->plugin->log("Result: ko");
 
-            $result = $db->manipulateF(
-                "UPDATE " . ilNolejPlugin::TABLE_DOC
-                . " SET status = %s, consumed_credit = %s"
-                . " WHERE document_id = %s;",
-                [
-                    "integer",
-                    "integer",
-                    "text"
-                ],
-                [
-                    ilNolejActivityManagementGUI::STATUS_ANALISYS,
-                    $this->data["consumedCredit"],
-                    $documentId
-                ]
+            $db->manipulateF(
+                "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET status = %s, consumed_credit = %s WHERE document_id = %s;",
+                ["integer", "integer", "text"],
+                [ilNolejManagerGUI::STATUS_ANALYSIS, $this->data["consumedCredit"], $documentId]
             );
-            if (!$result) {
-                $this->die_message(404, "Document not found.");
-            }
+
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_FAILED);
 
             $this->sendNotification(
                 $documentId,
@@ -431,30 +352,19 @@ class ilNolejWebhook
                 [
                     $document["title"],
                     ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $this->data["error_message"]
+                    $this->data["error_message"],
                 ]
             );
             return;
         }
 
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DOC
-            . " SET status = %s, consumed_credit = %s"
-            . " WHERE document_id = %s;",
-            [
-                "integer",
-                "integer",
-                "text"
-            ],
-            [
-                ilNolejActivityManagementGUI::STATUS_REVISION,
-                $this->data["consumedCredit"],
-                $documentId
-            ]
+        $db->manipulateF(
+            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
+            ["integer", "text"],
+            [$this->data["consumedCredit"], $documentId]
         );
-        if (!$result) {
-            $this->die_message(404, "Document not found.");
-        }
+
+        $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_REVISION);
 
         $this->sendNotification(
             $documentId,
@@ -468,14 +378,18 @@ class ilNolejWebhook
             [
                 $document["title"],
                 ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                $this->data["error_message"]
+                $this->data["error_message"],
             ]
         );
 
-        $this->die_message(200, "Analysis received!");
+        $this->exitWithMessage(200, "Analysis received!");
     }
 
-    function checkActivities()
+    /**
+     * Check activities action.
+     * @return void
+     */
+    public function checkActivities()
     {
         global $DIC;
 
@@ -485,19 +399,19 @@ class ilNolejWebhook
 
         if (
             !isset(
-            $this->data["documentID"],
-            $this->data["status"],
-            $this->data["code"],
-            $this->data["error_message"],
-            $this->data["consumedCredit"]
-        ) ||
+                $this->data["documentID"],
+                $this->data["status"],
+                $this->data["code"],
+                $this->data["error_message"],
+                $this->data["consumedCredit"]
+            ) ||
             !is_string($this->data["documentID"]) ||
             !is_string($this->data["status"]) ||
             !is_string($this->data["error_message"]) ||
             !is_integer($this->data["code"]) ||
             !is_integer($this->data["consumedCredit"])
         ) {
-            $this->die_message(400, "Request not valid.");
+            $this->exitWithMessage(400, "Request not valid.");
             return;
         }
 
@@ -506,45 +420,42 @@ class ilNolejWebhook
 
         $result = $db->queryF(
             "SELECT a.user_id, d.title"
-            . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
-            . " INNER JOIN ("
-            . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "   WHERE document_id = %s"
-            . "   AND tstamp = ("
-            . "     SELECT MAX(tstamp)"
-            . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
-            . "     WHERE document_id = %s"
-            . "   )"
-            . " ) a"
-            . " ON a.document_id = d.document_id"
-            . " WHERE d.document_id = %s AND d.status = %s;",
-            [
-                "text",
-                "text",
-                "text",
-                "integer"
-            ],
-            [
-                $documentId,
-                $documentId,
-                $documentId,
-                ilNolejActivityManagementGUI::STATUS_ACTIVITIES_PENDING
-            ]
+                . " FROM " . ilNolejPlugin::TABLE_DOC . " d"
+                . " INNER JOIN ("
+                . "   SELECT * FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "   WHERE document_id = %s"
+                . "   AND tstamp = ("
+                . "     SELECT MAX(tstamp)"
+                . "     FROM " . ilNolejPlugin::TABLE_ACTIVITY
+                . "     WHERE document_id = %s"
+                . "   )"
+                . " ) a"
+                . " ON a.document_id = d.document_id"
+                . " WHERE d.document_id = %s AND d.status = %s;",
+            ["text", "text", "text", "integer"],
+            [$documentId, $documentId, $documentId, ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING]
         );
-        if ($db->numRows($result) != 1) {
-            $this->die_message(404, "Document ID not found.");
+        if ($db->numRows($result) == 0) {
+            $this->exitWithMessage(404, "Document ID not found.");
             return;
         }
 
         $document = $db->fetchAssoc($result);
         $now = strtotime("now");
         $this->setUserLang($document["user_id"]);
+        $manager = ilNolejManagerGUI::getInstanceByDocumentId($documentId);
+
+        $db->manipulateF(
+            "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
+            ["integer", "text"],
+            [$this->data["consumedCredit"], $documentId]
+        );
 
         if (
             $this->data["status"] != "\"ok\"" &&
             $this->data["status"] != "ok"
         ) {
-            $this->log("Result: ko");
+            $this->plugin->log("Result: ko");
             $this->sendNotification(
                 $documentId,
                 (int) $document["user_id"],
@@ -557,35 +468,19 @@ class ilNolejWebhook
                 [
                     $document["title"],
                     ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
-                    $this->data["error_message"]
+                    $this->data["error_message"],
                 ]
             );
+
+            $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_ACTIVITIES);
             return;
         }
 
-        $result = $db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DOC
-            . " SET status = %s, consumed_credit = %s"
-            . " WHERE document_id = %s;",
-            [
-                "integer",
-                "integer",
-                "text"
-            ],
-            [
-                ilNolejActivityManagementGUI::STATUS_COMPLETED,
-                $this->data["consumedCredit"],
-                $documentId
-            ]
-        );
-        if (!$result) {
-            $this->die_message(404, "Document not found.");
-        }
+        $manager->updateDocumentStatus(ilNolejManagerGUI::STATUS_COMPLETED);
 
-        $activityManagement = new ilNolejActivityManagementGUI(null, $documentId);
-        $fails = $activityManagement->downloadActivities();
+        $fails = $manager->downloadActivities();
         if (!empty($fails)) {
-            $this->log("Failed to download some activities: " . $fails . ".");
+            $this->plugin->log("Failed to download some activities: " . $fails . ".");
             $this->sendNotification(
                 $documentId,
                 (int) $document["user_id"],
@@ -598,7 +493,7 @@ class ilNolejWebhook
                 [$fails]
             );
 
-            $this->die_message(200, "Activities received, but something went wrong while retrieving them.");
+            $this->exitWithMessage(200, "Activities received, but something went wrong while retrieving them.");
             return;
         }
 
@@ -613,14 +508,14 @@ class ilNolejWebhook
             "action_activities_ok_desc",
             [
                 $document["title"],
-                ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX))
+                ilDatePresentation::formatDate(new ilDateTime($now, IL_CAL_UNIX)),
             ]
         );
-        $this->die_message(200, "Activities received!");
+        $this->exitWithMessage(200, "Activities received!");
     }
 
     /**
-     * Send notification to user
+     * Send notification to user.
      *
      * @param string $documentId
      * @param int $userId
@@ -641,10 +536,10 @@ class ilNolejWebhook
         $errorMessage,
         $credits,
         $bodyVar,
-        $vars = array()
+        $vars = []
     ) {
         /** Send Notification */
-        $ass = new NolejActivity($documentId, $userId, $action);
+        $ass = new ilNolejActivity($documentId, $userId, $action);
         $ass->withStatus($status)
             ->withCode($code)
             ->withErrorMessage($errorMessage)
@@ -654,14 +549,7 @@ class ilNolejWebhook
         /** Send Email */
         $lng = $this->setUserLang($userId);
 
-        if (class_exists("ilNotificationConfig")) {
-            $notification = new ilNotificationConfig("chat_invitation");
-        } else if (class_exists("ILIAS\Notifications\Model\ilNotificationConfig")) {
-            $notification = new ILIAS\Notifications\Model\ilNotificationConfig("chat_invitation");
-        } else {
-            $this->log("Warning: Notification cannot be sent!");
-            return;
-        }
+        $notification = new ILIAS\Notifications\Model\ilNotificationConfig("chat_invitation");
 
         $notification->setTitleVar(
             $lng->txt(
@@ -681,7 +569,7 @@ class ilNolejWebhook
         $notification->setLongDescriptionVar($descriptionVar);
         $notification->setAutoDisable(false);
         $notification->setValidForSeconds(0);
-        $notification->setHandlerParam('mail.sender', SYSTEM_USER_ID);
+        $notification->setHandlerParam("mail.sender", SYSTEM_USER_ID);
         $notification->notifyByUsers([$userId]);
     }
 

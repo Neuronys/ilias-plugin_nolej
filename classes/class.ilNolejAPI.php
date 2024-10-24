@@ -15,19 +15,65 @@
  */
 class ilNolejAPI
 {
+    /** @var string Nolej API endpoint */
     public const API_URL = "https://api-live.nolej.io";
-    // public const API_URL = "https://api-staging.nolej.io";
-    // public const API_URL = "https://api-dev.nolej.io";
 
-    /** @var string */
-    private $apikey;
+    /** @var string[] Allowed audio formats */
+    public const TYPE_AUDIO = ["mp3", "wav", "opus", "ogg", "oga", "m4a", "aiff"];
+
+    /** @var string[] Allowed video formats */
+    public const TYPE_VIDEO = ["m4v", "mp4", "webm", "mpeg"];
+
+    /** @var string[] Allowed document formats */
+    public const TYPE_DOC = ["pdf", "doc", "docx", "odt"];
+
+    /** @var string[] Allowed text file formats */
+    public const TYPE_TEXT = ["txt", "htm", "html"];
+
+    /** @var string[] Allowed formats */
+    public const TYPE_SUPPORTED = [
+        ...self::TYPE_AUDIO,
+        ...self::TYPE_VIDEO,
+        ...self::TYPE_DOC,
+        ...self::TYPE_TEXT
+    ];
+
+    /** @var string[] Supported languages */
+    public const LANG_SUPPORTED = ["en", "fr", "it", "de", "pt", "es", "nl"];
+
+    /** @var int Max bytes for uploaded files (500 MB) */
+    public const MAX_SIZE = 524288000;
+
+    /** @var ?string */
+    private static $key = null;
 
     /**
-     * @param string $apikey
+     * API class constructor.
      */
-    public function __construct($apikey)
+    public function __construct()
     {
-        $this->apikey = $apikey;
+        self::$key = self::getKey();
+    }
+
+    /**
+     * Get the saved API key.
+     * @return bool
+     */
+    public static function getKey()
+    {
+        if (self::$key == null) {
+            self::$key = ilNolejPlugin::getConfig("api_key", "");
+        }
+        return self::$key;
+    }
+
+    /**
+     * Check that the API key has been set.
+     * @return bool
+     */
+    public static function hasKey()
+    {
+        return !empty(self::getKey());
     }
 
     /**
@@ -35,15 +81,15 @@ class ilNolejAPI
      * @param array $data
      * @param bool $decode
      */
-    public function post($path, $data = array(), $decode = true)
+    public function post($path, $data = [], $decode = true)
     {
         $data_json = json_encode($data);
         $url = self::API_URL . $path;
 
-        $client = new GuzzleHttp\Client(['http_errors' => false]);
+        $client = new GuzzleHttp\Client(["http_errors" => false]);
         $response = $client->request("POST", $url, [
             "headers" => [
-                "Authorization" => "X-API-KEY " . $this->apikey,
+                "Authorization" => "X-API-KEY " . self::$key,
                 "User-Agent" => "ILIAS Plugin",
                 "Content-Type" => "application/json"
             ],
@@ -65,15 +111,15 @@ class ilNolejAPI
      * @param bool $encode input's data
      * @param bool $decode output
      */
-    public function put($path, $data = array(), $encode = false, $decode = true)
+    public function put($path, $data = [], $encode = false, $decode = true)
     {
         $data_json = $encode ? json_encode($data) : $data;
         $url = self::API_URL . $path;
 
-        $client = new GuzzleHttp\Client(['http_errors' => false]);
+        $client = new GuzzleHttp\Client(["http_errors" => false]);
         $response = $client->request("PUT", $url, [
             "headers" => [
-                "Authorization" => "X-API-KEY " . $this->apikey,
+                "Authorization" => "X-API-KEY " . self::$key,
                 "User-Agent" => "ILIAS Plugin",
                 "Content-Type" => "application/json"
             ],
@@ -106,10 +152,10 @@ class ilNolejAPI
         $url = self::API_URL . $path;
         $encodedData = $encodeInput ? json_encode($data) : $data;
 
-        $client = new GuzzleHttp\Client(['http_errors' => false]);
+        $client = new GuzzleHttp\Client(["http_errors" => false]);
         $response = $client->request("GET", $url, [
             "headers" => [
-                "Authorization" => "X-API-KEY " . $this->apikey,
+                "Authorization" => "X-API-KEY " . self::$key,
                 "User-Agent" => "ILIAS Plugin",
                 "Content-Type" => "application/json"
             ],

@@ -11,8 +11,6 @@ action_analysis_ok_desc#:#Analysis of document "%s" has been completed on %s, yo
 action_review#:#Review in progress
 action_review_ko#:#Review failed
 action_review_ok#:#Review is ready
-action_tac#:#TAC received!
-action_tic#:#TIC sent
 action_transcription#:#Transcription in progress
 action_transcription_ko#:#Transcription failed
 action_transcription_ko_desc#:#Unfortunately, transcription of document "%s" has failed on %s. Error message: %s
@@ -62,11 +60,8 @@ cmd_details#:#Details
 cmd_edit#:#Edit
 cmd_generate#:#Generate activities
 cmd_insert#:#Insert
-cmd_review#:#Confirm review
-cmd_review_info#:#Once you've reviewed the summary, as well as each question and concept, you can proceed to create H5P activities.
 cmd_save#:#Save
 cmd_select#:#Select media from mediapool
-cmd_tic#:#Send TIC
 cmd_update#:#Update
 cmd_webhook_call#:#Check current status
 cmd_webhook_call_info#:#If you have been waiting a long time for the outcome of the operation, you can try to synchronize the status with the NOLEJ server. In fact, it is possible, albeit rare, that the answer was lost along the way...
@@ -78,7 +73,6 @@ concepts_game_ftw#:#Find the word
 concepts_games#:#Available games
 concepts_label#:#Label
 concepts_language#:#Language
-concepts_n#:#Concept #%d
 concepts_saved#:#Concepts have been updated.
 concepts_use_for_assessment#:#Use for assessment
 concepts_use_for_cw#:#Use for Crossword
@@ -86,9 +80,12 @@ concepts_use_for_dtw#:#Use for Drag the word
 concepts_use_for_ftw#:#Use for Find the word
 concepts_use_for_gaming#:#Use for gaming
 concepts_use_for_practice#:#Use for Concept cards
-configuration_title#:#Configure
+config_interval#:#Update interval
+config_interval_info#:#Specifies how often Nolej should check for activity updates (in seconds).
 content_loading#:#Content is loading...
 crs_create_xnlj#:#Create NOLEJ object
+document_id#:#Document ID
+edit_h5p#:#Edit H5P
 err_access_denied#:#You cannot access this course.
 err_activities_get#:#Cannot retrieve some of the generated activities: %s. Please, try again to generate the activities.
 err_analysis_not_ready#:#The analysis is not ready yet, please wait some time and check again.
@@ -100,10 +97,12 @@ err_content_id#:#cannot determine content id
 err_credentials#:#Invalid/Wrong credentials.
 err_doc_response#:#An error accurred during the creation of NOLEJ module:<br>%s<br>Please try again or contact an administrator if this error persists.
 err_file_upload#:#Failed to upload file. Please contact an administrator.
+err_ftb_missing_blank#:#Missing 4 underscores for Fill the blanks activity.
 err_h5p_content#:#Sorry, this activity cannot be loaded. Please contact an administrator.
 err_h5p_package#:#not a valid H5P package
 err_h5p_plugin#:#Sorry, your version of H5P plugin is not supported. Please update it or contact an administrator.
 err_json_decode#:#cannot decode the JSON
+err_media_format_unknown#:#Format not supported.
 err_questions_file#:#Questions file cannot be retrieved. Please, try again.
 err_questions_put#:#NOLEJ returned an error, please check your data and try again.
 err_questions_save#:#Questions file cannot be saved on disk. Try again, and if it persists ask an Administrator for help.
@@ -114,7 +113,6 @@ err_settings_save#:#Activities settings file cannot be saved on disk. Try again,
 err_summary_file#:#Summary file cannot be retrieved. Please, try again.
 err_summary_put#:#NOLEJ returned an error, please check your data and try again.
 err_summary_save#:#Summary file cannot be saved on disk. Try again, and if it persists ask an Administrator for help.
-err_tic_response#:#NOLEJ endpoint returned an invalid response.
 err_transcription_not_ready#:#The transcription is not ready yet, please wait some time and check again. It should take a tenth of the source duration; if after this time you haven't received any notification, please contact an Administrator. 
 fold_create_xnlj#:#Create NOLEJ object
 goto_activity_management#:#Go to Activity Management
@@ -150,6 +148,7 @@ prop_automatic_info#:#If checked, NOLEJ goes directly to the final step: the gen
 prop_content#:#Web page content
 prop_content_info#:#Analyze the web page content
 prop_description#:#Description
+prop_document#:#Document
 prop_file#:#File
 prop_file_info#:#Upload a file (audio, video, or a document).
 prop_freetext#:#Text
@@ -179,6 +178,9 @@ prop_web#:#Web URL
 prop_web_info#:#Analyze a resource from the Web.
 prop_web_src#:#Choose what to analyze from that URL
 questions_answer#:#Answer
+questions_answer_distractor#:#Statement to display
+questions_answer_false#:#False statement
+questions_answer_true#:#Correct statement
 questions_distractors#:#Distractors
 questions_enable#:#Question enabled
 questions_explanation#:#Explanation
@@ -216,9 +218,6 @@ tab_insert_from_pool#:#Select media from mediapool
 tab_modules#:#Modules
 tab_properties#:#Properties
 tab_review#:#Review
-tac_received#:#TAC received!
-tac_received_info#:#TAC with exchange ID %s has been received on %s.
-tic_sent#:#TIC sent.
 update_successful#:#Update Successful
 work_in_progress#:#NOLEJ AI is working for you. Please wait a bit more.
 xnlj_add#:#Create
@@ -228,4 +227,3 @@ xnlj_new#:#Add a NOLEJ object
 xnlj_read#:#Read: User has read access to NOLEJ objects
 xnlj_visible#:#Visible: NOLEJ object is visible
 xnlj_write#:#Edit Settings: User can edit settings of NOLEJ objects
-

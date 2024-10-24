@@ -11,8 +11,6 @@ action_analysis_ok_desc#:#Il documento "%s" è stato analizzato con successo in 
 action_review#:#Revisione in corso
 action_review_ko#:#Revisione fallita
 action_review_ok#:#Revisione completata
-action_tac#:#TAC ricevuto!
-action_tic#:#TIC inviato
 action_transcription#:#Trascrizione in corso
 action_transcription_ko#:#Trascrizione fallita
 action_transcription_ko_desc#:#Sfortunatamente, la trascrizione del documento "%s" non ha avuto successo, in data %s. Messaggio di errore: %s
@@ -62,11 +60,8 @@ cmd_details#:#Dettagli
 cmd_edit#:#Modifica
 cmd_generate#:#Genera attività
 cmd_insert#:#Inserisci
-cmd_review#:#Conferma revisione
-cmd_review_info#:#Se hai revisionato il sommario, tutte le domande e i concetti, puoi procedere con la creazione degli oggetti H5P.
 cmd_save#:#Salva
 cmd_select#:#Seleziona un oggetto dal mediapool
-cmd_tic#:#Invia TIC
 cmd_update#:#Aggiorna
 cmd_webhook_call#:#Controlla lo stato attuale
 cmd_webhook_call_info#:#Se attendi da molto l'esito dell'operazione, puoi provare a sincronizzare lo stato con il server di NOLEJ. È possibile infatti, seppur raro, che la risposta si sia persa per strada...
@@ -78,7 +73,6 @@ concepts_game_ftw#:#Trova la parola
 concepts_games#:#Giochi disponibili
 concepts_label#:#Parola chiave
 concepts_language#:#Lingua
-concepts_n#:#Concetto n° %d
 concepts_saved#:#I concetti sono stati aggiornati.
 concepts_use_for_assessment#:#Utilizza per i test
 concepts_use_for_cw#:#Utilizza per Cruciverba
@@ -86,9 +80,12 @@ concepts_use_for_dtw#:#Utilizza per Trascina la parola
 concepts_use_for_ftw#:#Utilizza per Trova la parola
 concepts_use_for_gaming#:#Utilizza per i giochi
 concepts_use_for_practice#:#Utilizza per le Carte concettuali
-configuration_title#:#Configura
+config_interval#:#Intervallo di aggiornamento
+config_interval_info#:#Specifica ogni quanto Nolej deve verificare aggiornamenti sulle attività (in secondi).
 content_loading#:#Caricamento del contenuto...
 crs_create_xnlj#:#Crea oggetto NOLEJ
+document_id#:#Document ID
+edit_h5p#:#Modifica H5P
 err_access_denied#:#Non puoi accedere a questo corso.
 err_activities_get#:#Impossibile ottenere alcune delle attività generate: %s. Riprova a generare nuovamente le attività.
 err_analysis_not_ready#:#L'analisi non è ancora completa, attendi ancora un po' di tempo e torna qui per verificare.
@@ -100,10 +97,12 @@ err_content_id#:#impossibile determinare l'id del contenuto
 err_credentials#:#Le credenziali non sono valide.
 err_doc_response#:#C'è stato un errore durante la creazione del modulo NOLEJ:<br>%s<br>Per favore riprova, oppure contatta un amministratore se l'errore persiste.
 err_file_upload#:#Errore nel caricamento del file. Contattare un amministratore.
+err_ftb_missing_blank#:#Non sono presenti i 4 trattini bassi per l'attività Riempi gli spazi.
 err_h5p_content#:#Non è stato possibile caricare l'attività. Per favore, contatta un amministratore.
 err_h5p_package#:#non è un valido pacchetto H5P
 err_h5p_plugin#:#La versione del plugin H5P installata non è supportata. Per favore, aggiorna il plugin o contatta un amministratore.
 err_json_decode#:#non può decodificare il JSON
+err_media_format_unknown#:#Formato non supportato.
 err_questions_file#:#Impossibile caricare le domande. Per favore, riprova.
 err_questions_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
 err_questions_save#:#Impossibile salvare il file delle domande. Riprova, e se persiste contatta un Amministratore.
@@ -114,7 +113,6 @@ err_settings_save#:#Impossibile salvare il file delle impostazioni delle attivit
 err_summary_file#:#Impossibile caricare il file di sommario. Per favore, riprova.
 err_summary_put#:#NOLEJ ha restituito un errore, per favore controlla i dati e riprova.
 err_summary_save#:#Impossibile salvare il file di sommario. Riprova, e se persiste contatta un Amministratore.
-err_tic_response#:#L'endpoint di NOLEJ ha restituito una risposta non prevista.
 err_transcription_not_ready#:#La trascrizione non è ancora completa, attendi ancora un po' di tempo e torna qui per verificare. L'attesa stimata è di circa un decimo rispetto alla durata del file scelto; se è trascorso molto più di questo tempo e non hai ancora ricevuto una notifica, per favore contatta un Amministratore.
 fold_create_xnlj#:#Crea un oggetto NOLEJ
 goto_activity_management#:#Vai in Gestione Attività
@@ -150,6 +148,7 @@ prop_automatic_info#:#Se impostato, NOLEJ procede direttamente con l'ultimo step
 prop_content#:#Contenuto della pagina web
 prop_content_info#:#Analizza il contenuto della pagina
 prop_description#:#Descrizione
+prop_document#:#Documento
 prop_file#:#File
 prop_file_info#:#Carica un file (audio, video, o un documento).
 prop_freetext#:#Testo
@@ -179,6 +178,9 @@ prop_web#:#URL web
 prop_web_info#:#Analizza una risorsa da Internet.
 prop_web_src#:#Scegli cosa NOLEJ dovrà analizzare da questo URL.
 questions_answer#:#Risposta
+questions_answer_distractor#:#Affermazione da visualizzare
+questions_answer_false#:#Affermazione falsa
+questions_answer_true#:#Affermazione corretta
 questions_distractors#:#Distrattori
 questions_enable#:#Domanda abilitata
 questions_explanation#:#Spiegazione
@@ -216,9 +218,6 @@ tab_insert_from_pool#:#Seleziona un media dal mediapool
 tab_modules#:#Moduli
 tab_properties#:#Proprietà
 tab_review#:#Revisione
-tac_received#:#TAC ricevuto!
-tac_received_info#:#TAC con exchange ID %s è stato ricevuto il %s.
-tic_sent#:#TIC inviato.
 update_successful#:#Aggiornamento completato.
 work_in_progress#:#NOLEJ AI sta lavorando per te. Per favore, attendi un altro po'.
 xnlj_add#:#Crea
@@ -228,4 +227,3 @@ xnlj_new#:#Aggiungi un oggetto NOLEJ
 xnlj_read#:#Lettura: l'utente può accedere agli oggetti NOLEJ
 xnlj_visible#:#Visibilità: gli oggetti NOLEJ sono visibili all'utente
 xnlj_write#:#Modifica impostazioni: l'utente può modificare le impostazioni degli oggetti NOLEJ
-

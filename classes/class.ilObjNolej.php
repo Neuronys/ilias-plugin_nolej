@@ -10,11 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once "./Services/Tracking/interfaces/interface.ilLPStatusPlugin.php";
-require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejPlugin.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilNolejConfig.php";
-require_once ilNolejPlugin::PLUGIN_DIR . "/classes/class.ilObjNolejGUI.php";
-
 /**
  * Repository plugin object class
  */
@@ -27,272 +22,265 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     protected string $documentId = "";
 
     /**
-     * Constructor
-     *
-     * @access public
+     * Constructor.
      * @param int $a_ref_id
      */
-    function __construct($a_ref_id = 0)
+    public function __construct($a_ref_id = 0)
     {
         parent::__construct($a_ref_id);
-        $this->config = new ilNolejConfig();
+
+        require_once "./Services/Tracking/interfaces/interface.ilLPStatusPlugin.php";
     }
 
     /**
      * Get type.
+     * @return void
      */
-    final function initType(): void
+    final public function initType(): void
     {
         $this->setType(ilNolejPlugin::PLUGIN_ID);
     }
 
     /**
-     * Create object
+     * Create object.
+     * @param bool $clone_mode
+     * @return void
      */
-    function doCreate(bool $clone_mode = false): void
+    public function doCreate(bool $clone_mode = false): void
     {
-        global $ilDB;
-
-        $ilDB->manipulateF(
+        $this->db->manipulateF(
             "INSERT INTO " . ilNolejPlugin::TABLE_DATA . " (id, is_online, document_id) VALUES (%s, %s, NULL)",
-            array("integer", "integer"),
-            array($this->getId(), 0)
+            ["integer", "integer"],
+            [$this->getId(), 0]
         );
     }
 
     /**
-     * Read data from db
+     * Read data from db.
+     * @return void
      */
-    function doRead(): void
+    public function doRead(): void
     {
-        global $ilDB;
-
-        $set = $ilDB->queryF(
+        $set = $this->db->queryF(
             "SELECT * FROM " . ilNolejPlugin::TABLE_DATA . " WHERE id = %s;",
-            array("integer"),
-            array($this->getId())
+            ["integer"],
+            [$this->getId()]
         );
-        while ($row = $ilDB->fetchAssoc($set)) {
+
+        while ($row = $this->db->fetchAssoc($set)) {
             $this->setOnline($row["is_online"] ?? false);
             $this->setDocumentId($row["document_id"] ?? "");
         }
     }
 
     /**
-     * Update data
+     * Update data.
+     * @return void
      */
-    function doUpdate(): void
+    public function doUpdate(): void
     {
-        global $ilDB;
-
-        $ilDB->manipulateF(
+        $this->db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DATA . " SET is_online = %s, document_id = %s WHERE id = %s;",
-            array("integer", "text", "integer"),
-            array($this->isOnline(), $this->getDocumentId(), $this->getId())
+            ["integer", "text", "integer"],
+            [$this->isOnline(), $this->getDocumentId(), $this->getId()]
         );
     }
 
     /**
-     * Delete data from db
+     * Delete data from db.
+     * @return void
      */
-    function doDelete(): void
+    public function doDelete(): void
     {
-        global $ilDB;
-
-        $ilDB->manipulateF(
+        $this->db->manipulateF(
             "DELETE FROM " . ilNolejPlugin::TABLE_DATA . " WHERE id = %s;",
-            array("integer"),
-            array($this->getId())
+            ["integer"],
+            [$this->getId()]
         );
     }
 
     /**
-     * Set online
-     * @param boolean online
+     * Set online.
+     * @param bool $online
+     * @return void
      */
-    function setOnline(bool $a_val): void
+    public function setOnline(bool $online): void
     {
-        $this->online = $a_val;
+        $this->online = $online;
     }
 
     /**
-     * Set document_id
-     * @param string documentId
+     * Set document_id.
+     * @param string $documentId
+     * @return void
      */
-    function setDocumentId(string $a_val): void
+    public function setDocumentId(string $documentId): void
     {
-        $this->documentId = $a_val;
+        $this->documentId = $documentId;
     }
 
     /**
-     * Get online
-     * @return boolean online
+     * Get online.
+     * @return bool online
      */
-    function isOnline(): bool
+    public function isOnline(): bool
     {
         return $this->online;
     }
 
     /**
-     * Get document_id
+     * Get document_id.
      * @return string documentId
      */
-    function getDocumentId(): string
+    public function getDocumentId(): string
     {
         return $this->documentId;
     }
 
     /**
-     * @return int
+     * Lookup the value of a document.
+     * @param string $name of the column
+     * @return string
      */
-    function getDocumentStatus(): int
+    protected function lookupDocumentData(string $name): string
     {
-        global $ilDB;
-
         if ($this->getDocumentId() == null) {
             return 0;
         }
 
-        $result = $ilDB->queryF(
-            "SELECT `status` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
-            array("text"),
-            array($this->getDocumentId())
+        $result = $this->db->queryF(
+            "SELECT `$name` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
+            ["text"],
+            [$this->getDocumentId()]
         );
 
         $row = $this->db->fetchAssoc($result);
-        return (int) $row["status"];
+        return $row[$name];
     }
 
     /**
+     * Get document status.
+     * @return int
+     */
+    public function getDocumentStatus(): int
+    {
+        return (int) $this->lookupDocumentData("status");
+    }
+
+    /**
+     * Get document status text.
      * @return string
      */
-    function getDocumentSource(): string
+    public function getDocumentStatusInfo(): string
     {
-        global $ilDB;
+        $status = $this->getDocumentStatus();
+        switch ($status) {
+            case ilNolejManagerGUI::STATUS_CREATION:
+                return $this->plugin->txt("tab_creation");
 
-        if ($this->getDocumentId() == null) {
-            return "";
+            case ilNolejManagerGUI::STATUS_CREATION_PENDING:
+                return $this->plugin->txt("action_transcription");
+
+            case ilNolejManagerGUI::STATUS_ANALYSIS:
+                return $this->plugin->txt("action_transcription_ok");
+
+            case ilNolejManagerGUI::STATUS_ANALYSIS_PENDING:
+                return $this->plugin->txt("action_analysis");
+
+            case ilNolejManagerGUI::STATUS_REVISION:
+            case ilNolejManagerGUI::STATUS_ACTIVITIES:
+                return $this->plugin->txt("action_analysis_ok");
+
+            case ilNolejManagerGUI::STATUS_ACTIVITIES_PENDING:
+                return $this->plugin->txt("action_activities");
+
+            case ilNolejManagerGUI::STATUS_COMPLETED:
+                return $this->plugin->txt("action_activities_ok");
+
+            case ilNolejManagerGUI::STATUS_FAILED:
+                return "";
         }
-
-        $result = $ilDB->queryF(
-            "SELECT `doc_url` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
-            array("text"),
-            array($this->getDocumentId())
-        );
-
-        $row = $this->db->fetchAssoc($result);
-        return $row["doc_url"];
     }
 
     /**
+     * Get document source.
      * @return string
      */
-    function getDocumentMediaType(): string
+    public function getDocumentSource(): string
     {
-        global $ilDB;
-
-        if ($this->getDocumentId() == null) {
-            return "";
-        }
-
-        $result = $ilDB->queryF(
-            "SELECT `media_type` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
-            array("text"),
-            array($this->getDocumentId())
-        );
-
-        $row = $this->db->fetchAssoc($result);
-        return $row["media_type"];
+        return $this->lookupDocumentData("doc_url");
     }
 
     /**
+     * Get the media type of the document.
      * @return string
      */
-    function getDocumentLang(): string
+    public function getDocumentMediaType(): string
     {
-        global $ilDB;
-
-        if ($this->getDocumentId() == null) {
-            return "";
-        }
-
-        $result = $ilDB->queryF(
-            "SELECT `language` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
-            array("text"),
-            array($this->getDocumentId())
-        );
-
-        $row = $this->db->fetchAssoc($result);
-        return $row["language"];
+        return $this->lookupDocumentData("media_type");
     }
 
     /**
+     * Get the document language.
      * @return string
      */
-    function getDocumentTitle(): string
+    public function getDocumentLang(): string
     {
-        global $ilDB;
-
-        if ($this->getDocumentId() == null) {
-            return "";
-        }
-
-        $result = $ilDB->queryF(
-            "SELECT `title` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
-            array("text"),
-            array($this->getDocumentId())
-        );
-
-        $row = $this->db->fetchAssoc($result);
-        return $row["title"];
+        return $this->lookupDocumentData("language");
     }
 
     /**
-     * @return bool
+     * Get the document title.
+     * @return string
      */
-    function getDocumentAutomaticMode(): bool
+    public function getDocumentTitle(): string
     {
-        global $ilDB;
-
-        if ($this->getDocumentId() == null) {
-            return false;
-        }
-
-        $result = $ilDB->queryF(
-            "SELECT `automatic_mode` FROM " . ilNolejPlugin::TABLE_DOC . " WHERE document_id = %s",
-            array("text"),
-            array($this->getDocumentId())
-        );
-
-        $row = $this->db->fetchAssoc($result);
-        return ilUtil::yn2tf($row["automatic_mode"]);
+        return $this->lookupDocumentData("title");
     }
 
     /**
+     * Returns the directory where all Nolej data is stored.
+     * @return string
+     */
+    public static function dataDir(): string
+    {
+        return "./" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/" . ilNolejPlugin::PLUGIN_ID . "/";
+    }
+
+    /**
+     * Returns the directory where all Nolej data of this document
+     * is stored (transcriptions, activities, ...)
+     *
      * @return string
      */
     public function getDataDir(): string
     {
-        return $this->config->dataDir() . $this->getDocumentId();
+        return self::dataDir() . $this->getDocumentId();
     }
 
+    /**
+     * Check if the user has write permission.
+     * @return bool
+     */
     public function hasWritePermission(): bool
     {
         global $ilAccess;
         return $ilAccess->checkAccess("write", "", $this->getRefId());
     }
 
+    /**
+     * Check if the user has read permission.
+     * @return bool
+     */
     public function hasReadPermission(): bool
     {
         global $ilAccess;
         return $ilAccess->checkAccess("read", "", $this->getRefId());
     }
 
-    public function lookupDetails(): void
-    {
-    }
-
     /**
+     * Get the ID of h5p activity of this document
+     * given its h5p package type.
      * @param string $type of h5p activity to get
      * @return int h5p content id
      */
@@ -300,20 +288,23 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     {
         $result = $this->db->queryF(
             "SELECT content_id FROM " . ilNolejPlugin::TABLE_H5P
-            . " WHERE document_id = %s"
-            . " AND type = %s"
-            . " ORDER BY `generated` DESC"
-            . " LIMIT 1",
+                . " WHERE document_id = %s"
+                . " AND type = %s"
+                . " ORDER BY `generated` DESC"
+                . " LIMIT 1",
             ["text", "text"],
             [$this->documentId, $type]
         );
+
         if ($row = $this->db->fetchAssoc($result)) {
             return (int) $row["content_id"];
         }
+
         return -1;
     }
 
     /**
+     * Reset LP of users.
      * @param array $user_ids
      */
     public function resetLPOfUsers(array $user_ids): void
@@ -324,13 +315,18 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
+     * Reset LP of a single user.
      * @param int $user_id
      */
     public function resetLPOfUser(int $user_id): void
     {
-        // TODO in future version
+        // No LP recorded yet.
     }
 
+    /**
+     * Reset LP of the current user.
+     * @param int $user_id
+     */
     public function resetLP(): void
     {
         global $ilUser;
@@ -338,7 +334,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
-     * Get all user ids with LP status completed
+     * Get all user ids with LP status completed.
      * @return array
      */
     public function getLPCompleted(): array
@@ -347,7 +343,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
-     * Get all user ids with LP status not attempted
+     * Get all user ids with LP status not attempted.
      * @return array
      */
     public function getLPNotAttempted(): array
@@ -356,7 +352,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
-     * Get all user ids with LP status failed
+     * Get all user ids with LP status failed.
      * @return array
      */
     public function getLPFailed(): array
@@ -366,7 +362,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
-     * Get all user ids with LP status in progress
+     * Get all user ids with LP status in progress.
      * @return array
      */
     public function getLPInProgress(): array
@@ -375,7 +371,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
-     * Get current status for given user
+     * Get current status for given user.
      * @param int $a_user_id
      * @return int
      */
@@ -385,7 +381,7 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
     }
 
     /**
-     * Get current percentage for given user
+     * Get current percentage for given user.
      * @param int $a_user_id
      * @return int
      */
@@ -394,4 +390,12 @@ class ilObjNolej extends ilObjectPlugin implements ilLPStatusPluginInterface
         return 0;
     }
 
+    /**
+     * Return true if the object uses news.
+     * @return bool
+     */
+    public function isNewsTimelineEffective(): bool
+    {
+        return false;
+    }
 }

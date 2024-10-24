@@ -14,7 +14,7 @@
  * Nolej notification repository
  * (using user preferences)
  */
-class NolejNotificationPrefRepository
+class ilNolejNotificationPrefRepository
 {
     /**
      * @var ilObjUser

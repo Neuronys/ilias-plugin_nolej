@@ -11,43 +11,41 @@ action_analysis_ok_desc#:#Die Analyse des Dokuments „%s“ wurde am %s abgesch
 action_review#:#Überprüfung läuft
 action_review_ko#:#Überprüfung fehlgeschlagen
 action_review_ok#:#Überprüfung ist fertig
-action_tac#:#TAC erhalten!
-action_tic#:#TIC gesendet
 action_transcription#:#Transkription läuft
 action_transcription_ko#:#Transkription fehlgeschlagen
 action_transcription_ko_desc#:#Leider ist die Transkription des Dokuments „%s“ am %s fehlgeschlagen. Fehlermeldungen
 action_transcription_ok#:#Die Transkription ist fertig
 action_transcription_ok_desc#:#Die Transkription des Dokuments „%s“ wurde am %s abgeschlossen. Sie können es jetzt überprüfen und mit der Analyse beginnen.
-Activities_crossword#:#Kreuzworträtsel
-Activities_cw_words#:#Definiert, wie viele Wörter in der Kreuzworträtselaktivität verwendet werden sollen
-Activities_dragtheword#:#Ziehen Sie das Wort
-Activities_dtw_words#:#Definiert, wie viele Wörter in der Ziehen Sie das Wort-Aktivität verwendet werden sollen
-Activities_findtheword#:#Finde das Wort
-Activities_flashcards_flashcards#:#Definiert, wie viele Karten in der konzeptionellen Bewertungsaktivität erscheinen sollen
-Activities_ftw_words#:#Definiert, wie viele Wörter in der Aktivität „Wortsuche“ verwendet werden sollen
-Activities_generation_start#:#Ausgewählte Aktivitäten werden generiert; Sie erhalten eine Benachrichtigung, wenn sie fertig sind. Es kann bis zu 1 Minute dauern.
-Activities_glossary#:#Glossar
-Activities_grade#:#Konzeptionelle Bewertung
-Activities_grade_questions#:#Definiert, wie viele Fragen in der konzeptionellen Bewertungsaktivität erscheinen sollen
-Activities_gradeq#:#Kontextbezogene Bewertung
-Activities_gradeq_questions#:#Definiert, wie viele Fragen in der kontextbezogenen Bewertungsaktivität angezeigt werden sollen
-Activities_hoquestions#:#Fragen höherer Ordnung
-Activities_ibook#:#Interaktives Buch
-Activities_ivideo#:#Interaktives Video
-Activities_ivideo_questions#:#Definiert, wie viele Fragen in der interaktiven Videoaktivität vorgeschlagen werden sollen. Es gibt zwei Sets: eines in der Mitte des Videos, eines am Ende
-Activities_ivideo_summary#:#Definiert, ob die Zusammenfassung am Ende der interaktiven Videoaktivität hinzugefügt wird
-Activities_ko#:#Aktivitätsgenerierung fehlgeschlagen: %s
-Activities_not_downloaded#:#Aktivitätsdatei kann nicht auf der Festplatte gefunden werden.
-Activities_not_yet_generated#:#Aktivitäten für dieses Dokument wurden noch nicht generiert.
-Activities_practice#:#Konzeptionelle Karten
-Activities_practice_flashcards#:#Definiert, wie viele Fragen in der konzeptionellen Lernkartenaktivität erscheinen sollen
-Activities_practiceq#:#Kontextbezogene Lernkarten
-Activities_practiceq_flashcards#:#Definiert, wie viele Fragen in der kontextbezogenen Lernkartenaktivität erscheinen sollen
-Activities_select#:#Wählen Sie eine Aktivität aus
-Activities_selected#:#NOLEJ-Aktivität: %s aus dem Modul „%s“.
-Activities_settings#:#Verfeinern Sie die Details, bevor Sie die Aktivitäten generieren
-Activities_summary#:#Zusammenfassung
-Activities_use_in_ibook#:#Diese Aktivität im Modul-Inhalt anzeigen
+activities_crossword#:#Kreuzworträtsel
+activities_cw_words#:#Definiert, wie viele Wörter in der Kreuzworträtselaktivität verwendet werden sollen
+activities_dragtheword#:#Ziehen Sie das Wort
+activities_dtw_words#:#Definiert, wie viele Wörter in der Ziehen Sie das Wort-Aktivität verwendet werden sollen
+activities_findtheword#:#Finde das Wort
+activities_flashcards_flashcards#:#Definiert, wie viele Karten in der konzeptionellen Bewertungsaktivität erscheinen sollen
+activities_ftw_words#:#Definiert, wie viele Wörter in der Aktivität „Wortsuche“ verwendet werden sollen
+activities_generation_start#:#Ausgewählte Aktivitäten werden generiert; Sie erhalten eine Benachrichtigung, wenn sie fertig sind. Es kann bis zu 1 Minute dauern.
+activities_glossary#:#Glossar
+activities_grade#:#Konzeptionelle Bewertung
+activities_grade_questions#:#Definiert, wie viele Fragen in der konzeptionellen Bewertungsaktivität erscheinen sollen
+activities_gradeq#:#Kontextbezogene Bewertung
+activities_gradeq_questions#:#Definiert, wie viele Fragen in der kontextbezogenen Bewertungsaktivität angezeigt werden sollen
+activities_hoquestions#:#Fragen höherer Ordnung
+activities_ibook#:#Interaktives Buch
+activities_ivideo#:#Interaktives Video
+activities_ivideo_questions#:#Definiert, wie viele Fragen in der interaktiven Videoaktivität vorgeschlagen werden sollen. Es gibt zwei Sets: eines in der Mitte des Videos, eines am Ende
+activities_ivideo_summary#:#Definiert, ob die Zusammenfassung am Ende der interaktiven Videoaktivität hinzugefügt wird
+activities_ko#:#Aktivitätsgenerierung fehlgeschlagen: %s
+activities_not_downloaded#:#Aktivitätsdatei kann nicht auf der Festplatte gefunden werden.
+activities_not_yet_generated#:#Aktivitäten für dieses Dokument wurden noch nicht generiert.
+activities_practice#:#Konzeptionelle Karten
+activities_practice_flashcards#:#Definiert, wie viele Fragen in der konzeptionellen Lernkartenaktivität erscheinen sollen
+activities_practiceq#:#Kontextbezogene Lernkarten
+activities_practiceq_flashcards#:#Definiert, wie viele Fragen in der kontextbezogenen Lernkartenaktivität erscheinen sollen
+activities_select#:#Wählen Sie eine Aktivität aus
+activities_selected#:#NOLEJ-Aktivität: %s aus dem Modul „%s“.
+activities_settings#:#Verfeinern Sie die Details, bevor Sie die Aktivitäten generieren
+activities_summary#:#Zusammenfassung
+activities_use_in_ibook#:#Diese Aktivität im Modul-Inhalt anzeigen
 api_key#:#API-Schlüssel
 api_key_info#:#Ihr NOLEJ-API-Schlüssel.
 cat_create_xnlj#:#NOLEJ-Objekt erstellen
@@ -62,33 +60,32 @@ cmd_details#:#Details
 cmd_edit#:#Bearbeiten
 cmd_generate#:#Aktivitäten generieren
 cmd_insert#:#Einfügen
-cmd_review#:#Bewertung bestätigen
-cmd_review_info#:#Sobald Sie die Zusammenfassung sowie jede Frage und jedes Konzept überprüft haben, können Sie mit der Erstellung von H5P-Aktivitäten fortfahren.
 cmd_save#:#Speichern
 cmd_select#:#Medien aus dem Medienpool auswählen
-cmd_tic#:#TIC senden
 cmd_update#:#Aktualisieren
 cmd_webhook_call#:#Überprüfen Sie den aktuellen Status
 cmd_webhook_call_info#:#Wenn Sie lange auf das Ergebnis der Operation gewartet haben, können Sie versuchen, den Status mit dem NOLEJ-Server zu synchronisieren. Tatsächlich ist es möglich, wenn auch selten, dass die Antwort unterwegs verloren ging ...
-Concepts_definition#:#Definition
-Konzepte_enable#:#Konzept aktiviert
-Concepts_game_cw#:#Kreuzworträtsel
-Concepts_game_dtw#:#Ziehen Sie das Wort
-Concepts_game_ftw#:#Finde das Wort
-Concepts_games#:#Verfügbare Spiele
-Concepts_label#:#Etikette
-Concepts_Sprache#:#Sprache
-Concepts_n#:#Konzept #%d
-Concepts_saved#:#Konzepte wurden aktualisiert.
-Concepts_use_for_assessment#:#Zur Bewertung verwenden
-Concepts_use_for_cw#:#Für Kreuzworträtsel verwenden
-Concepts_use_for_dtw#:#Zu Ziehen des Wortes verwenden
-Concepts_use_for_ftw#:#Verwenden Sie diese Option, um das Wort zu finden
-Concepts_use_for_gaming#:#Für Spiele verwenden
-Concepts_use_for_practice#:#Für Konzeptkarten verwenden
-configuration_title#:#Konfigurieren
+concepts_definition#:#Definition
+concepts_enable#:#Konzept aktiviert
+concepts_game_cw#:#Kreuzworträtsel
+concepts_game_dtw#:#Ziehen Sie das Wort
+concepts_game_ftw#:#Finde das Wort
+concepts_games#:#Verfügbare Spiele
+concepts_label#:#Etikette
+concepts_Sprache#:#Sprache
+concepts_saved#:#Konzepte wurden aktualisiert.
+concepts_use_for_assessment#:#Zur Bewertung verwenden
+concepts_use_for_cw#:#Für Kreuzworträtsel verwenden
+concepts_use_for_dtw#:#Zu Ziehen des Wortes verwenden
+concepts_use_for_ftw#:#Verwenden Sie diese Option, um das Wort zu finden
+concepts_use_for_gaming#:#Für Spiele verwenden
+concepts_use_for_practice#:#Für Konzeptkarten verwenden
+config_interval#:#Update interval
+config_interval_info#:#Specifies how often Nolej should check for activity updates (in seconds).
 content_loading#:#Inhalt wird geladen...
 crs_create_xnlj#:#NOLEJ-Objekt erstellen
+document_id#:#Document ID
+edit_h5p#:#Edit H5P
 err_access_denied#:#Sie können nicht auf diesen Kurs zugreifen.
 err_activities_get#:#Einige der generierten Aktivitäten können nicht abgerufen werden: %s. Bitte versuchen Sie erneut, die Aktivitäten zu generieren.
 err_analysis_not_ready#:#Die Analyse ist noch nicht fertig, bitte warten Sie und überprüfen Sie es erneut.
@@ -100,10 +97,12 @@ err_content_id#:#Inhalts-ID kann nicht ermittelt werden
 err_credentials#:#Ungültige/Falsche Anmeldeinformationen.
 err_doc_response#:#Bei der Erstellung des NOLEJ-Moduls ist ein Fehler aufgetreten:<br>%s<br>Bitte versuchen Sie es erneut oder wenden Sie sich an einen Administrator, wenn dieser Fehler weiterhin besteht.
 err_file_upload#:#Fehler beim Hochladen der Datei. Bitte wenden Sie sich an einen Administrator.
+err_ftb_missing_blank#:#Missing 4 underscores for Fill the blanks activity.
 err_h5p_content#:#Leider kann diese Aktivität nicht geladen werden. Bitte wenden Sie sich an einen Administrator.
 err_h5p_package#:#kein gültiges H5P-Paket
 err_h5p_plugin#:#Leider wird Ihre Version des H5P-Plugins nicht unterstützt. Bitte aktualisieren Sie es oder wenden Sie sich an einen Administrator.
 err_json_decode#:#JSON kann nicht dekodiert werden
+err_media_format_unknown#:#Format not supported.
 err_questions_file#:#Fragendatei kann nicht abgerufen werden. Bitte versuche Sie es erneut.
 err_questions_put#:#NOLEJ hat einen Fehler zurückgegeben. Bitte überprüfen Sie Ihre Daten und versuchen Sie es erneut.
 err_questions_save#:#Fragendatei kann nicht auf der Festplatte gespeichert werden. Versuchen Sie es erneut. Wenn das Problem weiterhin besteht, bitten Sie einen Administrator um Hilfe.
@@ -114,7 +113,6 @@ err_settings_save#:#Die Datei mit den Aktivitätseinstellungen kann nicht auf de
 err_summary_file#:#Zusammenfassungsdatei kann nicht abgerufen werden. Bitte versuche Sie es erneut.
 err_summary_put#:#NOLEJ hat einen Fehler zurückgegeben. Bitte überprüfen Sie Ihre Daten und versuchen Sie es erneut.
 err_summary_save#:#Zusammenfassungsdatei kann nicht auf der Festplatte gespeichert werden. Versuchen Sie es erneut. Wenn das Problem weiterhin besteht, bitten Sie einen Administrator um Hilfe.
-err_tic_response#:#NOLEJ-Endpunkt hat eine ungültige Antwort zurückgegeben.
 err_transcription_not_ready#:#Die Transkription ist noch nicht fertig, bitte warten Sie und überprüfen Sie es erneut. Es sollte ein Zehntel der Quelldauer dauern; wenn Sie nach Ablauf dieser Zeit keine Benachrichtigung erhalten haben, wenden Sie sich bitte an einen Administrator.
 fold_create_xnlj#:#NOLEJ-Objekt erstellen
 goto_activity_management#:#Gehen Sie zur Aktivitätsverwaltung
@@ -150,6 +148,7 @@ prop_automatic_info#:#Wenn aktiviert, geht NOLEJ direkt zum letzten Schritt: der
 prop_content#:#Webseiteninhalt
 prop_content_info#:#Analysieren Sie den Inhalt der Webseite
 prop_description#:#Beschreibung
+prop_document#:#Dokument
 prop_file#:#Datei
 prop_file_info#:#Laden Sie eine Datei hoch (Audio, Video oder ein Dokument).
 prop_freetext#:#Text
@@ -179,6 +178,9 @@ prop_web#:#Web-URL
 prop_web_info#:#Analysieren Sie eine Ressource aus dem Web.
 prop_web_src#:#Wählen Sie aus dieser URL aus, was analysiert werden soll
 questions_answer#:#Antwort
+questions_answer_distractor#:#Statement to display
+questions_answer_false#:#False statement
+questions_answer_true#:#Correct statement
 questions_distractors#:#Distraktoren
 questions_enable#:#Frage aktiviert
 questions_explanation#:#Erläuterung
@@ -216,9 +218,6 @@ tab_insert_from_pool#:#Medien aus Medienpool auswählen
 tab_modules#:#Module
 tab_properties#:#Eigenschaften
 tab_review#:#Bewertung
-tac_received#:#TAC erhalten!
-tac_received_info#:#TAC mit der Exchange-ID %s wurde am %s empfangen.
-tic_sent#:#TIC gesendet.
 update_successful#:#Update erfolgreich
 work_in_progress#:#NOLEJ AI arbeitet für Sie. Bitte warten Sie noch einen Moment.
 xnlj_add#:#Erstellen

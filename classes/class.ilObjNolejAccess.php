@@ -10,8 +10,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once "./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilObjNolej.php";
-
 /**
  * Please do not create instances of large application classes
  * Write small methods within this class to determine the status.
@@ -61,7 +59,7 @@ class ilObjNolejAccess extends ilObjectPluginAccess
         switch ($a_permission) {
             case "visible":
             case "read":
-                // if the current user can edit the given object it should also be visible.
+                // If the current user can edit the given object it should also be visible.
                 if ($this->access->checkAccessOfUser($a_user_id, "write", "", $a_ref_id)) {
                     return true;
                 }
@@ -90,11 +88,11 @@ class ilObjNolejAccess extends ilObjectPluginAccess
 
         $set = $ilDB->queryF(
             "SELECT is_online FROM " . ilNolejPlugin::TABLE_DATA . " WHERE id = %s;",
-            array("integer"),
-            array($a_obj_id)
+            ["integer"],
+            [$a_obj_id]
         );
         $rec = $ilDB->fetchAssoc($set);
-        return !((boolean) $rec["is_online"]);
+        return !((bool) $rec["is_online"]);
     }
 
     /**
@@ -103,11 +101,11 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      */
     public static function getConditionOperators(): array
     {
-        include_once './Services/Conditions/classes/class.ilConditionHandler.php'; //bugfix mantis 24891
-        return array(
+        include_once "./Services/Conditions/classes/class.ilConditionHandler.php";
+        return [
             ilConditionHandler::OPERATOR_FAILED,
             ilConditionHandler::OPERATOR_PASSED
-        );
+        ];
     }
 
     /**
@@ -117,13 +115,9 @@ class ilObjNolejAccess extends ilObjectPluginAccess
      */
     public static function _checkGoto(string $a_target): bool
     {
-        include_once ("./Customizing/global/plugins/Services/Repository/RepositoryObject/Nolej/classes/class.ilNolejGUI.php");
-        $target = substr($a_target, strlen(ilNolejPlugin::PLUGIN_ID) + 1); // Remove plugin ID
+        $target = substr($a_target, strlen(ilNolejPlugin::PLUGIN_ID) + 1); // Remove plugin ID.
 
-        if (
-            $target == "webhook" ||
-            $target == "modules"
-        ) {
+        if ($target == "webhook") {
             return true;
         }
 
