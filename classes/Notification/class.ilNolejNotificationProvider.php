@@ -20,6 +20,8 @@ use ILIAS\GlobalScreen\Scope\Notification\Provider\AbstractNotificationPluginPro
  */
 class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
 {
+    public const NOTIFICATION_TYPE = "nolej_activity";
+
     /**
      * @inheritDoc
      */
@@ -58,7 +60,7 @@ class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
                 $plugin->txt("plugin_title")
             );
 
-        $group = $factory->standardGroup($id('nolej_bucket_group'))
+        $group = $factory->standardGroup($id("nolej_bucket_group"))
             ->withTitle($plugin->txt("plugin_title"));
 
         for ($i = 0, $len = count($new_activities); $i < $len; $i++) {
@@ -80,7 +82,7 @@ class ilNolejNotificationProvider extends AbstractNotificationPluginProvider
                 ->withProperties([$lng->txt("time") => ilDatePresentation::formatDate($ts)]);
 
             $group->addNotification(
-                $factory->standard($id('nolej_bucket_' . $i))
+                $factory->standard($id("nolej_bucket_{$i}"))
                     ->withNotificationItem($nolej_notification_item)
                     ->withClosedCallable(
                         function () use ($activity) {
