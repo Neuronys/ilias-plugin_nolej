@@ -77,7 +77,7 @@ Concepts_game_dtw#:#Ziehen Sie das Wort
 Concepts_game_ftw#:#Finde das Wort
 Concepts_games#:#Verfügbare Spiele
 Concepts_label#:#Etikette
-Concepts_Sprache#:#Sprache
+concepts_language#:#Sprache
 Concepts_n#:#Konzept #%d
 Concepts_saved#:#Konzepte wurden aktualisiert.
 Concepts_use_for_assessment#:#Zur Bewertung verwenden
@@ -158,8 +158,8 @@ prop_input_file#:#Datei
 prop_input_file_info#:#Laden Sie ein Audio, ein Video oder ein Dokument hoch.
 prop_input_mob#:#Medienobjekt
 prop_input_mob_info#:#Wählen Sie ein Objekt aus einem Medienpool.
-prop_sprache#:#Sprache
-prop_lingual_info#:#Die Sprache der Medien. Dies hilft NOLEJ, die Medien besser zu analysieren.
+prop_language#:#Sprache
+prop_language_info#:#Die Sprache der Medien. Dies hilft NOLEJ, die Medien besser zu analysieren.
 prop_media_source#:#Medienquelle
 prop_mob#:#MediaPool
 prop_mob_info#:#Wählen Sie ein Objekt aus einem Medienpool.
