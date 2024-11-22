@@ -137,7 +137,7 @@ lp_status_2#:#Abgeschlossen
 lp_status_3#:#Fehlgeschlagen
 lp_status_info#:#Achtung, das Setzen des LP-Status setzt den LP-Status des aktuell angemeldeten Benutzers auf den gewählten Status. DER STATUS ALLER ANDEREN BENUTZER WIRD AUF NICHT EINGESTELLT GESETZT! Sie finden dieses Repository-Objekt, indem Sie nach seinem Titel, seiner Beschreibung oder dem Ausdruck „Repoplugin“ suchen.
 module_select#:#Wählen Sie ein NOLEJ-Modul aus
-module#:#NOLEJ-Module
+modules#:#NOLEJ-Module
 obj_xnlj#:#NOLEJ
 obj_xnlj_select#:#NOLEJ-Objekt auswählen
 objs_xnlj#:#NOLEJ-Objekte
