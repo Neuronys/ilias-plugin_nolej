@@ -72,7 +72,7 @@ concepts_game_dtw#:#Ziehen Sie das Wort
 concepts_game_ftw#:#Finde das Wort
 concepts_games#:#Verfügbare Spiele
 concepts_label#:#Etikette
-concepts_Sprache#:#Sprache
+concepts_language#:#Sprache
 concepts_saved#:#Konzepte wurden aktualisiert.
 concepts_use_for_assessment#:#Zur Bewertung verwenden
 concepts_use_for_cw#:#Für Kreuzworträtsel verwenden
@@ -135,7 +135,7 @@ lp_status_2#:#Abgeschlossen
 lp_status_3#:#Fehlgeschlagen
 lp_status_info#:#Achtung, das Setzen des LP-Status setzt den LP-Status des aktuell angemeldeten Benutzers auf den gewählten Status. DER STATUS ALLER ANDEREN BENUTZER WIRD AUF NICHT EINGESTELLT GESETZT! Sie finden dieses Repository-Objekt, indem Sie nach seinem Titel, seiner Beschreibung oder dem Ausdruck „Repoplugin“ suchen.
 module_select#:#Wählen Sie ein NOLEJ-Modul aus
-module#:#NOLEJ-Module
+modules#:#NOLEJ-Module
 obj_xnlj#:#NOLEJ
 obj_xnlj_select#:#NOLEJ-Objekt auswählen
 objs_xnlj#:#NOLEJ-Objekte
@@ -157,8 +157,8 @@ prop_input_file#:#Datei
 prop_input_file_info#:#Laden Sie ein Audio, ein Video oder ein Dokument hoch.
 prop_input_mob#:#Medienobjekt
 prop_input_mob_info#:#Wählen Sie ein Objekt aus einem Medienpool.
-prop_sprache#:#Sprache
-prop_lingual_info#:#Die Sprache der Medien. Dies hilft NOLEJ, die Medien besser zu analysieren.
+prop_language#:#Sprache
+prop_language_info#:#Die Sprache der Medien. Dies hilft NOLEJ, die Medien besser zu analysieren.
 prop_media_source#:#Medienquelle
 prop_mob#:#MediaPool
 prop_mob_info#:#Wählen Sie ein Objekt aus einem Medienpool.
