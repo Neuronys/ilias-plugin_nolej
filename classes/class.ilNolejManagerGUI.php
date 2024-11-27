@@ -60,6 +60,9 @@ class ilNolejManagerGUI
     /** @var int */
     public const STATUS_FAILED = 8;
 
+    /** @var int */
+    public const MAX_ATTEMPTS = 2;
+
     /** @var ilCtrl */
     protected ilCtrl $ctrl;
 
@@ -640,13 +643,7 @@ class ilNolejManagerGUI
         foreach ($activities->activities as $activity) {
             $path = "{$h5pDir}/{$activity->activity_name}.h5p";
 
-            // Download activity.
-            file_put_contents(
-                $path,
-                file_get_contents($activity->url)
-            );
-
-            $errorMessage = $this->importH5PContent($h5pDir, $activity->activity_name, $now);
+            $errorMessage = $this->downloadAndImportH5PContent($path, $activity->url, $h5pDir, $activity->activity_name, $now, self::MAX_ATTEMPTS);
             if (!empty($errorMessage)) {
                 $errorMessages[] = "{$activity->activity_name} ({$errorMessage})";
             }
@@ -656,14 +653,50 @@ class ilNolejManagerGUI
     }
 
     /**
+     * Download the h5p file and try to import it. In case of failure, try again
+     * until there are no more attempts left.
+     *
+     * @param string $path to save the activity
+     * @param string $url of the activity
+     * @param string $h5pDir directory where are located h5p activities
+     * @param string $type of h5p activity to import
+     * @param int $time
+     * @param int $attemptsLeft
+     * @return string error message. Empty string if succedeed.
+     */
+    protected function downloadAndImportH5PContent($path, $url, $h5pDir, $type, $time, $attemptsLeft)
+    {
+        if ($attemptsLeft != self::MAX_ATTEMPTS) {
+            $this->plugin->log("Retrying to import H5P activity {$type} of document {$this->documentId}...");
+        }
+
+        $attemptsLeft -= 1;
+
+        // Download activity.
+        file_put_contents(
+            $path,
+            file_get_contents($url)
+        );
+
+        $errorMessage = $this->importH5PContent($h5pDir, $type, $time);
+        if (!empty($errorMessage)) {
+            return $attemptsLeft == 0
+                ? $errorMessage
+                : $this->downloadAndImportH5PContent($path, $url, $h5pDir, $type, $time, $attemptsLeft);
+        }
+
+        return "";
+    }
+
+    /**
      * @param string $h5pDir directory where are located h5p activities
      * @param string $type of h5p activity to import
      * @param int $time
      * @return string error message. Empty string if succedeed.
      */
-    public function importH5PContent($h5pDir, $type, $time)
+    protected function importH5PContent($h5pDir, $type, $time)
     {
-        $this->plugin->log("Importing H5P activity {$type} of document {$this->documentId}");
+        $this->plugin->log("Importing H5P activity {$type} of document {$this->documentId}...");
 
         $filepath = substr("{$h5pDir}/{$type}.h5p", 1);
 
