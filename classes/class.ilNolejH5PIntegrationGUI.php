@@ -47,9 +47,6 @@ class ilNolejH5PIntegrationGUI
     /** @var ilGlobalPageTemplate */
     protected $tpl;
 
-    /** @var \ILIAS\UI\Renderer */
-    protected \ILIAS\UI\Renderer $renderer;
-
     /** @var \ILIAS\UI\Factory */
     protected \ILIAS\UI\Factory $factory;
 
