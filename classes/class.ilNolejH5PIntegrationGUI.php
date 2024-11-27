@@ -47,6 +47,9 @@ class ilNolejH5PIntegrationGUI
     /** @var ilGlobalPageTemplate */
     protected $tpl;
 
+    /** @var \ILIAS\UI\Renderer */
+    protected \ILIAS\UI\Renderer $renderer;
+
     /** @var \ILIAS\UI\Factory */
     protected \ILIAS\UI\Factory $factory;
 
@@ -313,7 +316,7 @@ class ilNolejH5PIntegrationGUI
         $metadata["parent_type"] = ilNolejPlugin::PLUGIN_ID;
 
         $h5p_storage->savePackage([
-            "metadata" => $metadata
+            "metadata" => $metadata,
         ]);
 
         ilH5PEditorStorage::removeTemporarilySavedFiles($file_upload_communicator->getUploadPath());

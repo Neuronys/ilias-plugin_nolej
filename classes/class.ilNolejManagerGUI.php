@@ -408,7 +408,7 @@ class ilNolejManagerGUI
                 $this->status == self::STATUS_ACTIVITIES_PENDING
                     ? self::glyphicon("refresh gly-spin") . $this->plugin->txt("action_activities")
                     : "",
-                $this->ctrl->getLinkTargetByClass([self::class, ilNolejActivitiesFormGUI::class], ilNolejActivitiesFormGUI::CMD_SHOW)
+                $this->ctrl->getLinkTargetByClass([self::class, ilNolejActivitiesFormGUI::class], ilNolejFormGUI::CMD_SHOW)
             )
                 ->withAvailability(
                     $this->status < self::STATUS_REVISION
@@ -593,7 +593,7 @@ class ilNolejManagerGUI
     {
         $this->db->manipulateF(
             "UPDATE " . ilNolejPlugin::TABLE_DOC
-                . " SET status = %s WHERE document_id = %s;",
+            . " SET status = %s WHERE document_id = %s;",
             ["integer", "text"],
             [$newStatus, $this->documentId]
         );
@@ -672,7 +672,13 @@ class ilNolejManagerGUI
         }
 
         $h5pIntegrationGui = new ilNolejH5PIntegrationGUI($this->obj_gui);
-        $contentId = $h5pIntegrationGui->importFromPath($filepath, $type);
+
+        try {
+            $contentId = $h5pIntegrationGui->importFromPath($filepath, $type);
+        } catch (Exception $e) {
+            $this->plugin->log("Import error for {$type} of document {$this->documentId}: {$e->getMessage()}");
+            return $this->plugin->txt("err_h5p_package");
+        }
 
         if ($contentId == -1) {
             $this->plugin->log("Import failed {$type} of document {$this->documentId}");
@@ -686,8 +692,8 @@ class ilNolejManagerGUI
 
         $this->db->manipulateF(
             "INSERT INTO " . ilNolejPlugin::TABLE_H5P
-                . " (document_id, type, `generated`, content_id)"
-                . " VALUES (%s, %s, %s, %s);",
+            . " (document_id, type, `generated`, content_id)"
+            . " VALUES (%s, %s, %s, %s);",
             ["text", "text", "integer", "integer"],
             [$this->documentId, $type, $time, $contentId]
         );
