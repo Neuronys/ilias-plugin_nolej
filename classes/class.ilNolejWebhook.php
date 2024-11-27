@@ -549,7 +549,7 @@ class ilNolejWebhook
         /** Send Email */
         $lng = $this->setUserLang($userId);
 
-        $notification = new ILIAS\Notifications\Model\ilNotificationConfig(ilNolejNotificationProvider::NOTIFICATION_TYPE);
+        $notification = new ILIAS\Notifications\Model\ilNotificationConfig("chat_invitation");
 
         $notification->setTitleVar(
             $lng->txt(
