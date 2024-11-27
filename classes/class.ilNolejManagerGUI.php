@@ -61,7 +61,7 @@ class ilNolejManagerGUI
     public const STATUS_FAILED = 8;
 
     /** @var int */
-    public const MAX_ATTEMPTS = 2;
+    public const MAX_ATTEMPTS = 3;
 
     /** @var ilCtrl */
     protected ilCtrl $ctrl;
