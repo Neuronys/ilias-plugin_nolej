@@ -313,7 +313,7 @@ class ilNolejH5PIntegrationGUI
         $metadata["parent_type"] = ilNolejPlugin::PLUGIN_ID;
 
         $h5p_storage->savePackage([
-            "metadata" => $metadata
+            "metadata" => $metadata,
         ]);
 
         ilH5PEditorStorage::removeTemporarilySavedFiles($file_upload_communicator->getUploadPath());
