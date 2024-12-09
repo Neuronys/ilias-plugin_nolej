@@ -822,8 +822,8 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $this->db->manipulateF(
             "INSERT INTO " . ilNolejPlugin::TABLE_DOC
                 . " (title, status, consumed_credit, doc_url, media_type, automatic_mode, language, document_id)"
-                . "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
-            ["text", "integer", "integer", "text", "text", "text", "text", "text"],
+                . " VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+            ["text", "integer", "integer", "blob", "text", "text", "text", "text"],
             [
                 $this->obj_gui->getObject()->getTitle(),
                 ilNolejManagerGUI::STATUS_CREATION_PENDING,
