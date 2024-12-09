@@ -319,3 +319,20 @@ if ($ilDB->tableExists("rep_robj_xhfp_cont")) {
 }
 
 ?>
+
+<#5>
+<?php
+
+if ($ilDB->tableColumnExists("rep_robj_xnlj_doc", "doc_url")) {
+    $ilDB->modifyTableColumn(
+        "rep_robj_xnlj_doc",
+        "doc_url",
+        [
+            "type" => "blob",
+            "notnull" => true,
+            "default" => null,
+        ]
+    );
+}
+
+?>
