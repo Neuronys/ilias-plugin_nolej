@@ -176,7 +176,7 @@ class ilNolejWebhook
             $this->plugin->log("Result: ko");
 
             $db->manipulateF(
-                "UPDATE " . ilNolejPlugin::TABLE_DOC . " consumed_credit = %s WHERE document_id = %s;",
+                "UPDATE " . ilNolejPlugin::TABLE_DOC . " SET consumed_credit = %s WHERE document_id = %s;",
                 ["integer", "text"],
                 [$this->data["consumedCredit"], $documentId]
             );
