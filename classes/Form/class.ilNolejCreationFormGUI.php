@@ -813,26 +813,27 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
             return sprintf($this->plugin->txt("err_doc_response"), $message);
         }
 
-        $this->db->manipulateF(
-            "UPDATE " . ilNolejPlugin::TABLE_DATA . " SET document_id = %s WHERE id = %s;",
-            ["text", "integer"],
-            [$result->id, $this->obj_gui->getObject()->getId()]
+        $this->db->update(
+            ilNolejPlugin::TABLE_DATA,
+            [
+                "document_id" => ["text", $result->id],
+            ],
+            [
+                "id" => ["integer", $this->obj_gui->getObject()->getId()],
+            ]
         );
 
-        $this->db->manipulateF(
-            "INSERT INTO " . ilNolejPlugin::TABLE_DOC
-                . " (title, status, consumed_credit, doc_url, media_type, automatic_mode, language, document_id)"
-                . " VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
-            ["text", "integer", "integer", "blob", "text", "text", "text", "text"],
+        $this->db->insert(
+            ilNolejPlugin::TABLE_DOC,
             [
-                $this->obj_gui->getObject()->getTitle(),
-                ilNolejManagerGUI::STATUS_CREATION_PENDING,
-                $decrementedCredit,
-                $url,
-                $format,
-                ilUtil::tf2yn($automaticMode),
-                $language,
-                $result->id,
+                "title" => ["text", $this->obj_gui->getObject()->getTitle()],
+                "status" => ["integer", ilNolejManagerGUI::STATUS_CREATION_PENDING],
+                "consumed_credit" => ["integer", $decrementedCredit],
+                "doc_url" => ["blob", $url],
+                "media_type" => ["text", $format],
+                "automatic_mode" => ["text", ilUtil::tf2yn($automaticMode)],
+                "language" => ["text", $language],
+                "document_id" => ["text", $result->id],
             ]
         );
 
