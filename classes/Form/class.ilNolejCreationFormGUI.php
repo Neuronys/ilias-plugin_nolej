@@ -318,6 +318,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         // Source web URL.
         $url = new ilUriInputGUI($this->plugin->txt("prop_" . self::PROP_URL), self::PROP_URL);
         $url->setRequired(true);
+        $url->setMaxLength(65000);
         $mediaWeb->addSubItem($url);
 
         // Source web type.
@@ -710,7 +711,7 @@ class ilNolejCreationFormGUI extends ilNolejFormGUI
         $media_item->setPurpose("Standard");
 
         // Save file to its path.
-        $path = $mob_dir . "/" . $filename;
+        $path = "{$mob_dir}/{$filename}";
         if ($content == null) {
             ilFileUtils::moveUploadedFile(
                 $_FILES[self::PROP_INPUT_FILE]["tmp_name"],

@@ -329,6 +329,7 @@ if ($ilDB->tableColumnExists("rep_robj_xnlj_doc", "doc_url")) {
         "doc_url",
         [
             "type" => "blob",
+            "length" => 65000,
             "notnull" => true,
             "default" => null,
         ]
